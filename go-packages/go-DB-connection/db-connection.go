@@ -39,7 +39,7 @@ func GenAuthToken(db dba.DB, user, hash string) (string, error) {
 
 	// No id was found, assume they gave wrong password or username
 	if id == "" {
-		return "", &TokenError{404, "Wrong username or password"}
+		return "", &TokenError{403, "Wrong username or password"}
 	}
 
 	// get random bytes to generate hmac

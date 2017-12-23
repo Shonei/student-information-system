@@ -11,4 +11,4 @@ CREATE TABLE project(student_id INT REFERENCES student(id), supervisor_id INT RE
 CREATE TABLE coursework_result(coursework_id INT REFERENCES coursework(id), student_id INT REFERENCES student(id), result INT, handed_in DATE);
 CREATE TABLE tutor(staff_id INT REFERENCES staff(id), student_id INT REFERENCES student(id), suppervision_year DATE);
 CREATE TABLE student_modules(module_code TEXT REFERENCES module(code), studnet_id INT REFERENCES student(id), study_year DATE);
-CREATE TABLE login_info(id INT PRIMARY KEY, user_pass TEXT, username TEXT, salt TEXT, access_lvl TEXT, expire_DATE DATE, token TEXT UNIQUE);
+CREATE TABLE login_info(id INT PRIMARY KEY, user_pass TEXT, username TEXT UNIQUE, salt TEXT, access_lvl TEXT, expire_DATE DATE, token TEXT UNIQUE);

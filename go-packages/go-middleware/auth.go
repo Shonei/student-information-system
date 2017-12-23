@@ -21,7 +21,7 @@ func BasicAuth(db dba.DB, next http.Handler) http.Handler {
 
 		switch lvl {
 		case -1:
-			http.Error(w, "Token doesn't match aur database.", http.StatusUnauthorized)
+			http.Error(w, "Token doesn't match our database.", http.StatusUnauthorized)
 			return
 		case 1:
 			user := strings.Split(token, ":")[0]

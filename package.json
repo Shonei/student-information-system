@@ -13,12 +13,16 @@
     "react-router-dom": "^4.2.2"
   },
   "devDependencies": {
+    "enzyme": "^3.2.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "jest": "^22.0.4",
     "react-scripts": "1.0.17"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "jest": "jest server-endpoint-tests",
     "eject": "react-scripts eject"
   }
 }
