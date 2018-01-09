@@ -35,3 +35,7 @@ All scripts that are needed to create the database are lacated in DB-scrippts.
 - Use the create-db.sql to create the database. This will create the tables and all the triggeres required.
 
 - To put data in the database run `node populate-db.js`. This will create fake data using fakerjs. All the users will have the username `shyl0-15` and password `password`.
+
+
+## TODO
+- Make get/salt/{user} return an error if user doesn't exits

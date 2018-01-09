@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Shonei/student-information-system/go-packages/go-DB-abstraction"
+	"github.com/Shonei/student-information-system/go-packages/dba"
 
-	"github.com/Shonei/student-information-system/go-packages/go-DB-connection"
+	"github.com/Shonei/student-information-system/go-packages/dbc"
 
 	"github.com/gorilla/mux"
 )
 
 // GetSalt will match the /get/salt/{user} route.
 // It will be providing the salt for the password of a user.
-func GetSalt(db dba.DB) http.Handler {
+func GetSalt(db dba.DBAbstraction) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -31,7 +31,7 @@ func GetSalt(db dba.DB) http.Handler {
 // that he will need to use for future requests.
 // The route will expect the header Authorization: {password}.
 // The password should be the hash value using sha512
-func GetToken(db dba.DB) http.Handler {
+func GetToken(db dba.DBAbstraction) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 

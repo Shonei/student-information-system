@@ -2,6 +2,7 @@
   "name": "sis",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8080/",
   "dependencies": {
     "crypto": "^1.0.1",
     "faker": "^4.1.0",

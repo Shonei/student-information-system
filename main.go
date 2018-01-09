@@ -2,15 +2,20 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/Shonei/student-information-system/go-packages/go-middleware"
+	"github.com/Shonei/student-information-system/go-packages/dbc"
 
-	"github.com/Shonei/student-information-system/go-packages/go-handlers"
+	"github.com/robfig/cron"
 
-	dba "github.com/Shonei/student-information-system/go-packages/go-DB-abstraction"
+	"github.com/Shonei/student-information-system/go-packages/mw"
+
+	"github.com/Shonei/student-information-system/go-packages/hand"
+
+	"github.com/Shonei/student-information-system/go-packages/dba"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -18,13 +23,12 @@ import (
 
 func main() {
 	connStr := os.Getenv("POSTGRES_CONNECTION")
-	// connStr := "user=shyl password=rz9h19cg dbname=sis sslmode=disable"
 	temp, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	db := dba.DB{temp}
+	db := &dba.DB{temp}
 	defer db.Close()
 
 	r := mux.NewRouter()
@@ -32,8 +36,14 @@ func main() {
 	r.Handle("/get/salt/{user}", hand.GetSalt(db)).Methods("GET", "POST")
 	r.Handle("/get/token/{user}", hand.GetToken(db)).Methods("POST")
 
-	r.Handle("/test/auth/{user}", mdw.BasicAuth(db, test()))
+	r.Handle("/test/auth/{user}", mw.BasicAuth(db, test()))
 
+	c := cron.New()
+	c.AddFunc("@every 10m", func() {
+		dbc.TokenCleanUp(db)
+		fmt.Println("cron ran")
+	})
+	c.Start()
 	http.Handle("/", r)
 	http.ListenAndServe(":8080", nil)
 	// http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
