@@ -15,6 +15,7 @@ class Login extends Component {
     this.hashPassword = this.hashPassword.bind(this);
   }
 
+  // A generic http responce parcer for the fetch api.
   fetchHTTPErrorCheck(res) {
     if (!res.ok) {
       throw res;

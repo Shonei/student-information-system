@@ -39,3 +39,4 @@ All scripts that are needed to create the database are lacated in DB-scrippts.
 
 ## TODO
 - Make get/salt/{user} return an error if user doesn't exits
+- Valid responce for when token is deleted after 2 hours?

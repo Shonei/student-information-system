@@ -24,7 +24,7 @@ func (t *TokenError) Error() string {
 
 // SingleParamQuery will execute a predefined sql query that takes a single
 // paramater and returns a single paramater with no additional modification to the data.
-// If it returns an empty string it would mean the query ffailed.
+// If it returns an empty string it would mean the query failed.
 func SingleParamQuery(db dba.DBAbstraction, query, param string) string {
 	switch query {
 	case "salt":
