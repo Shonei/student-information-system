@@ -4,7 +4,9 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha512"
+	"database/sql"
 	"encoding/hex"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -25,12 +27,12 @@ func (t *TokenError) Error() string {
 // SingleParamQuery will execute a predefined sql query that takes a single
 // paramater and returns a single paramater with no additional modification to the data.
 // If it returns an empty string it would mean the query failed.
-func SingleParamQuery(db dba.DBAbstraction, query, param string) string {
+func SingleParamQuery(db dba.DBAbstraction, query, param string) (string, error) {
 	switch query {
 	case "salt":
 		return db.Select("Select salt from login_info where username = $1", param)
 	}
-	return ""
+	return "", &TokenError{404, "No such query"}
 }
 
 // GenAuthToken will return the token for a given user and save the
@@ -66,23 +68,31 @@ func GenAuthToken(db dba.DBAbstraction, user, hash string) (string, error) {
 	return token, nil
 }
 
-// CheckToken checks the if the user has given a valid token and
+// CheckToken checks if the user has given a valid token and
 // returns the access level for that user
-// if the token doesn't match it returns -1
-func CheckToken(db dba.DBAbstraction, token string) int {
+// if the token doesn't exist it returns a TokenError
+func CheckToken(db dba.DBAbstraction, token string) (int, error) {
 	user := strings.Split(token, ":")[0]
 
-	lvl, err := db.Select("SELECT access_lvl FROM login_info WHERE username = $1 AND token = $2", user, token)
-
+	username, err := db.Select("SELECT username FROM login_info WHERE token = $1", token)
 	if err != nil {
-		return -1
+		if err == sql.ErrNoRows {
+			return -1, &TokenError{http.StatusGatewayTimeout, "Token timed out."}
+		}
+		return -1, err
 	}
+
+	if user != username {
+		return -1, &TokenError{http.StatusForbidden, "token doesn't match username"}
+	}
+
+	lvl, _ := db.Select("SELECT access_lvl FROM login_info WHERE token = $1 AND username = $2", user, token)
 
 	i, err := strconv.Atoi(lvl)
 	if err != nil {
-		return -1
+		return 0, err
 	}
-	return i
+	return i, nil
 }
 
 // TokenCleanUp will delete the tokens from the database

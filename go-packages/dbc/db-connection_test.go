@@ -4,66 +4,66 @@ import (
 	"errors"
 	"fmt"
 	"testing"
-
-	"github.com/Shonei/student-information-system/go-packages/dba"
 )
 
-type TestStruct struct {
+type OkStruct struct{}
+
+func (t *OkStruct) Select(s string, args ...interface{}) (string, error) {
+	return "1", nil
 }
 
-func (t *TestStruct) Select(s string, args ...interface{}) string {
-	val, _ := args[0].(string)
-	return val
+func (t *OkStruct) SelectMulti(s string, args ...interface{}) ([]map[string]string, error) {
+	return []map[string]string{{"OK": "1"}}, nil
 }
 
-func (t *TestStruct) SelectMulti(s string, args ...interface{}) ([]map[string]string, error) {
-	if len(args) > 0 {
-		return nil, errors.New("Fail")
-	}
-	arr := []map[string]string{}
-	arr[0] = map[string]string{s: s}
-	return arr, nil
-}
-
-func (t *TestStruct) PreparedStmt(s string, args ...interface{}) error {
-	if len(args) > 0 {
-		if args[0] == "err" {
-			return errors.New("Fail")
-		}
-	}
+func (t *OkStruct) PreparedStmt(s string, args ...interface{}) error {
 	return nil
 }
 
+type ErrorStruct struct{}
+
+func (t *ErrorStruct) Select(s string, args ...interface{}) (string, error) {
+	return "", errors.New("not ok")
+}
+
+func (t *ErrorStruct) SelectMulti(s string, args ...interface{}) ([]map[string]string, error) {
+	return nil, errors.New("not ok")
+}
+
+func (t *ErrorStruct) PreparedStmt(s string, args ...interface{}) error {
+	return errors.New("not ok")
+}
+
 func TestSingleParamQuery(t *testing.T) {
-	type args struct {
-		db    dba.DBAbstraction
-		query string
-		param string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{name: "No retun",
-			args: args{&TestStruct{}, "not-salt", ""},
-			want: ""},
-		{name: "Valid return",
-			args: args{&TestStruct{}, "salt", "value"},
-			want: "value"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := SingleParamQuery(tt.args.db, tt.args.query, tt.args.param); got != tt.want {
-				t.Errorf("SingleParamQuery() = %v, want %v", got, tt.want)
+	t.Run("No error", func(t *testing.T) {
+		got, err := SingleParamQuery(&OkStruct{}, "salt", "")
+		if err != nil {
+			t.Error("Didn't want an error")
+		}
+
+		if got != "1" {
+			t.Errorf("Got %s - wanted ok", got)
+		}
+	})
+
+	t.Run("Returns error", func(t *testing.T) {
+		_, err := SingleParamQuery(&ErrorStruct{}, "salt", "")
+		if err == nil {
+			t.Error("Didn't want an error")
+		}
+
+		_, err = SingleParamQuery(&ErrorStruct{}, "", "")
+		if err != nil {
+			if _, ok := err.(*TokenError); !ok {
+				t.Error("Expecting a TokenError")
 			}
-		})
-	}
+		}
+	})
 }
 
 func TestGenAuthToken(t *testing.T) {
 	t.Run("No error", func(t *testing.T) {
-		got, err := GenAuthToken(&TestStruct{}, "Shyl", "")
+		got, err := GenAuthToken(&OkStruct{}, "Shyl", "")
 		if err != nil {
 			t.Errorf("Got error we don't want error - %v", err)
 		}
@@ -74,34 +74,29 @@ func TestGenAuthToken(t *testing.T) {
 	})
 
 	t.Run("Returning an error", func(t *testing.T) {
-		_, err := GenAuthToken(&TestStruct{}, "Shyl", "")
+		_, err := GenAuthToken(&ErrorStruct{}, "Shyl", "")
 		if err == nil {
 			t.Errorf("Got erro don't want error")
 		}
 	})
 }
+
 func TestCheckToken(t *testing.T) {
-	type args struct {
-		db    dba.DBAbstraction
-		token string
-	}
-	tests := []struct {
-		name string
-		args args
-		want int
-	}{
-		{name: "valid output",
-			args: args{&TestStruct{}, "1:2"},
-			want: 1},
-		{name: "Error occured",
-			args: args{&TestStruct{}, "sfh:2"},
-			want: -1},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := CheckToken(tt.args.db, tt.args.token); got != tt.want {
-				t.Errorf("CheckToken() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Run("Valid token", func(t *testing.T) {
+		got, err := CheckToken(&OkStruct{}, "1:")
+		if err != nil {
+			t.Error("Got an error when we didn't want one")
+		}
+
+		if got != 1 {
+			t.Errorf("Got %v - wanted 1")
+		}
+	})
+
+	t.Run("We get an error", func(t *testing.T) {
+		_, err := CheckToken(&ErrorStruct{}, "1:")
+		if err == nil {
+			t.Error("We din't get an error.")
+		}
+	})
 }

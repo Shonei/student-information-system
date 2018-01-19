@@ -4,7 +4,7 @@ const crypto = require('crypto');
 describe('Tests the get/salt/{user} endpoint', () => {
   it('Using valid input', () => {
     expect.assertions(1);
-    return fetch('http://localhost:8080/get/salt/shyl7')
+    return fetch('http://localhost:8080/get/salt/shyl2')
       .then(res => res.json())
       .then(data => expect(data.salt.length).toBeGreaterThan(0));
   });
@@ -26,13 +26,13 @@ describe('Tests the get/salt/{user} endpoint', () => {
 describe('Tests the whole authentication process', () => {
   it('Authenticates successfully', () => {
     expect.assertions(1);
-    return fetch('http://localhost:8080/get/salt/shyl7')
+    return fetch('http://localhost:8080/get/salt/shyl2')
       .then(res => res.json())
       .then(data => {
         let hash = crypto.createHmac('sha512', data.salt);
         hash.update('password');
         const pass = hash.digest('hex');
-        return fetch('http://localhost:8080/get/token/shyl7', {
+        return fetch('http://localhost:8080/get/token/shyl2', {
           method: 'POST',
           credentials: 'same-origin',
           headers: {
@@ -43,15 +43,15 @@ describe('Tests the whole authentication process', () => {
       .then(data => expect(data.token.length).toEqual(134));
   });
 
-  it('Authenticates successfully', () => {
+  it('Authenticate fails succesfully', () => {
     expect.assertions(2);
-    return fetch('http://localhost:8080/get/salt/shyl7')
+    return fetch('http://localhost:8080/get/salt/shyl2')
       .then(res => res.json())
       .then(data => {
         let hash = crypto.createHmac('sha512', data.salt);
         hash.update('password');
         const pass = hash.digest('hex');
-        return fetch('http://localhost:8080/get/token/shyl7', {
+        return fetch('http://localhost:8080/get/token/shyl2', {
           method: 'POST',
           credentials: 'same-origin',
           headers: {
@@ -64,9 +64,9 @@ describe('Tests the whole authentication process', () => {
       });
   });
 
-  it('Authenticates successfully', () => {
+  it('Authenticate fails successfully', () => {
     expect.assertions(2);
-    return fetch('http://localhost:8080/get/salt/shyl7')
+    return fetch('http://localhost:8080/get/salt/shyl2')
       .then(res => res.json())
       .then(data => {
         let hash = crypto.createHmac('sha512', data.salt);
@@ -83,7 +83,5 @@ describe('Tests the whole authentication process', () => {
         expect(res.ok).toEqual(false);
         expect(res.status).toEqual(403);
       });
-
   });
-
 });

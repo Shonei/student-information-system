@@ -17,9 +17,15 @@ func GetSalt(db dba.DBAbstraction) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		salt := dbc.SingleParamQuery(db, "salt", vars["user"])
+		salt, err := dbc.SingleParamQuery(db, "salt", vars["user"])
+		if err != nil {
+			if val, ok := err.(*dbc.TokenError); ok {
+				http.Error(w, val.Message, val.HttpCode)
+				return
+			}
+		}
 		m := map[string]string{"salt": salt}
-		err := json.NewEncoder(w).Encode(m)
+		err = json.NewEncoder(w).Encode(m)
 		if err != nil {
 			http.Error(w, "We were unable to parse the salt.", http.StatusBadRequest)
 		}

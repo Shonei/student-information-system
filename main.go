@@ -36,7 +36,9 @@ func main() {
 	r.Handle("/get/salt/{user}", hand.GetSalt(db)).Methods("GET", "POST")
 	r.Handle("/get/token/{user}", hand.GetToken(db)).Methods("POST")
 
-	r.Handle("/test/auth/{user}", mw.BasicAuth(db, test()))
+	r.Handle("/test/auth/{user}", mw.BasicAuth(func(str string) (int, error) {
+		return dbc.CheckToken(db, str)
+	}, test()))
 
 	c := cron.New()
 	c.AddFunc("@every 10m", func() {
