@@ -1,14 +1,14 @@
-const { Client } = require('pg');
+// const { Client } = require('pg');
 const faker = require('faker');
 const crypto = require('crypto');
 
-const client = new Client({
-  user: 'shyl',
-  password: 'rz9h19cg',
-  database: 'sis',
-});
+// const client = new Client({
+//   user: 'shyl',
+//   password: 'rz9h19cg',
+//   database: 'sis',
+// });
 
-client.connect().then(console.log).catch(console.log);
+// client.connect().then(console.log).catch(console.log);
 
 // faker.seed(123);
 
@@ -79,6 +79,12 @@ const cwkCode = [
   faker.random.number(),
   faker.random.number(),
   faker.random.number()];
+
+let client = {};
+client.query = (str, arr) => {
+  console.log(str, arr);
+  return Promise.resolve('ok');
+};
 
 function inserIntoLoginInfo(start, iterations, level) {
   const loginInfo = 'INSERT INTO login_info(id, username, user_pass, salt, access_lvl) VALUES($1, $2, $3, $4, $5)';

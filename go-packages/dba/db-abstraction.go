@@ -2,7 +2,6 @@ package dba
 
 import (
 	"database/sql"
-	"log"
 )
 
 // DB is custom struct to abstract the database
@@ -14,24 +13,17 @@ type DB struct {
 // It should make testing the server easier
 // as we can mock the responce from this layer.
 type DBAbstraction interface {
-	Select(string, ...interface{}) string
+	Select(string, ...interface{}) (string, error)
 	SelectMulti(string, ...interface{}) ([]map[string]string, error)
 	PreparedStmt(string, ...interface{}) error
 }
 
 // Select is a basic query function that expect to recieve a single string
 // as the responce from the query.
-func (db *DB) Select(s string, args ...interface{}) string {
+func (db *DB) Select(s string, args ...interface{}) (string, error) {
 	var val string
 	err := db.QueryRow(s, args...).Scan(&val)
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return ""
-		}
-		log.Println(err)
-	}
-	return val
+	return val, err
 }
 
 // SelectMulti is the abstraction for sql.Query.

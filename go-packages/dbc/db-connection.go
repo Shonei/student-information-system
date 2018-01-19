@@ -37,16 +37,16 @@ func SingleParamQuery(db dba.DBAbstraction, query, param string) string {
 // token in the database. If there is an error the function will
 // return an error value and an empty string.
 func GenAuthToken(db dba.DBAbstraction, user, hash string) (string, error) {
-	id := db.Select("SELECT id FROM login_info WHERE username = $1 AND user_pass = $2", user, hash)
+	id, err := db.Select("SELECT id FROM login_info WHERE username = $1 AND user_pass = $2", user, hash)
 
 	// No id was found, assume they gave wrong password or username
-	if id == "" {
+	if err != nil {
 		return "", &TokenError{403, "Wrong username or password"}
 	}
 
 	// get random bytes to generate hmac
 	key := make([]byte, 64)
-	_, err := rand.Read(key)
+	_, err = rand.Read(key)
 	if err != nil {
 		return "", &TokenError{500, "We encountered a problem generating the token. Please try again."}
 	}
@@ -72,9 +72,9 @@ func GenAuthToken(db dba.DBAbstraction, user, hash string) (string, error) {
 func CheckToken(db dba.DBAbstraction, token string) int {
 	user := strings.Split(token, ":")[0]
 
-	lvl := db.Select("SELECT access_lvl FROM login_info WHERE username = $1 AND token = $2", user, token)
+	lvl, err := db.Select("SELECT access_lvl FROM login_info WHERE username = $1 AND token = $2", user, token)
 
-	if lvl == "" {
+	if err != nil {
 		return -1
 	}
 

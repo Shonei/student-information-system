@@ -46,7 +46,7 @@ class Login extends Component {
       .then(data => console.log(data))
       .catch(err => {
         err.text()
-        .then(e => console.log(e))
+          .then(e => console.log(e))
       });
   }
 
