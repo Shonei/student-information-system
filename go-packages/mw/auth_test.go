@@ -23,8 +23,6 @@ func TestBasicAuth(t *testing.T) {
 		defer ts.Close()
 		var u bytes.Buffer
 		u.WriteString(string(ts.URL))
-		u.WriteString("/get/salt/shyl1")
-		u.WriteString("Authorization: 1:")
 
 		res, err := http.Get(u.String())
 		if err != nil {
@@ -68,6 +66,42 @@ func TestBasicAuth(t *testing.T) {
 
 		str := string(b)
 		want := "We encountered an error authenticating you"
+		if !strings.Contains(str, want) {
+			t.Errorf("Expected '%v' - got '%v'", want, str)
+		}
+	})
+
+	t.Run("Auth failes", func(t *testing.T) {
+		ts := httptest.NewServer(BasicAuth(func(str string) (int, error) {
+			return 1, nil
+		}, GetTestHandler()))
+		defer ts.Close()
+		var u bytes.Buffer
+		u.WriteString(string(ts.URL))
+
+		req, _ := http.NewRequest("GET", u.String(), nil)
+		req.Header.Set("Authorization", "1:adsf")
+
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Error("Error in http.Get")
+		}
+
+		if res != nil {
+			defer res.Body.Close()
+		}
+
+		if res.StatusCode != http.StatusUnauthorized {
+			t.Error("Status is not internalservarerror as expected")
+		}
+
+		b, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Error("Error in ReadAll")
+		}
+
+		str := string(b)
+		want := "You don't have the authority to access that resource"
 		if !strings.Contains(str, want) {
 			t.Errorf("Expected '%v' - got '%v'", want, str)
 		}
