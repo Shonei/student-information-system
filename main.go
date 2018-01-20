@@ -22,7 +22,7 @@ import (
 )
 
 func main() {
-	connStr := os.Getenv("POSTGRES_CONNECTION")
+	connStr := os.Getenv("DATABASE_URL")
 	temp, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)

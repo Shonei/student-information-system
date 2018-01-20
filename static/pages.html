@@ -159,34 +159,47 @@
       </div>
     </div>
 
-<div class="row">
-  <div class="col s12">
-    <div class="card horizontal hoverable">
-      <div class="card-image">
-        <img src="programme.png">
-      </div>
-      <div class="card-stacked">
-        <span class="card-title center">Programme page</span>
-        <div class="card-content">
-          <p>This page will be only visible by staff. From here they will be able to change module lists and module 
-            credits as appropriate. 
-          </p>
-          <br>
-          <h5>Navigation</h5>
-          <ul>
-            <li>
-              <i class="material-icons">place</i>Module page</li>
-          </ul>
+    <div class="row">
+      <div class="col s12">
+        <div class="card horizontal hoverable">
+          <div class="card-image">
+            <img src="programme.png">
+          </div>
+          <div class="card-stacked">
+            <span class="card-title center">Programme page</span>
+            <div class="card-content">
+              <p>This page will be only visible by staff. From here they will be able to change module lists and module credits
+                as appropriate.
+              </p>
+              <br>
+              <h5>Navigation</h5>
+              <ul>
+                <li>
+                  <i class="material-icons">place</i>Module page</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
   </div>
 
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $(window).resize(function () {
+        if ($(window).width() < 1024) {
+          $('.card').removeClass('horizontal');
+          $('.card').addClass('vertical');
+        } else {
+          $('.card').removeClass('vertical'); 
+          $('.card').addClass('horizontal');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>
