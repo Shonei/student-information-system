@@ -27,9 +27,6 @@ func BasicAuth(checkToken func(string) (int, error), next http.Handler) http.Han
 		}
 
 		switch lvl {
-		case -1:
-			http.Error(w, "Wrong credentials send.", http.StatusUnauthorized)
-			return
 		case 1:
 			user := strings.Split(token, ":")[0]
 			vars := mux.Vars(r)

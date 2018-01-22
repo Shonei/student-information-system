@@ -30,7 +30,7 @@ func (db *DB) Select(s string, args ...interface{}) (string, error) {
 // It is used for select statements that will return multiple rows.
 // The data will be sttored in a array of maps.
 func (db *DB) SelectMulti(s string, args ...interface{}) ([]map[string]string, error) {
-	rows, err := db.Query(s, args)
+	rows, err := db.Query(s, args...)
 	if err != nil {
 		return nil, err
 	}

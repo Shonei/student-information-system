@@ -16,94 +16,50 @@ func GetTestHandler() http.HandlerFunc {
 }
 
 func TestBasicAuth(t *testing.T) {
-	t.Run("Auth pass", func(t *testing.T) {
-		ts := httptest.NewServer(BasicAuth(func(str string) (int, error) {
-			return 1, nil
-		}, GetTestHandler()))
-		defer ts.Close()
-		var u bytes.Buffer
-		u.WriteString(string(ts.URL))
+	tests := []struct {
+		name   string
+		f      func(string) (int, error)
+		status int
+		auth   string
+		want   string
+	}{
+		{"Passes", func(s string) (int, error) { return 1, nil }, 200, "", ""},
+		{"Passes", func(s string) (int, error) { return 1, errors.New("sgd") }, 500, "", `We encountered an error authenticating you`},
+	}
 
-		res, err := http.Get(u.String())
-		if err != nil {
-			t.Error("Error in http.Get")
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ts := httptest.NewServer(BasicAuth(tt.f, GetTestHandler()))
+			defer ts.Close()
+			var u bytes.Buffer
+			u.WriteString(string(ts.URL))
 
-		if res != nil {
-			defer res.Body.Close()
-		}
+			req, _ := http.NewRequest("GET", u.String(), nil)
+			req.Header.Set("Authorization", tt.auth)
 
-		if res.StatusCode != 200 {
-			t.Error("Status is not 200 as expected")
-		}
-	})
+			res, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Error("Error in http.Get")
+			}
 
-	t.Run("Auth failes", func(t *testing.T) {
-		ts := httptest.NewServer(BasicAuth(func(str string) (int, error) {
-			return 1, errors.New("")
-		}, GetTestHandler()))
-		defer ts.Close()
-		var u bytes.Buffer
-		u.WriteString(string(ts.URL))
+			if res != nil {
+				defer res.Body.Close()
+			}
 
-		res, err := http.Get(u.String())
-		if err != nil {
-			t.Error("Error in http.Get")
-		}
+			if res.StatusCode != tt.status {
+				t.Error("Status is not internalservarerror as expected")
+			}
 
-		if res != nil {
-			defer res.Body.Close()
-		}
+			b, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				t.Error("Error in ReadAll")
+			}
 
-		if res.StatusCode != http.StatusInternalServerError {
-			t.Error("Status is not internalservarerror as expected")
-		}
+			str := string(b)
 
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			t.Error("Error in ReadAll")
-		}
-
-		str := string(b)
-		want := "We encountered an error authenticating you"
-		if !strings.Contains(str, want) {
-			t.Errorf("Expected '%v' - got '%v'", want, str)
-		}
-	})
-
-	t.Run("Auth failes", func(t *testing.T) {
-		ts := httptest.NewServer(BasicAuth(func(str string) (int, error) {
-			return 1, nil
-		}, GetTestHandler()))
-		defer ts.Close()
-		var u bytes.Buffer
-		u.WriteString(string(ts.URL))
-
-		req, _ := http.NewRequest("GET", u.String(), nil)
-		req.Header.Set("Authorization", "1:adsf")
-
-		res, err := http.DefaultClient.Do(req)
-		if err != nil {
-			t.Error("Error in http.Get")
-		}
-
-		if res != nil {
-			defer res.Body.Close()
-		}
-
-		if res.StatusCode != http.StatusUnauthorized {
-			t.Error("Status is not internalservarerror as expected")
-		}
-
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			t.Error("Error in ReadAll")
-		}
-
-		str := string(b)
-		want := "You don't have the authority to access that resource"
-		if !strings.Contains(str, want) {
-			t.Errorf("Expected '%v' - got '%v'", want, str)
-		}
-	})
+			if !strings.Contains(str, tt.want) {
+				t.Errorf("Expected '%v' - got '%v'", tt.want, str)
+			}
+		})
+	}
 }

@@ -23,6 +23,8 @@ import (
 
 func main() {
 	connStr := os.Getenv("DATABASE_URL")
+	port := os.Getenv("PORT")
+
 	temp, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
@@ -31,24 +33,38 @@ func main() {
 	db := &dba.DB{temp}
 	defer db.Close()
 
+	checkToken := func(str string) (int, error) { return dbc.CheckToken(db, str) }
+
 	r := mux.NewRouter()
 	r.Handle("/", http.FileServer(http.Dir("build")))
-	r.Handle("/get/salt/{user}", hand.GetSalt(db)).Methods("GET", "POST")
-	r.Handle("/get/token/{user}", hand.GetToken(db)).Methods("POST")
 
-	r.Handle("/test/auth/{user}", mw.BasicAuth(func(str string) (int, error) {
-		return dbc.CheckToken(db, str)
-	}, test()))
+	r.Handle("/get/salt/{user}", hand.GetSalt(func(user string) (string, error) {
+		return dbc.SingleParamQuery(db, "salt", user)
+	})).Methods("GET", "POST")
 
+	r.Handle("/get/token/{user}", hand.GetToken(func(user, hash string) (string, error) {
+		return dbc.GenAuthToken(db, user, hash)
+	})).Methods("GET", "POST")
+
+	r.Handle("/get/student/profile/{user}", mw.BasicAuth(checkToken, hand.GetStudentPro(func(str string) (map[string]string, error) {
+		return dbc.GetStudentPro(db, str)
+	}))).Methods("GET", "POST")
+
+	// Routes in place for testing purposes
+	r.Handle("/test/auth/{user}", mw.BasicAuth(checkToken, test()))
+	r.Handle("/ping", test())
+
+	// Cron timed command to clean the timedout tokes
 	c := cron.New()
 	c.AddFunc("@every 10m", func() {
 		dbc.TokenCleanUp(db)
 		fmt.Println("cron ran")
 	})
 	c.Start()
+
 	http.Handle("/", r)
-	http.ListenAndServe(":8080", nil)
-	// http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
+
+	log.Println(http.ListenAndServe(":"+port, nil))
 }
 
 func test() http.Handler {

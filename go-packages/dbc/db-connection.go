@@ -102,3 +102,15 @@ func TokenCleanUp(db dba.DBAbstraction) {
 	query := "UPDATE login_info SET token = null, expire_date = null WHERE expire_date + '2 hours' < NOW();"
 	db.PreparedStmt(query)
 }
+
+// GetStudentPro returns a map containing relevant information for a students profile.
+func GetStudentPro(db dba.DBAbstraction, user string) (map[string]string, error) {
+	query := "SELECT student.id, first_name, middle_name, last_name, email, current_level, picture_url, entry_year FROM student INNER JOIN login_info ON (student.id = login_info.id) WHERE login_info.username = $1;"
+
+	m, err := db.SelectMulti(query, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return m[0], nil
+}
