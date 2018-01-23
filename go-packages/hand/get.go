@@ -40,7 +40,7 @@ func GetSalt(f func(string) (string, error)) http.Handler {
 // that he will need to use for future requests.
 // The route will expect the header Authorization: {password}.
 // The password should be the hash value using sha512
-func GetToken(f func(string, string) (string, error)) http.Handler {
+func GetToken(f func(string, string) (map[string]string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -57,8 +57,8 @@ func GetToken(f func(string, string) (string, error)) http.Handler {
 		}
 
 		// Create and write json responce sending the token
-		m := map[string]string{"token": token}
-		err = json.NewEncoder(w).Encode(m)
+		// m := map[string]string{"token": token}
+		err = json.NewEncoder(w).Encode(token)
 		if err != nil {
 			http.Error(w, "We were unable to parse the token.", http.StatusInternalServerError)
 			return

@@ -12,8 +12,7 @@ describe('Tests the get/salt/{user} endpoint', () => {
   it('Using invalid username', () => {
     expect.assertions(1);
     return fetch('http://localhost:8080/get/salt/user')
-      .then(res => res.json())
-      .then(data => expect(data).toEqual({ salt: '' }));
+      .then(data => expect(data.status).toEqual(500));  
   });
 
   it('Ommiting the user completely', () => {

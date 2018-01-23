@@ -62,13 +62,13 @@ func TestGetSalt(t *testing.T) {
 func TestGetToken(t *testing.T) {
 	tests := []struct {
 		name   string
-		f      func(string, string) (string, error)
+		f      func(string, string) (map[string]string, error)
 		status int
 		want   string
 	}{
-		{"Passes", func(s1, s2 string) (string, error) { return "hello", nil }, 200, `{"token":"hello"}`},
-		{"unknown fail", func(s1, s2 string) (string, error) { return "", errors.New("sgd") }, 500, `We encountered an error. Please try again.`},
-		{"token error", func(s1, s2 string) (string, error) { return "", &dbc.TokenError{404, "No"} }, 404, `No`},
+		{"Passes", func(s1, s2 string) (map[string]string, error) { return map[string]string{"token": "token"}, nil }, 200, `{"token":"token"}`},
+		{"unknown fail", func(s1, s2 string) (map[string]string, error) { return nil, errors.New("sgd") }, 500, `We encountered an error. Please try again.`},
+		{"token error", func(s1, s2 string) (map[string]string, error) { return nil, &dbc.TokenError{404, "No"} }, 404, `No`},
 	}
 
 	for _, tt := range tests {

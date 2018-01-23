@@ -24,7 +24,10 @@ For more information check [create-react-app](https://github.com/facebookincubat
 
 - To run the server all you have to do is type `go run main`. This will start the server.
 
-- You might have to download the gorilla/mux package and the postgreSQL drivers. Luckily go has a noce way of doing that. All you have to do is run `go get github.com/gorilla/mux` and `go get github.com/lib/pq`.
+- You might have to download the gorilla/mux package and the postgreSQL drivers. Luckily go has a nice way of doing that. All you have to do is run `go get github.com/gorilla/mux` and `go get github.com/lib/pq`.
+
+- CRON was added to the server to clean up timed out tokens. To install the package use the command
+ `github.com/robfig/cron`.
 
 - To install the go packages that come with this repository go into the go-packages folder. There will be a nummber of subfolders. You have to visit each one and type `go install`. This is a one time step which will create the binaries for the packages.
 

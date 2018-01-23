@@ -43,7 +43,20 @@ class Login extends Component {
       .then(this.fetchHTTPErrorCheck)
       .then(this.hashPassword)
       .then(this.fetchHTTPErrorCheck)
-      .then(data => console.log(data))
+      .then(data => {
+        var h = new Date();
+        h.setTime(h.getTime() + (2 * 60 * 60 * 1000));
+        document.cookie = 'token=' + data.token + ";" + "expires=" + h.toUTCString() + ";path=/";
+        window.localStorage.setItem('access_level', data.level);
+        let loc = '/';
+        if(data.level ===  '1') {
+          loc = '/student';
+        } else if (parseInt(data.level, 10) > 1 ) {
+          loc = '/staff';
+        }
+        document.location.href = loc;
+
+      })
       .catch(err => {
         err.text()
           .then(e => console.log(e))

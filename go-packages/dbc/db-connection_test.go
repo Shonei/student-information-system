@@ -2,7 +2,6 @@ package dbc
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 )
 
@@ -67,16 +66,16 @@ func TestGenAuthToken(t *testing.T) {
 		if err != nil {
 			t.Errorf("Got error we don't want error - %v", err)
 		}
-		fmt.Println(len(got))
-		if len(got) != 133 {
-			t.Errorf("Hash was not generated - %v", got)
+
+		if len(got["token"]) != 133 {
+			t.Errorf("Want 133 - %v", len(got["token"]))
 		}
 	})
 
 	t.Run("Returning an error", func(t *testing.T) {
 		_, err := GenAuthToken(&ErrorStruct{}, "Shyl", "")
 		if err == nil {
-			t.Errorf("Got erro don't want error")
+			t.Errorf("Got error don't want error")
 		}
 	})
 }

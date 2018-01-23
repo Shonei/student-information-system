@@ -1,6 +1,7 @@
 package mw
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -22,6 +23,7 @@ func BasicAuth(checkToken func(string) (int, error), next http.Handler) http.Han
 				http.Error(w, val.Message, val.HttpCode)
 				return
 			}
+			log.Println(err)
 			http.Error(w, "We encountered an error authenticating you", http.StatusInternalServerError)
 			return
 		}

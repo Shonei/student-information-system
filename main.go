@@ -42,7 +42,7 @@ func main() {
 		return dbc.SingleParamQuery(db, "salt", user)
 	})).Methods("GET", "POST")
 
-	r.Handle("/get/token/{user}", hand.GetToken(func(user, hash string) (string, error) {
+	r.Handle("/get/token/{user}", hand.GetToken(func(user, hash string) (map[string]string, error) {
 		return dbc.GenAuthToken(db, user, hash)
 	})).Methods("GET", "POST")
 
