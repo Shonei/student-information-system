@@ -2,8 +2,9 @@
   "name": "sis",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8080/",
+  "proxy": "http://localhost:54656/",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "crypto": "^1.0.1",
     "faker": "^4.1.0",
     "material-ui": "^0.20.0",

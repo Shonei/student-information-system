@@ -88,7 +88,7 @@ func TestCheckToken(t *testing.T) {
 		}
 
 		if got != 1 {
-			t.Errorf("Got %v - wanted 1")
+			t.Error("Got %v - wanted 1", got)
 		}
 	})
 
@@ -96,6 +96,94 @@ func TestCheckToken(t *testing.T) {
 		_, err := CheckToken(&ErrorStruct{}, "1:")
 		if err == nil {
 			t.Error("We din't get an error.")
+		}
+	})
+}
+
+func TestGetStudentPro(t *testing.T) {
+	t.Run("All goes well", func(t *testing.T) {
+		_, err := GetStudentPro(&ErrorStruct{}, "sdfhdsaf")
+		if err == nil {
+			t.Error("Got no error")
+		}
+	})
+
+	t.Run("It fails successfully", func(t *testing.T) {
+		m, err := GetStudentPro(&OkStruct{}, "sdg")
+		if err != nil {
+			t.Errorf("Expected no error got %v", err)
+		}
+
+		if m["OK"] != "1" {
+			t.Errorf("Wanted 1 got - %v", m)
+		}
+	})
+}
+
+func TestGetStudentModules(t *testing.T) {
+	t.Run("All go wells", func(t *testing.T) {
+		m, err := GetStudentModules(&OkStruct{}, "now", "")
+
+		if m[0]["OK"] != "1" {
+			t.Errorf("Wanted 1 - got %v.", m)
+		}
+
+		if err != nil {
+			t.Error("Wanted no errors")
+		}
+	})
+
+	t.Run("All go wells with past", func(t *testing.T) {
+		m, err := GetStudentModules(&OkStruct{}, "past", "")
+
+		if m[0]["OK"] != "1" {
+			t.Errorf("Wanted 1 - got %v.", m)
+		}
+
+		if err != nil {
+			t.Error("Wanted no errors")
+		}
+	})
+
+	t.Run("Failes", func(t *testing.T) {
+		_, err := GetStudentModules(&OkStruct{}, "nosw", "")
+
+		if err == nil {
+			t.Error("Wanted no errors")
+		}
+	})
+}
+
+func TestGetStudentCwk(t *testing.T) {
+	t.Run("All go wells", func(t *testing.T) {
+		m, err := GetStudentCwk(&OkStruct{}, "timetable", "")
+
+		if m[0]["OK"] != "1" {
+			t.Errorf("Wanted 1 - got %v.", m)
+		}
+
+		if err != nil {
+			t.Error("Wanted no errors")
+		}
+	})
+
+	t.Run("All go wells with past", func(t *testing.T) {
+		m, err := GetStudentCwk(&OkStruct{}, "results", "")
+
+		if m[0]["OK"] != "1" {
+			t.Errorf("Wanted 1 - got %v.", m)
+		}
+
+		if err != nil {
+			t.Error("Wanted no errors")
+		}
+	})
+
+	t.Run("Failes", func(t *testing.T) {
+		_, err := GetStudentCwk(&OkStruct{}, "nosw", "")
+
+		if err == nil {
+			t.Error("Wanted no errors")
 		}
 	})
 }

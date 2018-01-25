@@ -34,21 +34,19 @@ func main() {
 	defer db.Close()
 
 	checkToken := func(str string) (int, error) { return dbc.CheckToken(db, str) }
+	singleParamQuery := func(user string) (string, error) { return dbc.SingleParamQuery(db, "salt", user) }
+	genAuthtoken := func(user, hash string) (map[string]string, error) { return dbc.GenAuthToken(db, user, hash) }
+	getStudentPro := func(str string) (map[string]string, error) { return dbc.GetStudentPro(db, str) }
+	getStudentModules := func(time, user string) ([]map[string]string, error) { return dbc.GetStudentModules(db, time, user) }
+	getStudentCwk := func(t, user string) ([]map[string]string, error) { return dbc.GetStudentCwk(db, t, user) }
 
 	r := mux.NewRouter()
 	r.Handle("/", http.FileServer(http.Dir("build")))
-
-	r.Handle("/get/salt/{user}", hand.GetSalt(func(user string) (string, error) {
-		return dbc.SingleParamQuery(db, "salt", user)
-	})).Methods("GET", "POST")
-
-	r.Handle("/get/token/{user}", hand.GetToken(func(user, hash string) (map[string]string, error) {
-		return dbc.GenAuthToken(db, user, hash)
-	})).Methods("GET", "POST")
-
-	r.Handle("/get/student/profile/{user}", mw.BasicAuth(checkToken, hand.GetStudentPro(func(str string) (map[string]string, error) {
-		return dbc.GetStudentPro(db, str)
-	}))).Methods("GET", "POST")
+	r.Handle("/get/salt/{user}", hand.GetSalt(singleParamQuery)).Methods("GET", "POST")
+	r.Handle("/get/token/{user}", hand.GetToken(genAuthtoken)).Methods("GET", "POST")
+	r.Handle("/get/student/profile/{user}", mw.BasicAuth(checkToken, hand.GetStudentPro(getStudentPro))).Methods("GET", "POST")
+	r.Handle("/get/student/modules/{time}/{user}", mw.BasicAuth(checkToken, hand.GetStudentModules(getStudentModules))).Methods("GET", "POST")
+	r.Handle("/get/student/cwk/{type}/{user}", mw.BasicAuth(checkToken, hand.GetStudentCwk(getStudentCwk))).Methods("GET", "POST")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(checkToken, test()))

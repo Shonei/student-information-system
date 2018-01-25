@@ -6,7 +6,6 @@
 
 -- Module codes: 10684 / 25351 / 86583 / 25509 / 72065
 
-
 INSERT INTO login_info(id, username, user_pass, salt, access_lvl) VALUES(72862, 'shyl0', '286b71340d8e757aa91bf2e0a35cd252f880e45c6b24898aa254d22c6acca3796563ffd478447a6852ed758f8591f6f628d133724d9d55b2162d14a4c2f33d58', 'Producer', 1);
 INSERT INTO login_info(id, username, user_pass, salt, access_lvl) VALUES(44148, 'shyl1', '6b15d92931598254b662327d6475f271b3b4f2436890c048840f592d246664e02df156a4b11b2ce80db2b5c2b39a45e652dc924725d31ccf65cf04f0832acfc7', 'empowering', 1);
 INSERT INTO login_info(id, username, user_pass, salt, access_lvl) VALUES(37362, 'shyl2', 'd9dc46f07bc162f910c900a587b05089324ba61f10eb612800284705eac69441cb9df63415b2c3bbc6d9f2b76f74a3da3280c798e96af4fbafb3126f5c575a5f', 'supply-chains', 2);
@@ -109,7 +108,7 @@ INSERT INTO tutor(staff_id, student_id, suppervision_year) VALUES(37362, 44148, 
 INSERT INTO tutor(staff_id, student_id, suppervision_year) VALUES(37362, 44148, '2018-10-09T13:14:10.734Z');
 INSERT INTO tutor(staff_id, student_id, suppervision_year) VALUES(37362, 44148, '2018-10-09T13:14:10.734Z');
 
-INSERT INTO student_modules(module_code, studnet_id, study_year, result) VALUES(72065, 72862, '2018-01-18', 66);
-INSERT INTO student_modules(module_code, studnet_id, study_year, result) VALUES(25509, 44148, '2018-01-17', 66);
-INSERT INTO student_modules(module_code, studnet_id, study_year, result) VALUES(86583, 44148, '2018-01-15', 66);
-INSERT INTO student_modules(module_code, studnet_id, study_year, result) VALUES(25351, 44148, '2018-01-13', 66);
+INSERT INTO student_modules(module_code, student_id, study_year, result) VALUES(72065, 72862, '2018-01-18', 66);
+INSERT INTO student_modules(module_code, student_id, study_year, result) VALUES(25509, 44148, '2014-01-17', 66);
+INSERT INTO student_modules(module_code, student_id, study_year) VALUES(86583, 44148, '2012-01-15');
+INSERT INTO student_modules(module_code, student_id, study_year, result) VALUES(25351, 44148, '2018-01-13', 66);

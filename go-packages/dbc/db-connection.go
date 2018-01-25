@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Shonei/student-information-system/go-packages/dba"
 )
@@ -117,4 +118,37 @@ func GetStudentPro(db dba.DBAbstraction, user string) (map[string]string, error)
 	}
 
 	return m[0], nil
+}
+
+// GetStudentModules returns an array of key/value pairs of the modules for a student
+func GetStudentModules(db dba.DBAbstraction, t, user string) ([]map[string]string, error) {
+	now := "SELECT module.code, module.name, student_modules.study_year, student_modules.result FROM student_modules INNER JOIN module ON module.code = student_modules.module_code INNER JOIN student ON student.id = student_modules.student_id INNER JOIN login_info ON student_modules.student_id = login_info.id WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = $2;"
+	past := "SELECT module.code, module.name, student_modules.study_year, student_modules.result FROM student_modules INNER JOIN module ON module.code = student_modules.module_code INNER JOIN student ON student.id = student_modules.student_id INNER JOIN login_info ON student_modules.student_id = login_info.id WHERE login_info.username = $1 AND NOT to_char(student_modules.study_year, 'YYYY') = $2;"
+	year := time.Now()
+
+	switch t {
+	case "now":
+		return db.SelectMulti(now, user, year.Year())
+	case "past":
+		return db.SelectMulti(past, user, string(year.Year()))
+	default:
+		return nil, &TokenError{404, "Wrong parameters"}
+	}
+}
+
+// GetStudentCwk will retrive the cwk table for a given student by a given name.
+// It can return both cwk results and cwk schedule based on the t(type) paramater.
+// It only accepts a timetable or results as input.
+func GetStudentCwk(db dba.DBAbstraction, t, user string) ([]map[string]string, error) {
+	result := "SELECT coursework.module_code, coursework.cwk_name, coursework.percentage, coursework.marks, coursework_result.result FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');"
+	timetable := "SELECT coursework.cwk_name, coursework.posted_on, coursework.deadline FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id  WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');"
+
+	switch t {
+	case "timetable":
+		return db.SelectMulti(timetable, user)
+	case "results":
+		return db.SelectMulti(result, user)
+	default:
+		return nil, &TokenError{404, "Wrong parameters"}
+	}
 }

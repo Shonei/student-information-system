@@ -4,8 +4,8 @@ const crypto = require('crypto');
 
 // const client = new Client({
 //   user: 'shyl',
-//   password: 'rz9h19cg',
-//   database: 'sis',
+//   password: '',             // TYPE THE PASSWORD
+//   database: 'sis',          // DONT UPLOAD YOUR PASSWORD AGAIN
 // });
 
 // client.connect().then(console.log).catch(console.log);

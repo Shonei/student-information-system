@@ -8,8 +8,14 @@ class Tables extends Component {
     super();
 
     this.state = {
-
+      value: 'b'
     };
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    this.setState({value:e});
   }
 
   render() {

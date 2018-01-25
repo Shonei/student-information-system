@@ -2,7 +2,6 @@ package hand
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/Shonei/student-information-system/go-packages/dbc"
@@ -73,7 +72,7 @@ func GetToken(f func(string, string) (map[string]string, error)) http.Handler {
 func GetStudentPro(f func(string) (map[string]string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		fmt.Println(vars)
+
 		m, err := f(vars["user"])
 		if err != nil {
 			http.Error(w, "We were unable to retrieve the profile.", http.StatusInternalServerError)
@@ -83,6 +82,49 @@ func GetStudentPro(f func(string) (map[string]string, error)) http.Handler {
 		err = json.NewEncoder(w).Encode(m)
 		if err != nil {
 			http.Error(w, "We encountered an error parsing the students profile", http.StatusInternalServerError)
+			return
+		}
+	})
+}
+
+// GetStudentModules will match the /get/student/modules/{time}/{user} path.
+// It will return the module list for the current modules or module from past years.
+// The time paramater can be now or past only.
+func GetStudentModules(f func(string, string) ([]map[string]string, error)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		m, err := f(vars["time"], vars["user"])
+		if err != nil {
+			// FIX THIS
+			http.Error(w, "No modules were found", http.StatusBadRequest)
+			return
+		}
+
+		err = json.NewEncoder(w).Encode(m)
+		if err != nil {
+			http.Error(w, "Cound't encode the module to json", http.StatusInternalServerError)
+			return
+		}
+	})
+}
+
+// GetStudentCwk will match the /get/student/cwk/{type}/{user} path.
+// Based on the type either results or timetable it will return
+// the cwk results for a student or the timetable for his cwks.
+func GetStudentCwk(f func(string, string) ([]map[string]string, error)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		m, err := f(vars["type"], vars["user"])
+		if err != nil {
+			http.Error(w, "We encountered an error retrieving the coursework.", http.StatusInternalServerError)
+			return
+		}
+
+		err = json.NewEncoder(w).Encode(m)
+		if err != nil {
+			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
 			return
 		}
 	})
