@@ -2,51 +2,85 @@ import React, { Component } from 'react';
 import { wrapFetch as fetch } from './helpers';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { Tabs, Tab } from 'material-ui';
+import CustomTable from './CustomTable';
 
 class Tables extends Component {
   constructor() {
     super();
 
     this.state = {
-      value: 'b'
+      value: 'current',
+      timetable: []
+    };
+
+    this.tables = {
+      'current': [],
+      'past': [],
+      'cwk': []
     };
 
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(e) {
-    this.setState({value:e});
+    this.setState({ value: e });
+  }
+
+  componentDidMount() {
+    fetch('/get/student/modules/now/', 'GET')
+      .then(e => this.tables["current"] = e)
+      .catch(console.log)
+
+    fetch('/get/student/modules/past/', 'GET')
+      .then(e => this.tables["past"] = e)
+      .catch(console.log)
+
+    fetch('/get/student/cwk/results/', 'GET')
+      .then(e => this.tables["cwk"] = e)
+      .catch(console.log)
+
+    fetch('/get/student/cwk/timetable/', 'GET')
+      .then(e => this.setState({ timetable: e }))
+      .catch(console.log)
   }
 
   render() {
     return (
-      <Grid fluid>
+      <div>
         <br />
         <Tabs
           value={this.state.value}
           onChange={this.handleChange}>
-          <Tab label="Tab A" value="a">
-            <div>
-              <h2>Controllable Tab A</h2>
-              <p>
-                Tabs are also controllable if you want to programmatically pass them their values.
-              This allows for more functionality in Tabs such as not
-              having any Tab selected or assigning them different values.
-            </p>
-            </div>
+          <Tab label="Current modules" value="current">
+            <CustomTable key="current"
+              headers={['Module code', 'Name', 'Result', 'Year']}
+              order={['code', 'name', 'result', 'study_year']}
+              values={this.tables[this.state.value]}>
+            </CustomTable>
           </Tab>
-          <Tab label="Tab B" value="b">
-            <div>
-              <h2>Controllable Tab B</h2>
-              <p>
-                This is another example of a controllable tab. Remember, if you
-              use controllable Tabs, you need to give all of your tabs values or else
-              you wont be able to select them.
-            </p>
-            </div>
+          <Tab label="Past modules" value="past">
+            <CustomTable key="past"
+              headers={['Module code', 'Name', 'Result', 'Year']}
+              order={['code', 'name', 'result', 'study_year']}
+              values={this.tables[this.state.value]}>
+            </CustomTable>
+          </Tab>
+          <Tab label="Coursework results" value="cwk">
+            <CustomTable key="cwk"
+              headers={['Name', 'Module', '%', 'Marks', 'Result']}
+              order={['cwk_name', 'module_code', 'percentage', 'marks', 'result']}
+              values={this.tables[this.state.value]}>
+            </CustomTable>
           </Tab>
         </Tabs>
-      </Grid>
+        <br />
+        <h2>Coursework timetable</h2>
+        <CustomTable
+          headers={['Coursework name', 'Posted', 'Deadline']}
+          order={['cwk_name', 'posted_on', 'deadline']}
+          values={this.state.timetable}>
+        </CustomTable>
+      </div>
     );
   }
 }

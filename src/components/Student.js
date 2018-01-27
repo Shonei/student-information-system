@@ -26,7 +26,7 @@ class Student extends Component {
         <Row center="xs">
           <Col xs={12} md={3}>
             <Avatar src="https://github.com/Shonei/student-information-system/blob/master/database.jpg?raw=true"
-              size={150} />
+              size={180} />
             <p><b>ID: </b>{this.state.id}</p>
           </Col>
           <Col xs={12} md={3}>

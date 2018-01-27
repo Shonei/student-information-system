@@ -42,6 +42,7 @@ All scripts that are needed to create the database are lacated in DB-scrippts.
 
 ## TODO
 - Make get/salt/{user} return an error if user doesn't exits
-- Valid responce for when token is deleted after 2 hours?
-- Add empty value checks for /get/student/cwk and /get/student/modules
 - Integration tests for endpoints
+- STOP JUST CONSOL LOGGING ERRORS
+- Valid responce for when token is deleted after 2 hours ?
+- Add empty value checks for /get/student/cwk and /get/student/modules ?
