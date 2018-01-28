@@ -22,10 +22,10 @@ import (
 )
 
 func main() {
-	connStr := os.Getenv("DATABASE_URL")
+	// connStr := os.Getenv("DATABASE_URL")
 	port := os.Getenv("PORT")
 
-	temp, err := sql.Open("postgres", connStr)
+	temp, err := sql.Open("postgres", "postgres://cwycamplnjowxb:0ee86af13ba2101b58c2f16dda9801fa779bd83686cb974f074f5c51d0e3613f@ec2-54-217-218-80.eu-west-1.compute.amazonaws.com:5432/df90p8b9r6cptp")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +41,6 @@ func main() {
 	getStudentCwk := func(t, user string) ([]map[string]string, error) { return dbc.GetStudentCwk(db, t, user) }
 
 	r := mux.NewRouter()
-	r.Handle("/", http.FileServer(http.Dir("build")))
 	r.Handle("/get/salt/{user}", hand.GetSalt(singleParamQuery)).Methods("GET", "POST")
 	r.Handle("/get/token/{user}", hand.GetToken(genAuthtoken)).Methods("GET", "POST")
 	r.Handle("/get/student/profile/{user}", mw.BasicAuth(checkToken, hand.GetStudentPro(getStudentPro))).Methods("GET", "POST")
@@ -51,6 +50,9 @@ func main() {
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(checkToken, test()))
 	r.Handle("/ping", test())
+
+	// static file server
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/")))
 
 	// Cron timed command to clean the timedout tokes
 	c := cron.New()

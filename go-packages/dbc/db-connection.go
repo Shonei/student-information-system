@@ -6,7 +6,7 @@ import (
 	"crypto/sha512"
 	"database/sql"
 	"encoding/hex"
-	"log"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -49,7 +49,7 @@ func GenAuthToken(db dba.DBAbstraction, user, hash string) (map[string]string, e
 	}
 
 	// get random bytes to generate hmac
-	key := make([]byte, 64)
+	key := make([]byte, 32)
 	_, err = rand.Read(key)
 	if err != nil {
 		return nil, &TokenError{500, "We encountered a problem generating the token. Please try again."}
@@ -80,6 +80,7 @@ func CheckToken(db dba.DBAbstraction, token string) (int, error) {
 	user := strings.Split(token, ":")[0]
 
 	username, err := db.Select("SELECT username FROM login_info WHERE token = $1", token)
+	fmt.Println(token)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return -1, &TokenError{http.StatusGatewayTimeout, "Token timed out."}
@@ -92,7 +93,7 @@ func CheckToken(db dba.DBAbstraction, token string) (int, error) {
 	}
 
 	lvl, err := db.Select("SELECT access_lvl FROM login_info WHERE token = $1 AND username = $2", token, user)
-	log.Println(err)
+
 	i, err := strconv.Atoi(lvl)
 	if err != nil {
 		return 0, err

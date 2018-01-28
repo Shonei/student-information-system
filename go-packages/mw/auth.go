@@ -16,8 +16,13 @@ import (
 // have a hign enought level or are the owner of that information.
 func BasicAuth(checkToken func(string) (int, error), next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get("Authorization")
-		lvl, err := checkToken(token)
+		token, err := r.Cookie("token")
+		if err != nil {
+			http.Error(w, "Cookie missing.", http.StatusBadRequest)
+			return
+		}
+
+		lvl, err := checkToken(token.Value)
 		if err != nil {
 			if val, ok := err.(*dbc.TokenError); ok {
 				http.Error(w, val.Message, val.HttpCode)
@@ -30,7 +35,7 @@ func BasicAuth(checkToken func(string) (int, error), next http.Handler) http.Han
 
 		switch lvl {
 		case 1:
-			user := strings.Split(token, ":")[0]
+			user := strings.Split(token.Value, ":")[0]
 			vars := mux.Vars(r)
 			if user == vars["user"] {
 				next.ServeHTTP(w, r)
