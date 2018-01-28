@@ -97,6 +97,16 @@ class Login extends Component {
               </Col>
             </Row>
           </Col>
+          <Col xs={12}>
+            <Row center="xs">
+              <Col xs={6} >
+                <h3>Login Info</h3>
+                <p><b>Student: </b>student/password</p>
+                <p><b>Staff: </b>staff/password</p>
+                <p><b>Admin: </b>admin/password</p>
+              </Col>
+            </Row>
+          </Col>
         </Row>
       </Grid>
     );

@@ -1,7 +1,4 @@
 import React, { PureComponent } from 'react';
-import { wrapFetch as fetch } from './helpers';
-import { Grid, Row, Col } from 'react-flexbox-grid';
-import { Tabs, Tab } from 'material-ui';
 import {
   Table,
   TableBody,

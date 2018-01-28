@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { wrapFetch as fetch } from './helpers';
-import { Grid, Row, Col } from 'react-flexbox-grid';
 import { Tabs, Tab } from 'material-ui';
 import CustomTable from './CustomTable';
 
