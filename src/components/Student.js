@@ -9,13 +9,19 @@ class Student extends Component {
     super();
 
     this.state = {
-
+      first_name: '',
+      middle_name: '',
+      last_name: '',
+      email: '',
+      entry_year: '',
+      current_level: '',
+      id: ''
     };
   }
 
   componentDidMount() {
     fetch('/get/student/profile/', 'GET')
-      .then(j => { this.setState(() => j); console.log(j) })
+      .then(j => this.setState(() => j))
       .catch(console.log)
   }
 
@@ -35,7 +41,7 @@ class Student extends Component {
             <p><b>Last name: </b>{this.state.last_name}</p>
             <p><b>Email: </b>{this.state.email}</p>
             <p><b>Entry year: </b>{this.state.entry_year}</p>
-            <p><b>Current level</b>{this.state.current_level}</p>
+            <p><b>Current level: </b>{this.state.current_level}</p>
           </Col>
         </Row>
         <Tables></Tables>

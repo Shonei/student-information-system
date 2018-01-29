@@ -7,6 +7,7 @@ import { MuiThemeProvider as mui } from 'material-ui/styles/MuiThemeProvider';
 
 configure({ adapter: new Adapter() });
 
+
 describe('testing the NavBar', () => {
   it('It renders', () => {
     const wrapper = shallow(<NavBar />, { context: { mui } });

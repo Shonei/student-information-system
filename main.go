@@ -22,10 +22,10 @@ import (
 )
 
 func main() {
-	// connStr := os.Getenv("DATABASE_URL")
+	connStr := os.Getenv("DATABASE_URL")
 	port := os.Getenv("PORT")
 
-	temp, err := sql.Open("postgres", "postgres://cwycamplnjowxb:0ee86af13ba2101b58c2f16dda9801fa779bd83686cb974f074f5c51d0e3613f@ec2-54-217-218-80.eu-west-1.compute.amazonaws.com:5432/df90p8b9r6cptp")
+	temp, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}

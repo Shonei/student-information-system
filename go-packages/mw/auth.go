@@ -18,6 +18,7 @@ func BasicAuth(checkToken func(string) (int, error), next http.Handler) http.Han
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, err := r.Cookie("token")
 		if err != nil {
+			log.Println(err)
 			http.Error(w, "Cookie missing.", http.StatusBadRequest)
 			return
 		}

@@ -1,5 +1,5 @@
 function cookieCheck() {
-  let token = document.cookie.match(/token=[a-z:0-9]{120,134}/g);
+  let token = window.document.cookie.match(/token=[a-z:0-9]{120,134}/g);
   if (token) {
     // Add this token to fetch Authentication header
     token = token[0].replace('token=', '');

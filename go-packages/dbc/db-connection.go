@@ -6,7 +6,6 @@ import (
 	"crypto/sha512"
 	"database/sql"
 	"encoding/hex"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -80,7 +79,6 @@ func CheckToken(db dba.DBAbstraction, token string) (int, error) {
 	user := strings.Split(token, ":")[0]
 
 	username, err := db.Select("SELECT username FROM login_info WHERE token = $1", token)
-	fmt.Println(token)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return -1, &TokenError{http.StatusGatewayTimeout, "Token timed out."}

@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { wrapFetch as fetch } from './helpers';
 import { Grid, Row, Col } from 'react-flexbox-grid';
+import PropTypes from 'prop-types';
 import { Tabs, Tab } from 'material-ui';
 import {
   Table,
@@ -19,7 +20,7 @@ class CustomTable extends PureComponent {
     this.getHeader = this.getHeader.bind(this);
     this.getBody = this.getBody.bind(this);
 
-    // MUST HAVE order and headers
+    // MUST HAVE and headers
   }
 
   handleClick(e, f) {
@@ -36,11 +37,11 @@ class CustomTable extends PureComponent {
   getBody(order, values) {
     let arr = [];
 
-    if (!values) {
+    if (!values || !order) {
       return;
     }
 
-    if (values.lenght < 1) {
+    if (values.lenght < 1 || order.lenght < 1) {
       return;
     }
 
@@ -65,5 +66,11 @@ class CustomTable extends PureComponent {
     );
   }
 }
+
+CustomTable.propTypes = {
+  headers: PropTypes.arrayOf(PropTypes.string).isRequired,
+  order: PropTypes.arrayOf(PropTypes.string),
+  order: PropTypes.array,
+};
 
 export default CustomTable;

@@ -55,7 +55,6 @@ class Login extends Component {
           loc = '/staff';
         }
         document.location.href = loc;
-
       })
       .catch(err => {
         err.text()

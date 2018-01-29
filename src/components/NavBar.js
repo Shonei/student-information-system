@@ -30,7 +30,7 @@ class NavBar extends Component {
     } else if (parseInt(lvl, 10) > 1) {
       loc = '/staff';
     } 
-    document.location.href = loc;
+    document.location.href = 'loc';
   }
 
   render() {
