@@ -78,10 +78,10 @@ This will return a list of coursewowks for aa given student. Based on the type p
 ]
 ```
 
-### Experimental or temporary endpoints
+## Experimental or temporary endpoints
 
-## /test/auth/{user} [All methods]
+### /test/auth/{user} [All methods]
 Used to test if you were able to generate a valid access token. Should return an 'Ok' on valid respons.
 
-## /ping [All methods]
+### /ping [All methods]
 Ping to see if the server is alive. Should always respond with and 'Ok'.
