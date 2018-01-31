@@ -1,4 +1,4 @@
-# system-information-system
+# student-information-system
 
 [Backlog](https://shonei.github.io/student-information-system/)
 
