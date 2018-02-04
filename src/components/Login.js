@@ -48,6 +48,7 @@ class Login extends Component {
         h.setTime(h.getTime() + (2 * 60 * 60 * 1000));
         document.cookie = 'token=' + data.token + ";" + "expires=" + h.toUTCString() + ";path=/";
         window.localStorage.setItem('access_level', data.level);
+        window.localStorage.setItem('user', this.username);
         let loc = '/';
         if(data.level ===  '1') {
           loc = '/student';

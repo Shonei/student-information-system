@@ -67,8 +67,8 @@ func TestGenAuthToken(t *testing.T) {
 			t.Errorf("Got error we don't want error - %v", err)
 		}
 
-		if len(got["token"]) != 133 {
-			t.Errorf("Want 133 - %v", len(got["token"]))
+		if len(got["token"]) != 207 {
+			t.Errorf("Want 207 - %v", len(got["token"]))
 		}
 	})
 
@@ -76,26 +76,6 @@ func TestGenAuthToken(t *testing.T) {
 		_, err := GenAuthToken(&ErrorStruct{}, "Shyl", "")
 		if err == nil {
 			t.Errorf("Got error don't want error")
-		}
-	})
-}
-
-func TestCheckToken(t *testing.T) {
-	t.Run("Valid token", func(t *testing.T) {
-		got, err := CheckToken(&OkStruct{}, "1:")
-		if err != nil {
-			t.Error("Got an error when we didn't want one")
-		}
-
-		if got != 1 {
-			t.Error("Got %v - wanted 1", got)
-		}
-	})
-
-	t.Run("We get an error", func(t *testing.T) {
-		_, err := CheckToken(&ErrorStruct{}, "1:")
-		if err == nil {
-			t.Error("We din't get an error.")
 		}
 	})
 }

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { wrapFetch as fetch } from './helpers';
-import { Grid, Row, Col } from 'react-flexbox-grid';
 import { Tabs, Tab } from 'material-ui';
 import CustomTable from './CustomTable';
 
@@ -28,20 +27,42 @@ class Tables extends Component {
 
   componentDidMount() {
     fetch('/get/student/modules/now/', 'GET')
-      .then(e => this.tables["current"] = e)
-      .catch(console.log)
+      .then(e => {
+        this.tables["current"] = e.map(elem => {
+          elem.study_year = new Date(elem.study_year).getFullYear();
+          return elem;
+        });
+      })
+      .catch(err => err.text().then(console.log));
 
     fetch('/get/student/modules/past/', 'GET')
-      .then(e => this.tables["past"] = e)
-      .catch(console.log)
+      .then(e => {
+        this.tables["past"] = e.map(elem => {
+          elem.study_year = new Date(elem.study_year).getFullYear();
+          return elem;
+        });
+      })
+      .catch(err => err.text().then(console.log));
 
     fetch('/get/student/cwk/results/', 'GET')
-      .then(e => this.tables["cwk"] = e)
-      .catch(console.log)
+      .then(e => {
+        this.tables["cwk"] = e.map(elem => {
+          elem.study_year = new Date(elem.study_year).getFullYear();
+          return elem;
+        });
+      })
+      .catch(err => err.text().then(console.log));
 
     fetch('/get/student/cwk/timetable/', 'GET')
-      .then(e => this.setState({ timetable: e }))
-      .catch(console.log)
+      .then(e => {
+        e = e.map(elem => {
+          elem.deadline = new Date(elem.deadline).toLocaleString();
+          elem.posted_on = new Date(elem.posted_on).toLocaleString();
+          return elem;
+        });
+        this.setState({ timetable: e });
+      })
+      .catch(err => err.text().then(console.log));
   }
 
   render() {

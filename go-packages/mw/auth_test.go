@@ -2,7 +2,6 @@ package mw
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -18,24 +17,24 @@ func GetTestHandler() http.HandlerFunc {
 func TestBasicAuth(t *testing.T) {
 	tests := []struct {
 		name   string
-		f      func(string) (int, error)
 		status int
 		auth   string
 		want   string
 	}{
-		{"Passes", func(s string) (int, error) { return 1, nil }, 200, "", ""},
-		{"Passes", func(s string) (int, error) { return 1, errors.New("sgd") }, 500, "", `We encountered an error authenticating you`},
+		{"Passes", 401, "", ""},
+		{"Passes", 401, "", "Invalid JWT"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ts := httptest.NewServer(BasicAuth(tt.f, GetTestHandler()))
+			ts := httptest.NewServer(BasicAuth(GetTestHandler()))
 			defer ts.Close()
 			var u bytes.Buffer
 			u.WriteString(string(ts.URL))
 
 			req, _ := http.NewRequest("GET", u.String(), nil)
 			req.Header.Set("Authorization", tt.auth)
+			req.AddCookie(&http.Cookie{Name: "token"})
 
 			res, err := http.DefaultClient.Do(req)
 			if err != nil {

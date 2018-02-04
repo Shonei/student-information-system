@@ -37,3 +37,5 @@ yarn-error.log*
 
 *.pem
 test.js
+test.java
+static/test.go

@@ -1,8 +1,5 @@
 import React, { PureComponent } from 'react';
-import { wrapFetch as fetch } from './helpers';
-import { Grid, Row, Col } from 'react-flexbox-grid';
 import PropTypes from 'prop-types';
-import { Tabs, Tab } from 'material-ui';
 import {
   Table,
   TableBody,
@@ -46,7 +43,7 @@ class CustomTable extends PureComponent {
     }
 
     values.forEach((value, i) => {
-      let temp = order.map(e => <TableRowColumn key={value[e]}>{value[e]}</TableRowColumn>);
+      let temp = order.map(e => <TableRowColumn key={Math.random()}>{String(value[e])}</TableRowColumn>);
       arr.push(<TableRow hoverable={true} key={i}>{temp}</TableRow>);
     });
 
@@ -70,7 +67,6 @@ class CustomTable extends PureComponent {
 CustomTable.propTypes = {
   headers: PropTypes.arrayOf(PropTypes.string).isRequired,
   order: PropTypes.arrayOf(PropTypes.string),
-  order: PropTypes.array,
 };
 
 export default CustomTable;

@@ -24,14 +24,14 @@ describe('Tests the get/salt/{user} endpoint', () => {
 
 describe('Tests the whole authentication process', () => {
   it('Authenticates successfully', () => {
-    expect.assertions(1);
-    return fetch('http://localhost:54656/get/salt/shyl2')
+    expect.assertions(2);
+    return fetch('http://localhost:54656/get/salt/shyl1')
       .then(res => res.json())
       .then(data => {
         let hash = crypto.createHmac('sha512', data.salt);
         hash.update('password');
         const pass = hash.digest('hex');
-        return fetch('http://localhost:54656/get/token/shyl2', {
+        return fetch('http://localhost:54656/get/token/shyl1', {
           method: 'POST',
           credentials: 'same-origin',
           headers: {
@@ -39,7 +39,10 @@ describe('Tests the whole authentication process', () => {
           }
         });
       }).then(res => res.json())
-      .then(data => expect(data.token.length).toEqual(134));
+      .then(data => {
+        expect(data.token.length).toEqual(208);
+        expect(data.level).toEqual('1');
+      });
   });
 
   it('Authenticate fails succesfully', () => {
@@ -59,7 +62,7 @@ describe('Tests the whole authentication process', () => {
         });
       }).then(res => {
         expect(res.ok).toEqual(false);
-        expect(res.status).toEqual(403);
+        expect(res.status).toEqual(500);
       });
   });
 
@@ -80,7 +83,7 @@ describe('Tests the whole authentication process', () => {
         });
       }).then(res => {
         expect(res.ok).toEqual(false);
-        expect(res.status).toEqual(403);
+        expect(res.status).toEqual(500);
       });
   });
 });
