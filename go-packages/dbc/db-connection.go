@@ -15,7 +15,9 @@ type TokenError struct {
 	Message  string
 }
 
-type CustomToken struct {
+// the custom claims created in the JWT token
+// those are the clasim expected by the authentication middleware
+type customToken struct {
 	User        string `json:"user"`
 	AccessLevel int    `json:"access_level"`
 	jwt.StandardClaims
@@ -58,7 +60,7 @@ func GenAuthToken(db dba.DBAbstraction, user, hash string) (map[string]string, e
 	}
 
 	// Create the Claims
-	claims := CustomToken{
+	claims := customToken{
 		user, lvl,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(2 * time.Hour).Unix(),

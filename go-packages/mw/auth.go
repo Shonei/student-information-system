@@ -11,11 +11,15 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-type CustomToken struct {
+// These are the claims that the JWT expects to find in the token
+// package dbc must make sure it sends the same claims for the json
+type customToken struct {
 	User        string `json:"user"`
 	AccessLevel int    `json:"access_level"`
 	jwt.StandardClaims
 }
+
+var errTokenExpired = errors.New("jwt expired")
 
 // BasicAuth is the authorization middleware for get routes
 // that accept a /{user} in the url. It compares the user from the url and the
@@ -32,6 +36,9 @@ func BasicAuth(next http.Handler) http.Handler {
 
 		claims, err := validateJWT(token.Value)
 		if err != nil {
+			if err == errTokenExpired {
+				http.Error(w, "The token has expired", http.StatusUnauthorized)
+			}
 			log.Println(err)
 			http.Error(w, "Invalid JWT", http.StatusUnauthorized)
 			return
@@ -53,9 +60,8 @@ func BasicAuth(next http.Handler) http.Handler {
 	})
 }
 
-func validateJWT(token string) (CustomToken, error) {
-	t, err := jwt.ParseWithClaims(token, &CustomToken{}, func(token *jwt.Token) (interface{}, error) {
-
+func validateJWT(token string) (customToken, error) {
+	t, err := jwt.ParseWithClaims(token, &customToken{}, func(token *jwt.Token) (interface{}, error) {
 		// Make sure we have the same method as when signing the token
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -64,12 +70,17 @@ func validateJWT(token string) (CustomToken, error) {
 	})
 
 	if err != nil {
-		return CustomToken{}, err
+		if val, ok := err.(jwt.ValidationError); ok {
+			if val.Errors == jwt.ValidationErrorExpired {
+				return customToken{}, errTokenExpired
+			}
+		}
+		return customToken{}, err
 	}
 
-	if claims, ok := t.Claims.(*CustomToken); ok && t.Valid {
+	if claims, ok := t.Claims.(*customToken); ok && t.Valid {
 		return *claims, nil
 	}
 
-	return CustomToken{}, errors.New("we encountered an unexpected problem")
+	return customToken{}, errors.New("we encountered an unexpected problem")
 }
