@@ -52,8 +52,8 @@ func main() {
 	r.Handle("/ping", test())
 
 	// static file server
-	r.Handle("/", http.FileServer(http.Dir("build/"))).Methods("GET")
-	r.Handle("/student", http.StripPrefix("/student", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/student").Handler(http.StripPrefix("/student", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/"))).Methods("GET")
 
 	// Cron timed command to clean the timedout tokes
 	c := cron.New()
