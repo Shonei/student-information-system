@@ -7,12 +7,11 @@ import (
 	"os"
 
 	"github.com/Shonei/student-information-system/go-packages/dbc"
+	"github.com/Shonei/student-information-system/go-packages/utils"
 
 	"github.com/Shonei/student-information-system/go-packages/mw"
 
 	"github.com/Shonei/student-information-system/go-packages/hand"
-
-	"github.com/Shonei/student-information-system/go-packages/dba"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -27,28 +26,42 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db := &dba.DB{temp}
+	db := &utils.DB{temp}
 	defer db.Close()
 
 	singleParamQuery := func(user string) (string, error) { return dbc.SingleParamQuery(db, "salt", user) }
 	genAuthtoken := func(user, hash string) (map[string]string, error) { return dbc.GenAuthToken(db, user, hash) }
-	getStudentPro := func(str string) (map[string]string, error) { return dbc.GetStudentPro(db, str) }
-	getStudentModules := func(time, user string) ([]map[string]string, error) { return dbc.GetStudentModules(db, time, user) }
+	getStudentPro := func(str string) (map[string]string, error) { return dbc.GetProfile(db, "student", str) }
+	getStudentModules := func(time, user string) ([]map[string]string, error) { return dbc.GetModulesList(db, time, user) }
 	getStudentCwk := func(t, user string) ([]map[string]string, error) { return dbc.GetStudentCwk(db, t, user) }
+	getStaffPro := func(str string) (map[string]string, error) { return dbc.GetProfile(db, "staff", str) }
+	getStaffModules := func(str string) ([]map[string]string, error) { return dbc.GetModulesList(db, "staff", str) }
+	getStaffTutees := func(str string) ([]map[string]string, error) { return dbc.GetStaffTutees(db, str) }
 
 	r := mux.NewRouter()
-	r.Handle("/get/salt/{user}", hand.GetSalt(singleParamQuery)).Methods("GET", "POST")
-	r.Handle("/get/token/{user}", hand.GetToken(genAuthtoken)).Methods("GET", "POST")
-	r.Handle("/get/student/profile/{user}", mw.BasicAuth(hand.GetStudentPro(getStudentPro))).Methods("GET", "POST")
-	r.Handle("/get/student/modules/{time}/{user}", mw.BasicAuth(hand.GetStudentModules(getStudentModules))).Methods("GET", "POST")
-	r.Handle("/get/student/cwk/{type}/{user}", mw.BasicAuth(hand.GetStudentCwk(getStudentCwk))).Methods("GET", "POST")
+	r.Handle("/get/salt/{user}", hand.GetSalt(singleParamQuery)).Methods("GET")
+	r.Handle("/get/token/{user}", hand.GetToken(genAuthtoken)).Methods("GET")
+	r.Handle("/get/student/profile/{user}", mw.BasicAuth(hand.GetProfile(getStudentPro))).Methods("GET")
+	r.Handle("/get/student/modules/{time}/{user}", mw.BasicAuth(hand.GetStudentModules(getStudentModules))).Methods("GET")
+	r.Handle("/get/student/cwk/{type}/{user}", mw.BasicAuth(hand.GetStudentCwk(getStudentCwk))).Methods("GET")
+
+	r.Handle("/get/staff/profile/{user}", hand.GetProfile(getStaffPro)).Methods("GET")
+	r.Handle("/get/staff/modules/{user}", hand.GetStaffModules(getStaffModules)).Methods("GET")
+	r.Handle("/get/staff/tutees/{user}", hand.GetStaffTutees(getStaffTutees)).Methods("GET")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))
 	r.Handle("/ping", test())
 
 	// static file server
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/")))
+	r.PathPrefix("/student").Handler(http.StripPrefix("/student", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/staff").Handler(http.StripPrefix("/staff", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/"))).Methods("GET")
+	// r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/")))
+
+	// r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 	w.Write([]byte("sgjsfgjsfgjsgfj"))
+	// })
 
 	// listen on the router
 	http.Handle("/", r)

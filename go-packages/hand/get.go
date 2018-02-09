@@ -2,9 +2,8 @@ package hand
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
-
-	"github.com/Shonei/student-information-system/go-packages/dbc"
 
 	"github.com/gorilla/mux"
 )
@@ -15,13 +14,8 @@ func GetSalt(f func(string) (string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
-		// salt, err := dbc.SingleParamQuery(db, "salt", vars["user"])
 		salt, err := f(vars["user"])
 		if err != nil {
-			if val, ok := err.(*dbc.TokenError); ok {
-				http.Error(w, val.Message, val.HttpCode)
-				return
-			}
 			http.Error(w, "We encountered an error. Please try again.", http.StatusInternalServerError)
 			return
 		}
@@ -47,10 +41,6 @@ func GetToken(f func(string, string) (map[string]string, error)) http.Handler {
 		// token, err := dbc.GenAuthToken(db, vars["user"], hash)
 		token, err := f(vars["user"], hash)
 		if err != nil {
-			if val, ok := err.(*dbc.TokenError); ok {
-				http.Error(w, val.Message, val.HttpCode)
-				return
-			}
 			http.Error(w, "We encountered an error. Please try again.", http.StatusInternalServerError)
 			return
 		}
@@ -69,7 +59,7 @@ func GetToken(f func(string, string) (map[string]string, error)) http.Handler {
 // It will return the information about a given student.
 // This will include only his personal information(e.g. email, usernmae) and
 // not information about his studies.
-func GetStudentPro(f func(string) (map[string]string, error)) http.Handler {
+func GetProfile(f func(string) (map[string]string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
@@ -118,6 +108,49 @@ func GetStudentCwk(f func(string, string) ([]map[string]string, error)) http.Han
 
 		m, err := f(vars["type"], vars["user"])
 		if err != nil {
+			http.Error(w, "We encountered an error retrieving the coursework.", http.StatusInternalServerError)
+			return
+		}
+
+		err = json.NewEncoder(w).Encode(m)
+		if err != nil {
+			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
+			return
+		}
+	})
+}
+
+// GetStudentCwk will match the /get/student/cwk/{type}/{user} path.
+// Based on the type either results or timetable it will return
+// the cwk results for a student or the timetable for his cwks.
+func GetStaffModules(f func(string) ([]map[string]string, error)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		m, err := f(vars["user"])
+		if err != nil {
+			http.Error(w, "We encountered an error retrieving the coursework.", http.StatusInternalServerError)
+			return
+		}
+
+		err = json.NewEncoder(w).Encode(m)
+		if err != nil {
+			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
+			return
+		}
+	})
+}
+
+// GetStudentCwk will match the /get/student/cwk/{type}/{user} path.
+// Based on the type either results or timetable it will return
+// the cwk results for a student or the timetable for his cwks.
+func GetStaffTutees(f func(string) ([]map[string]string, error)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		m, err := f(vars["user"])
+		if err != nil {
+			log.Println(err)
 			http.Error(w, "We encountered an error retrieving the coursework.", http.StatusInternalServerError)
 			return
 		}

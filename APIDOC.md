@@ -2,10 +2,10 @@
 
 [Live Demo](https://sis-shonei.herokuapp.com/)
 
-## /get/salt/{user} [POST, GET]
+## /get/salt/{user} [GET]
 Provided a valid username this endpoint will return the salt that needs to be used to hash the users password for validation later on.
 
-## /get/token/{user} [POST GET]
+## /get/token/{user} [GET]
 The endpoint that returns a token that is used to gain access to the API. After you have obtained the salt you need to create an HMAC using the salt as the key. The hashing algorith needs to be SHA512 and produce a hex encoded string. The hashed password needs to be send in the Authorization header.
 
 Afte you optain the token you will have to send it as a cookie for each resource you try to access in the API. Addionally the token has a 2 hours time to live so after 2 hours you will need to create a new token.
@@ -22,7 +22,7 @@ return fetch('http://localhost:54656/get/token/shyl2',{
   });
 ```
 
-## /get/student/profile/{user} [POST GET]
+## /get/student/profile/{user} [GET]
 This endpoint returns the personal information of the student. This is only accessible if you are student or part of the School of computing staff.
 
 ### Sample output
@@ -38,7 +38,7 @@ This endpoint returns the personal information of the student. This is only acce
 }
 ```
 
-## get/student/modules/{time}/{user} [POST GET]
+## get/student/modules/{time}/{user} [GET]
 This endpoint returns a list of the studetns modules with results. The time parameter can be either 'now' to get the current year modules or 'past' to get the modules he has taken in past years. This is only accessible if you are student or part of the School of computing staff.
 
 ### Sample outpur 
@@ -59,7 +59,7 @@ This endpoint returns a list of the studetns modules with results. The time para
 ]
 ```
 
-## /get/student/cwk/{type}/{user} [POST GET]
+## /get/student/cwk/{type}/{user} [GET]
 This will return a list of coursewowks for aa given student. Based on the type parameter which can be either 'results' or 'timetable' it will return the coursework results for the current year modules or the timetable of coursework that the student needs to submit.
 
 ## Sample output

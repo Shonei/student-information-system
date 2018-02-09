@@ -16,12 +16,14 @@ class NavBar extends Component {
     this.handleHomeClick = this.handleHomeClick.bind(this);
   }
 
-  handleLogin(user) {
+  // Clears all global state and cookies
+  handleLogoff(user) {
     document.cookie = '';
     localStorage.clear();
     document.location.href = '/';
   }
 
+  // Based on the access level take the user to their home page
   handleHomeClick() {
     let lvl = localStorage.getItem('access_level');
     let loc = '/';
@@ -41,7 +43,7 @@ class NavBar extends Component {
           showMenuIconButton={false}
           onTitleClick={this.handleHomeClick}
           iconElementRight={<FlatButton label="Logoff"
-            onClick={this.handleLogin} />}>
+            onClick={this.handleLogoff} />}>
         </AppBar>
         <Router>
           <div>

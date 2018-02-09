@@ -16,14 +16,14 @@ class CustomTable extends PureComponent {
     this.handleClick = this.handleClick.bind(this);
     this.getHeader = this.getHeader.bind(this);
     this.getBody = this.getBody.bind(this);
-
-    // MUST HAVE and headers
   }
 
   handleClick(e, f) {
+    // will be needed later on
     console.log(e, f);
   }
 
+  // creates a table header row given an array of strings
   getHeader(arr) {
     return (
       < TableRow >
@@ -31,17 +31,24 @@ class CustomTable extends PureComponent {
       </TableRow >);
   }
 
+  // IS THIS A USELESS COMMENT 
+  // MOST LIKELY YES
+  // SO IT IS THE ONE ABOVE
+  // given an order and values it creates an table body
   getBody(order, values) {
     let arr = [];
 
+    // check for empty or undefined values
     if (!values || !order) {
       return;
     }
 
+    // makes sure they are arrays
     if (values.lenght < 1 || order.lenght < 1) {
       return;
     }
 
+    // create the table body
     values.forEach((value, i) => {
       let temp = order.map(e => <TableRowColumn key={Math.random()}>{String(value[e])}</TableRowColumn>);
       arr.push(<TableRow hoverable={true} key={i}>{temp}</TableRow>);
@@ -65,6 +72,7 @@ class CustomTable extends PureComponent {
 }
 
 CustomTable.propTypes = {
+  // headers are needed so people can still know what info is stored in the table
   headers: PropTypes.arrayOf(PropTypes.string).isRequired,
   order: PropTypes.arrayOf(PropTypes.string),
 };

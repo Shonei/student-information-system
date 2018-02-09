@@ -1,4 +1,4 @@
-package dba
+package utils
 
 import (
 	"database/sql"

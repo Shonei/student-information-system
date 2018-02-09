@@ -20,6 +20,7 @@ type customToken struct {
 }
 
 var errTokenExpired = errors.New("jwt expired")
+var errInvalidToken = errors.New("the jwt is not valid")
 
 // BasicAuth is the authorization middleware for get routes
 // that accept a /{user} in the url. It compares the user from the url and the
@@ -36,11 +37,14 @@ func BasicAuth(next http.Handler) http.Handler {
 
 		claims, err := validateJWT(token.Value)
 		if err != nil {
+			log.Println(err)
 			if err == errTokenExpired {
 				http.Error(w, "The token has expired", http.StatusUnauthorized)
 			}
-			log.Println(err)
-			http.Error(w, "Invalid JWT", http.StatusUnauthorized)
+			if err == errInvalidToken {
+				http.Error(w, "Invalid JWT", http.StatusUnauthorized)
+			}
+			http.Error(w, "We were unable to validate your token.", http.StatusUnauthorized)
 			return
 		}
 
@@ -60,6 +64,11 @@ func BasicAuth(next http.Handler) http.Handler {
 	})
 }
 
+// Uses the JWT package to validate the token.
+// It makes sure that the token was created using the method we have chosen.
+// In our case it must be an HMAC.
+// It also makes usre we can parse the claims that were made in the token.
+// If an error is encountered it will return an empty token.
 func validateJWT(token string) (customToken, error) {
 	t, err := jwt.ParseWithClaims(token, &customToken{}, func(token *jwt.Token) (interface{}, error) {
 		// Make sure we have the same method as when signing the token
@@ -78,6 +87,7 @@ func validateJWT(token string) (customToken, error) {
 		return customToken{}, err
 	}
 
+	// Parse and check claims validity
 	if claims, ok := t.Claims.(*customToken); ok && t.Valid {
 		return *claims, nil
 	}

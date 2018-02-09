@@ -19,37 +19,40 @@ class Tables extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.parseYear = this.parseYear.bind(this);
   }
 
   handleChange(e) {
     this.setState({ value: e });
   }
 
+  // 3 of hte tables have an year value that needs to be made human readable.
+  // this is used by hte map function to parse said year value.
+  parseYear(obj) {
+    return new Date(obj.study_year).getFullYear();
+  }
+
+  // get all the data from the server
+  // There might be a problem where the current table doesn't render
+  // as it doesn't trigget any rerenders once it is loded.
+  // However the coursework results table will force the component to rerender
+  // so that should render all the other tables as well.
   componentDidMount() {
     fetch('/get/student/modules/now/', 'GET')
       .then(e => {
-        this.tables["current"] = e.map(elem => {
-          elem.study_year = new Date(elem.study_year).getFullYear();
-          return elem;
-        });
+        this.tables["current"] = e.map(this.parseYear);
       })
       .catch(err => err.text().then(console.log));
 
     fetch('/get/student/modules/past/', 'GET')
       .then(e => {
-        this.tables["past"] = e.map(elem => {
-          elem.study_year = new Date(elem.study_year).getFullYear();
-          return elem;
-        });
+        this.tables["past"] = e.map(this.parseYear);
       })
       .catch(err => err.text().then(console.log));
 
     fetch('/get/student/cwk/results/', 'GET')
       .then(e => {
-        this.tables["cwk"] = e.map(elem => {
-          elem.study_year = new Date(elem.study_year).getFullYear();
-          return elem;
-        });
+        this.tables["cwk"] = e.map(this.parseYear);
       })
       .catch(err => err.text().then(console.log));
 
