@@ -1,0 +1,95 @@
+import React, { Component } from 'react';
+import { wrapFetch as fetch } from './../helpers';
+import { Avatar } from 'material-ui';
+import { Grid, Row, Col } from 'react-flexbox-grid';
+import CustomTable from './../CustomTable';
+
+class Staff extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      modules: [],
+      tutees: [],
+      address1: '',
+      address2: '',
+      email: '',
+      first_name: '',
+      id: '',
+      last_name: '',
+      middle_name: '',
+      phone: ''
+    };
+
+    this.handleStudentClick = this.handleStudentClick.bind(this);
+  }
+
+  componentDidMount() {
+    fetch('/get/staff/profile/')
+      .then(j => this.setState(() => j))
+      .catch(console.log);
+
+    fetch('/get/staff/modules/')
+      .then(m => this.setState({ modules: m }))
+      .catch(console.log);
+
+    fetch('/get/staff/tutees/')
+      .then(val => {
+        val = val.map(student => {
+          student.username = <a style={{cursor : "pointer"}} onClick={() => this.handleStudentClick(student.username)}>{student.username}</a>;
+          return student;
+        });
+        this.setState({ tutees: val });
+      })
+      .catch(console.log);
+  }
+
+  handleStudentClick(username) {
+    // Why is hte name all the way here
+    // I don't know
+    console.log(username.props.children);
+  }
+
+  render() {
+    const fullName = this.state.first_name + ' ' + this.state.middle_name + ' ' + this.state.last_name;
+    const URL = "https://github.com/Shonei/student-information-system/blob/master/database.jpg?raw=true";
+
+    return (
+      <Grid fluid>
+        <br />
+        <br />
+        <Row center="xs">
+          <Col xs={12} md={3}>
+            <Avatar src={URL}
+              size={180} />
+          </Col>
+          <Col xs={12} md={3}>
+            <p><b>Full name: </b>{fullName}</p>
+            <p><b>ID: </b>{this.state.id}</p>
+            <p><b>Address: </b>{this.state.address1 + ' ' + this.state.address2}</p>
+            <p><b>Email: </b>{this.state.email}</p>
+            <p><b>Phone: </b>{this.state.phone}</p>
+          </Col>
+        </Row>
+        <br />
+        <br />
+        <h3><b>Modules:</b></h3>
+        <CustomTable
+          headers={['Code', 'Name', 'Role']}
+          order={['code', 'name', 'staff_role']}
+          values={this.state.modules}
+        ></CustomTable>
+        <br />
+        <br />
+        <h3><b>Tutoring:</b></h3>
+        <CustomTable
+          headers={['Username', 'ID', 'Programme', 'Year']}
+          order={['username', 'id', 'programme_code', 'year']}
+          values={this.state.tutees}
+        ></CustomTable>
+      </Grid>
+    );
+  }
+}
+
+export default Staff;

@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Shonei/student-information-system/go-packages/utils"
+
 	"github.com/gorilla/mux"
 )
 
@@ -55,17 +57,19 @@ func GetToken(f func(string, string) (map[string]string, error)) http.Handler {
 	})
 }
 
-// GetStudentPro will match the /get/student/profile/{user} path.
-// It will return the information about a given student.
-// This will include only his personal information(e.g. email, usernmae) and
-// not information about his studies.
 func GetProfile(f func(string) (map[string]string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
 		m, err := f(vars["user"])
 		if err != nil {
-			http.Error(w, "We were unable to retrieve the profile.", http.StatusInternalServerError)
+			switch err {
+			case utils.ErrSuspiciousInput:
+				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
+			case utils.ErrUnexpectedChoice:
+			default:
+				http.Error(w, "We were unable to retrieve the profile.", http.StatusInternalServerError)
+			}
 			return
 		}
 
@@ -86,8 +90,13 @@ func GetStudentModules(f func(string, string) ([]map[string]string, error)) http
 
 		m, err := f(vars["time"], vars["user"])
 		if err != nil {
-			// FIX THIS
-			http.Error(w, "No modules were found", http.StatusBadRequest)
+			switch err {
+			case utils.ErrSuspiciousInput:
+				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
+			case utils.ErrUnexpectedChoice:
+			default:
+				http.Error(w, "We were unable to retrieve any modules.", http.StatusInternalServerError)
+			}
 			return
 		}
 
@@ -108,7 +117,13 @@ func GetStudentCwk(f func(string, string) ([]map[string]string, error)) http.Han
 
 		m, err := f(vars["type"], vars["user"])
 		if err != nil {
-			http.Error(w, "We encountered an error retrieving the coursework.", http.StatusInternalServerError)
+			switch err {
+			case utils.ErrSuspiciousInput:
+				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
+			case utils.ErrUnexpectedChoice:
+			default:
+				http.Error(w, "We encountered an error retrieving the coursework.", http.StatusInternalServerError)
+			}
 			return
 		}
 
@@ -120,16 +135,19 @@ func GetStudentCwk(f func(string, string) ([]map[string]string, error)) http.Han
 	})
 }
 
-// GetStudentCwk will match the /get/student/cwk/{type}/{user} path.
-// Based on the type either results or timetable it will return
-// the cwk results for a student or the timetable for his cwks.
 func GetStaffModules(f func(string) ([]map[string]string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
 		m, err := f(vars["user"])
 		if err != nil {
-			http.Error(w, "We encountered an error retrieving the coursework.", http.StatusInternalServerError)
+			switch err {
+			case utils.ErrSuspiciousInput:
+				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
+			case utils.ErrUnexpectedChoice:
+			default:
+				http.Error(w, "We were unable to retrieve the modules.", http.StatusInternalServerError)
+			}
 			return
 		}
 
@@ -141,9 +159,6 @@ func GetStaffModules(f func(string) ([]map[string]string, error)) http.Handler {
 	})
 }
 
-// GetStudentCwk will match the /get/student/cwk/{type}/{user} path.
-// Based on the type either results or timetable it will return
-// the cwk results for a student or the timetable for his cwks.
 func GetStaffTutees(f func(string) ([]map[string]string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -151,7 +166,7 @@ func GetStaffTutees(f func(string) ([]map[string]string, error)) http.Handler {
 		m, err := f(vars["user"])
 		if err != nil {
 			log.Println(err)
-			http.Error(w, "We encountered an error retrieving the coursework.", http.StatusInternalServerError)
+			http.Error(w, "We encountered an error retrieving the tutees list.", http.StatusInternalServerError)
 			return
 		}
 

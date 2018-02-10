@@ -13,14 +13,8 @@ class CustomTable extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.handleClick = this.handleClick.bind(this);
     this.getHeader = this.getHeader.bind(this);
     this.getBody = this.getBody.bind(this);
-  }
-
-  handleClick(e, f) {
-    // will be needed later on
-    console.log(e, f);
   }
 
   // creates a table header row given an array of strings
@@ -36,6 +30,7 @@ class CustomTable extends PureComponent {
   // SO IT IS THE ONE ABOVE
   // given an order and values it creates an table body
   getBody(order, values) {
+    // console.log(values)
     let arr = [];
 
     // check for empty or undefined values
@@ -50,7 +45,7 @@ class CustomTable extends PureComponent {
 
     // create the table body
     values.forEach((value, i) => {
-      let temp = order.map(e => <TableRowColumn key={Math.random()}>{String(value[e])}</TableRowColumn>);
+      let temp = order.map(e => <TableRowColumn key={Math.random()}>{value[e]}</TableRowColumn>);
       arr.push(<TableRow hoverable={true} key={i}>{temp}</TableRow>);
     });
 
@@ -59,8 +54,9 @@ class CustomTable extends PureComponent {
 
   render() {
     return (
-      <Table onCellClick={this.handleClick}>
-        <TableHeader>
+      <Table>
+        <TableHeader
+          adjustForCheckbox={false}>
           {this.getHeader(this.props.headers)}
         </TableHeader>
         <TableBody displayRowCheckbox={false}>

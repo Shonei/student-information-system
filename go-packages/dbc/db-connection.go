@@ -138,6 +138,10 @@ func GetStudentCwk(db utils.DBAbstraction, t, user string) ([]map[string]string,
 	result := "SELECT coursework.module_code, coursework.cwk_name, coursework.percentage, coursework.marks, coursework_result.result FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');"
 	timetable := "SELECT coursework.cwk_name, coursework.posted_on, coursework.deadline FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id  WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');"
 
+	if !basicParser.MatchString(user) {
+		return nil, utils.ErrSuspiciousInput
+	}
+
 	switch t {
 	case "timetable":
 		return db.SelectMulti(timetable, user)
@@ -150,7 +154,7 @@ func GetStudentCwk(db utils.DBAbstraction, t, user string) ([]map[string]string,
 
 // GetStaffTutees returns a list of studetns that the given staff member tutors.
 func GetStaffTutees(db utils.DBAbstraction, user string) ([]map[string]string, error) {
-	tutoring := "SELECT login_info.username, student.id, student.programme_code, to_char(tutor.suppervision_year, 'YYYY') FROM tutor INNER JOIN student ON student.id = tutor.student_id INNER JOIN staff ON staff.id = tutor.staff_id INNER JOIN login_info ON login_info.id = student.id WHERE tutor.staff_id = (SELECT id FROM login_info WHERE username = $1);"
+	tutoring := "SELECT login_info.username, student.id, student.programme_code, to_char(tutor.suppervision_year, 'YYYY') AS year FROM tutor INNER JOIN student ON student.id = tutor.student_id INNER JOIN staff ON staff.id = tutor.staff_id INNER JOIN login_info ON login_info.id = student.id WHERE tutor.staff_id = (SELECT id FROM login_info WHERE username = $1);"
 
 	if !basicParser.MatchString(user) {
 		return nil, utils.ErrSuspiciousInput

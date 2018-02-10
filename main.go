@@ -39,15 +39,19 @@ func main() {
 	getStaffTutees := func(str string) ([]map[string]string, error) { return dbc.GetStaffTutees(db, str) }
 
 	r := mux.NewRouter()
+	// Universal routes
 	r.Handle("/get/salt/{user}", hand.GetSalt(singleParamQuery)).Methods("GET")
 	r.Handle("/get/token/{user}", hand.GetToken(genAuthtoken)).Methods("GET")
+
+	// Studetn part of the API
 	r.Handle("/get/student/profile/{user}", mw.BasicAuth(hand.GetProfile(getStudentPro))).Methods("GET")
 	r.Handle("/get/student/modules/{time}/{user}", mw.BasicAuth(hand.GetStudentModules(getStudentModules))).Methods("GET")
 	r.Handle("/get/student/cwk/{type}/{user}", mw.BasicAuth(hand.GetStudentCwk(getStudentCwk))).Methods("GET")
 
-	r.Handle("/get/staff/profile/{user}", hand.GetProfile(getStaffPro)).Methods("GET")
-	r.Handle("/get/staff/modules/{user}", hand.GetStaffModules(getStaffModules)).Methods("GET")
-	r.Handle("/get/staff/tutees/{user}", hand.GetStaffTutees(getStaffTutees)).Methods("GET")
+	// Staff API
+	r.Handle("/get/staff/profile/{user}", mw.BasicAuth(hand.GetProfile(getStaffPro))).Methods("GET")
+	r.Handle("/get/staff/modules/{user}", mw.BasicAuth(hand.GetStaffModules(getStaffModules))).Methods("GET")
+	r.Handle("/get/staff/tutees/{user}", mw.BasicAuth(hand.GetStaffTutees(getStaffTutees))).Methods("GET")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))
@@ -57,11 +61,6 @@ func main() {
 	r.PathPrefix("/student").Handler(http.StripPrefix("/student", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/staff").Handler(http.StripPrefix("/staff", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/"))).Methods("GET")
-	// r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/")))
-
-	// r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 	w.Write([]byte("sgjsfgjsfgjsgfj"))
-	// })
 
 	// listen on the router
 	http.Handle("/", r)

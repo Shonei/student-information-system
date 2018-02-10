@@ -1,5 +1,5 @@
 ﻿CREATE TABLE login_info(id INT PRIMARY KEY, user_pass TEXT, username TEXT UNIQUE, salt TEXT, access_lvl TEXT, expire_date TIMESTAMP, token TEXT UNIQUE);
-CREATE TABLE staff(id INT PRIMARY KEY REFERENCES login_info(id), first_name TEXT, middle_name TEXT, last_name TEXT, email TEXT, address1 TEXT, address2 TEXT, phone TEXT);
+CREATE TABLE staff(id INT PRIMARY KEY REFERENCES login_info(id), first_name TEXT, middle_name TEXT, last_name TEXT, email TEXT, address1 TEXT, address2 TEXT, phone TEXT, picture_url TEXT,);
 CREATE TABLE programme(code TEXT PRIMARY KEY, UCAS_code TEXT, duration INT, manager INT REFERENCES staff(id), attendance TEXT, school TEXT); 
 CREATE TABLE module(code TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT, syllabus TEXT, semester INT NOT NULL, year_of_study INT NOT NULL, credits INT NOT NULL);
 -- Place student automatically on mendaroty modules depending on the programme they are taking
