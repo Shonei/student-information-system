@@ -11,7 +11,7 @@ configure({ adapter: new Adapter() });
 describe('testing the NavBar', () => {
   it('It renders', () => {
     const wrapper = shallow(<NavBar />, { context: { mui } });
-    expect(wrapper.find('Route').length).toEqual(2);
+    expect(wrapper.find('Route').length).toEqual(3);
     expect(wrapper.find('AppBar').length).toEqual(1);
   });
 });

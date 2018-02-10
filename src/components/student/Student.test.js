@@ -7,6 +7,9 @@ import { MuiThemeProvider as mui } from 'material-ui/styles/MuiThemeProvider';
 
 configure({ adapter: new Adapter() });
 
+window.localStorage = {
+  getItem: jest.fn(cb => 'shgsg')
+};
 
 describe('testing the Student', () => {
   let wrapper;
