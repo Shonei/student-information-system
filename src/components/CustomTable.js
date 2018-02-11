@@ -25,12 +25,8 @@ class CustomTable extends PureComponent {
       </TableRow >);
   }
 
-  // IS THIS A USELESS COMMENT 
-  // MOST LIKELY YES
-  // SO IT IS THE ONE ABOVE
   // given an order and values it creates an table body
   getBody(order, values) {
-    // console.log(values)
     let arr = [];
 
     // check for empty or undefined values
@@ -38,14 +34,15 @@ class CustomTable extends PureComponent {
       return;
     }
 
-    // makes sure they are arrays
-    if (values.lenght < 1 || order.lenght < 1) {
+    // makes sure they are arrays 
+    if (values.lenght > 1 || order.lenght > 1) {
       return;
     }
 
     // create the table body
     values.forEach((value, i) => {
-      let temp = order.map(e => <TableRowColumn key={Math.random()}>{value[e]}</TableRowColumn>);
+      // create the tables body with a good enough unique key and check for empty values
+      let temp = order.map(e => <TableRowColumn key={Math.random()}>{value[e] ? value[e] : ''}</TableRowColumn>);
       arr.push(<TableRow hoverable={true} key={i}>{temp}</TableRow>);
     });
 

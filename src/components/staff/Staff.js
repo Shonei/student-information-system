@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { wrapFetch as fetch } from './../helpers';
-import { Avatar } from 'material-ui';
+import { Avatar, FlatButton } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import CustomTable from './../CustomTable';
 
@@ -25,18 +25,19 @@ class Staff extends Component {
   }
 
   componentDidMount() {
-    fetch('/get/staff/profile/')
+    fetch('staff', '/get/staff/profile/')
       .then(j => this.setState(() => j))
       .catch(console.log);
 
-    fetch('/get/staff/modules/')
+    fetch('staff', '/get/staff/modules/')
       .then(m => this.setState({ modules: m }))
       .catch(console.log);
 
-    fetch('/get/staff/tutees/')
+    fetch('staff', '/get/staff/tutees/')
       .then(val => {
         val = val.map(student => {
-          student.username = <a style={{cursor : "pointer"}} onClick={() => this.handleStudentClick(student.username)}>{student.username}</a>;
+          const user = student.username;
+          student.username = <FlatButton style={{ cursor: "pointer" }} onClick={() => this.handleStudentClick(user)} label={user}/>;
           return student;
         });
         this.setState({ tutees: val });
@@ -45,9 +46,8 @@ class Staff extends Component {
   }
 
   handleStudentClick(username) {
-    // Why is hte name all the way here
-    // I don't know
-    console.log(username.props.children);
+    window.localStorage.setItem('student', username);
+    window.location.href = '/student';
   }
 
   render() {

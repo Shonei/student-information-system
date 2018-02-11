@@ -3,8 +3,8 @@
 // a fetch wrapper to make using fetch easier
 // it parses the imput and rejects the a promise if there was an error
 // or returns the json responce as a promise
-function wrapFetch(url, m ='GET') {
-  const uname = window.localStorage.getItem('user');
+function wrapFetch(user, url, m ='GET') {
+  const uname = window.localStorage.getItem(user);
   return fetch(url + uname, {
     method: m,
     credentials: 'same-origin',

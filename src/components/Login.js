@@ -56,14 +56,15 @@ class Login extends Component {
         // as a global shared state to manage the view.
         // This makes it so users have to always login once they leave the app.
         window.localStorage.setItem('access_level', data.level);
-        window.localStorage.setItem('user', this.username);
         
         // a somewhat ugly change of path but it works.
         let loc = '/';
         if (data.level === '1') {
           loc = '/student';
+          window.localStorage.setItem('student', this.username);
         } else if (parseInt(data.level, 10) > 1) {
           loc = '/staff';
+          window.localStorage.setItem('staff', this.username);
         }
         document.location.href = loc;
       })

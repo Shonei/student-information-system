@@ -43,6 +43,7 @@ func GetToken(f func(string, string) (map[string]string, error)) http.Handler {
 		// token, err := dbc.GenAuthToken(db, vars["user"], hash)
 		token, err := f(vars["user"], hash)
 		if err != nil {
+			log.Println(err)
 			http.Error(w, "We encountered an error. Please try again.", http.StatusInternalServerError)
 			return
 		}

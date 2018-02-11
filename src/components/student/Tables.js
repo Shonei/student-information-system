@@ -39,26 +39,26 @@ class Tables extends Component {
   // However the coursework results table will force the component to rerender
   // so that should render all the other tables as well.
   componentDidMount() {
-    fetch('/get/student/modules/now/')
+    fetch('student', '/get/student/modules/now/')
       .then(e => {
         this.tables["current"] = e.map(this.parseYear);
       })
       .catch(err => err.text().then(console.log));
 
-    fetch('/get/student/modules/past/')
+    fetch('student', '/get/student/modules/past/')
       .then(e => {
         this.tables["past"] = e.map(this.parseYear);
         console.log(this.tables);
       })
       .catch(err => err.text().then(console.log));
 
-    fetch('/get/student/cwk/results/')
+    fetch('student', '/get/student/cwk/results/')
       .then(e => {
         this.tables["cwk"] = e.map(this.parseYear);
       })
       .catch(err => err.text().then(console.log));
 
-    fetch('/get/student/cwk/timetable/')
+    fetch('student', '/get/student/cwk/timetable/')
       .then(e => {
         e = e.map(elem => {
           elem.deadline = new Date(elem.deadline).toLocaleString();
