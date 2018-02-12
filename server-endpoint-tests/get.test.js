@@ -345,7 +345,7 @@ describe('Tests the /get/student/cwk/{type}/{user} endpoint', () => {
 
   it('No user send and fails to get coursework', () => {
     expect.assertions(2);
-    return fetch('http://localhost:54656/get/student/cwk/result/', {
+    return fetch('http://localhost:54656/get/student/cwk/results/', {
       headers: {
         cookie: testCookie,
       }
@@ -357,7 +357,7 @@ describe('Tests the /get/student/cwk/{type}/{user} endpoint', () => {
 
   it('fail to get cwk results with wrong username', () => {
     expect.assertions(2);
-    return fetch('http://localhost:54656/get/student/cwk/result/shyl0', {
+    return fetch('http://localhost:54656/get/student/cwk/results/shyl0', {
       headers: {
         cookie: testCookie,
       }
@@ -369,7 +369,7 @@ describe('Tests the /get/student/cwk/{type}/{user} endpoint', () => {
 
   it('No user send and fails to get cwk results', () => {
     expect.assertions(2);
-    return fetch('http://localhost:54656/get/student/cwk/result/', {
+    return fetch('http://localhost:54656/get/student/cwk/results/', {
       headers: {
         cookie: testCookie,
       }

@@ -31,11 +31,15 @@ func main() {
 
 	singleParamQuery := func(user string) (string, error) { return dbc.SingleParamQuery(db, "salt", user) }
 	genAuthtoken := func(user, hash string) (map[string]string, error) { return dbc.GenAuthToken(db, user, hash) }
+
 	getStudentPro := func(str string) (map[string]string, error) { return dbc.GetProfile(db, "student", str) }
-	getStudentModules := func(time, user string) ([]map[string]string, error) { return dbc.GetModulesList(db, time, user) }
-	getStudentCwk := func(t, user string) ([]map[string]string, error) { return dbc.GetStudentCwk(db, t, user) }
+	getCwkResults := func(user string) ([]map[string]string, error) { return dbc.GetStudentCwk(db, "results", user) }
+	getCwkTimetable := func(user string) ([]map[string]string, error) { return dbc.GetStudentCwk(db, "timetable", user) }
+	getNowModules := func(user string) ([]map[string]string, error) { return dbc.GetModulesList(db, "now", user) }
+	getPastModules := func(user string) ([]map[string]string, error) { return dbc.GetModulesList(db, "past", user) }
+
 	getStaffPro := func(str string) (map[string]string, error) { return dbc.GetProfile(db, "staff", str) }
-	getStaffModules := func(str string) ([]map[string]string, error) { return dbc.GetModulesList(db, "staff", str) }
+	getStaffModules := func(str string) ([]map[string]string, error) { return dbc.GetStaffModules(db, str) }
 	getStaffTutees := func(str string) ([]map[string]string, error) { return dbc.GetStaffTutees(db, str) }
 
 	r := mux.NewRouter()
@@ -45,13 +49,15 @@ func main() {
 
 	// Studetn part of the API
 	r.Handle("/get/student/profile/{user}", mw.BasicAuth(hand.GetProfile(getStudentPro))).Methods("GET")
-	r.Handle("/get/student/modules/{time}/{user}", mw.BasicAuth(hand.GetStudentModules(getStudentModules))).Methods("GET")
-	r.Handle("/get/student/cwk/{type}/{user}", mw.BasicAuth(hand.GetStudentCwk(getStudentCwk))).Methods("GET")
+	r.Handle("/get/student/cwk/timetable/{user}", mw.BasicAuth(hand.BasicGet(getCwkTimetable))).Methods("GET")
+	r.Handle("/get/student/cwk/results/{user}", mw.BasicAuth(hand.BasicGet(getCwkResults))).Methods("GET")
+	r.Handle("/get/student/modules/now/{user}", mw.BasicAuth(hand.BasicGet(getNowModules))).Methods("GET")
+	r.Handle("/get/student/modules/past/{user}", mw.BasicAuth(hand.BasicGet(getPastModules))).Methods("GET")
 
 	// Staff API
 	r.Handle("/get/staff/profile/{user}", mw.BasicAuth(hand.GetProfile(getStaffPro))).Methods("GET")
-	r.Handle("/get/staff/modules/{user}", mw.BasicAuth(hand.GetStaffModules(getStaffModules))).Methods("GET")
-	r.Handle("/get/staff/tutees/{user}", mw.BasicAuth(hand.GetStaffTutees(getStaffTutees))).Methods("GET")
+	r.Handle("/get/staff/modules/{user}", mw.BasicAuth(hand.BasicGet(getStaffModules))).Methods("GET")
+	r.Handle("/get/staff/tutees/{user}", mw.BasicAuth(hand.BasicGet(getStaffTutees))).Methods("GET")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))

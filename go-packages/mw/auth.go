@@ -22,10 +22,10 @@ type customToken struct {
 var errTokenExpired = errors.New("jwt expired")
 var errInvalidToken = errors.New("the jwt is not valid")
 
-// BasicAuth is the authorization middleware for get routes
-// that accept a /{user} in the url. It compares the user from the url and the
-// user in the token and data in the database. It grants access to people that
-// have a hign enought level or are the owner of that information.
+// BasicAuth is the authorization middleware for get routes that provide information
+// about a specific student. It will make sure that the studetn can only view their own results
+// and not another students personal information. Inaddition this function will give
+// staff access to the API so they can see student information as well.
 func BasicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, err := r.Cookie("token")
@@ -49,6 +49,7 @@ func BasicAuth(next http.Handler) http.Handler {
 		}
 
 		switch claims.AccessLevel {
+		// student can only view their own data
 		case 1:
 			vars := mux.Vars(r)
 			if claims.User == vars["user"] {
@@ -57,6 +58,7 @@ func BasicAuth(next http.Handler) http.Handler {
 				http.Error(w, "You don't have the authority to access that resource", http.StatusUnauthorized)
 				return
 			}
+		// staff can view all data
 		case 2, 3:
 			next.ServeHTTP(w, r)
 			return

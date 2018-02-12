@@ -30,11 +30,11 @@ func GetSalt(f func(string) (string, error)) http.Handler {
 	})
 }
 
-// GetToken will match the /get/token/{user} route.
-// It will authenticate a user and send him the authorizaton token
-// that he will need to use for future requests.
-// The route will expect the header Authorization: {password}.
-// The password should be the hash value using sha512
+// GetToken will match the /get/token/{user} route. It will authenticate a user
+// and send him the authorizaton token that he will need to use for future requests.
+// The route will expect the header Authorization: {password}. The password should
+// be the hash value using sha512. The function arguments needs to be a function that
+// validates the password and username and sends back a token that will be send over.
 func GetToken(f func(string, string) (map[string]string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -58,6 +58,9 @@ func GetToken(f func(string, string) (map[string]string, error)) http.Handler {
 	})
 }
 
+// GetProfile matches the /get/student/profile/{user} and /get/staff/profile/{user}
+// endpoints. It will read in a user and format the profile for that given user.
+// The output will be a basic JSON responce containing a single object.
 func GetProfile(f func(string) (map[string]string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -82,97 +85,29 @@ func GetProfile(f func(string) (map[string]string, error)) http.Handler {
 	})
 }
 
-// GetStudentModules will match the /get/student/modules/{time}/{user} path.
-// It will return the module list for the current modules or module from past years.
-// The time paramater can be now or past only.
-func GetStudentModules(f func(string, string) ([]map[string]string, error)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-
-		m, err := f(vars["time"], vars["user"])
-		if err != nil {
-			switch err {
-			case utils.ErrSuspiciousInput:
-				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
-			case utils.ErrUnexpectedChoice:
-			default:
-				http.Error(w, "We were unable to retrieve any modules.", http.StatusInternalServerError)
-			}
-			return
-		}
-
-		err = json.NewEncoder(w).Encode(m)
-		if err != nil {
-			http.Error(w, "Cound't encode the module to json", http.StatusInternalServerError)
-			return
-		}
-	})
-}
-
-// GetStudentCwk will match the /get/student/cwk/{type}/{user} path.
-// Based on the type either results or timetable it will return
-// the cwk results for a student or the timetable for his cwks.
-func GetStudentCwk(f func(string, string) ([]map[string]string, error)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-
-		m, err := f(vars["type"], vars["user"])
-		if err != nil {
-			switch err {
-			case utils.ErrSuspiciousInput:
-				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
-			case utils.ErrUnexpectedChoice:
-			default:
-				http.Error(w, "We encountered an error retrieving the coursework.", http.StatusInternalServerError)
-			}
-			return
-		}
-
-		err = json.NewEncoder(w).Encode(m)
-		if err != nil {
-			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
-			return
-		}
-	})
-}
-
-func GetStaffModules(f func(string) ([]map[string]string, error)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-
-		m, err := f(vars["user"])
-		if err != nil {
-			switch err {
-			case utils.ErrSuspiciousInput:
-				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
-			case utils.ErrUnexpectedChoice:
-			default:
-				http.Error(w, "We were unable to retrieve the modules.", http.StatusInternalServerError)
-			}
-			return
-		}
-
-		err = json.NewEncoder(w).Encode(m)
-		if err != nil {
-			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
-			return
-		}
-	})
-}
-
-func GetStaffTutees(f func(string) ([]map[string]string, error)) http.Handler {
+// BasicGet will match endpoints where there is only a single parameter in the
+// form of a user. All responces from this function are going to be in the forme of
+// an array consisting of JSON objects or an http error and a text messagi
+// giving more information about the error that was encountered.
+func BasicGet(f func(string) ([]map[string]string, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
 		m, err := f(vars["user"])
 		if err != nil {
 			log.Println(err)
-			http.Error(w, "We encountered an error retrieving the tutees list.", http.StatusInternalServerError)
+			// check error type and return
+			switch err {
+			case utils.ErrSuspiciousInput:
+				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
+			case utils.ErrUnexpectedChoice:
+			default:
+				http.Error(w, "We encountered an unexpected error retrieving the data.", http.StatusInternalServerError)
+			}
 			return
 		}
 
-		err = json.NewEncoder(w).Encode(m)
-		if err != nil {
+		if err = json.NewEncoder(w).Encode(m); err != nil {
 			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
 			return
 		}

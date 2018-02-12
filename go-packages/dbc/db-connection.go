@@ -10,17 +10,12 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+// Used to validate all the username that will be used when accessing the DB
 var basicParser = regexp.MustCompile("^[a-zA-Z0-9]+$")
-
-// TokenError will be used as a message for http request containing a http code
-// a mostly human readable message.
-type TokenError struct {
-	HttpCode int
-	Message  string
-}
 
 // the custom claims created in the JWT token
 // those are the clasim expected by the authentication middleware
+// and must match the JSON representation
 type customToken struct {
 	User        string `json:"user"`
 	AccessLevel int    `json:"access_level"`
@@ -29,7 +24,6 @@ type customToken struct {
 
 // SingleParamQuery will execute a predefined sql query that takes a single
 // paramater and returns a single paramater with no additional modification to the data.
-// If it returns an empty string it would mean the query failed.
 func SingleParamQuery(db utils.DBAbstraction, query, param string) (string, error) {
 	switch query {
 	case "salt":
@@ -38,9 +32,10 @@ func SingleParamQuery(db utils.DBAbstraction, query, param string) (string, erro
 	return "", utils.ErrUnexpectedChoice
 }
 
-// GenAuthToken will return the token for a given user and save the
-// token in the database. If there is an error the function will
-// return an error value and an empty string.
+// GenAuthToken will authenticate the user based on the HMAC value fo the password
+// and he username. If they match the database results a map will be generated containing a token and
+// the access level for that user. The token will then be used for consecutive requests
+// to the server removing the need for sending personal information agian.
 func GenAuthToken(db utils.DBAbstraction, user, hash string) (map[string]string, error) {
 	level, err := db.Select("SELECT access_lvl FROM login_info WHERE username = $1 AND user_pass = $2", user, hash)
 	if err != nil {
@@ -103,15 +98,13 @@ func GetProfile(db utils.DBAbstraction, choice, user string) (map[string]string,
 	return m[0], nil
 }
 
-// GetModulesList returns an array of key/value pairs of the modules for a given person.
+// GetModulesList returns an array containing information about the modules of a given person.
 // It it gets a now or past parameter it returns the modules for a student either
-// his current modules or the modules he has taken in the past. If results are avalable they will
-// be included in the responce. If the coice parameter is staff the modules that a staff is involved
-// will be returned.
+// his current modules or the modules he has taken in the past.
+// If it gets an unexpected parameter it will return a utils.ErrUnexpectedChoice.
 func GetModulesList(db utils.DBAbstraction, choice, user string) ([]map[string]string, error) {
 	now := "SELECT module.code, module.name, student_modules.study_year, student_modules.result FROM student_modules INNER JOIN module ON module.code = student_modules.module_code INNER JOIN student ON student.id = student_modules.student_id INNER JOIN login_info ON student_modules.student_id = login_info.id WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = $2;"
 	past := "SELECT module.code, module.name, student_modules.study_year, student_modules.result FROM student_modules INNER JOIN module ON module.code = student_modules.module_code INNER JOIN student ON student.id = student_modules.student_id INNER JOIN login_info ON student_modules.student_id = login_info.id WHERE login_info.username = $1 AND NOT to_char(student_modules.study_year, 'YYYY') = $2;"
-	staff := "SELECT module.code, module.name, teaching.staff_role FROM module INNER JOIN teaching ON teaching.module_code = module.code INNER JOIN staff ON staff.id = teaching.staff_id INNER JOIN login_info ON login_info.id = staff.id WHERE login_info.username = $1;"
 	year := time.Now()
 
 	if !basicParser.MatchString(user) || !basicParser.MatchString(choice) {
@@ -122,21 +115,20 @@ func GetModulesList(db utils.DBAbstraction, choice, user string) ([]map[string]s
 	case "now":
 		return db.SelectMulti(now, user, year.Year())
 	case "past":
-		return db.SelectMulti(past, user, string(year.Year()))
-	case "staff":
-		return db.SelectMulti(staff, user)
+		return db.SelectMulti(past, user, year.Year())
 	default:
 		return nil, utils.ErrUnexpectedChoice
 	}
 }
 
 // GetStudentCwk will retrive the cwk table for a given student by a given name.
-// It can return both cwk results and cwk schedule based on the t(type) paramater.
+// It can return both cwk results and cwk schedule based on the t paramater.
 // It only accepts a timetable or results as input.
+// It will return a  utils.ErrUnexpectedChoice otherwise.
 func GetStudentCwk(db utils.DBAbstraction, t, user string) ([]map[string]string, error) {
 	// check if courseowrk has a result or not. In results tap show only courseworks with results.
-	result := "SELECT coursework.module_code, coursework.cwk_name, coursework.percentage, coursework.marks, coursework_result.result FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');"
-	timetable := "SELECT coursework.cwk_name, coursework.posted_on, coursework.deadline FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id  WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');"
+	result := "SELECT coursework.module_code, coursework.cwk_name, coursework.percentage, coursework.marks, coursework_result.result FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id WHERE login_info.username = $1 AND coursework_result.result IS NOT NULL;"
+	timetable := "SELECT coursework.cwk_name, coursework.posted_on, coursework.deadline FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id  WHERE login_info.username = $1 AND coursework_result.result IS NULL;"
 
 	if !basicParser.MatchString(user) {
 		return nil, utils.ErrSuspiciousInput
@@ -150,6 +142,19 @@ func GetStudentCwk(db utils.DBAbstraction, t, user string) ([]map[string]string,
 	default:
 		return nil, utils.ErrUnexpectedChoice
 	}
+}
+
+// GetStaffModules returns an array of the modules a staff is involved in.
+// IT was seperated from the GetModulesList to limit the access to invormation
+// that will require a higher level of access, like the details for a staff member.
+func GetStaffModules(db utils.DBAbstraction, user string) ([]map[string]string, error) {
+	staff := "SELECT module.code, module.name, teaching.staff_role FROM module INNER JOIN teaching ON teaching.module_code = module.code INNER JOIN staff ON staff.id = teaching.staff_id INNER JOIN login_info ON login_info.id = staff.id WHERE login_info.username = $1;"
+
+	if !basicParser.MatchString(user) {
+		return nil, utils.ErrSuspiciousInput
+	}
+
+	return db.SelectMulti(staff, user)
 }
 
 // GetStaffTutees returns a list of studetns that the given staff member tutors.

@@ -58,7 +58,7 @@ func TestSingleParamQuery(t *testing.T) {
 
 		_, err = SingleParamQuery(&ErrorStruct{}, "", "")
 		if err != utils.ErrUnexpectedChoice {
-			t.Error("Expecting a TokenError")
+			t.Error("Expecting a ErrUnexpectedChoice")
 		}
 	})
 }
@@ -85,7 +85,7 @@ func TestGenAuthToken(t *testing.T) {
 
 func TestGetStudentCwk(t *testing.T) {
 	t.Run("All go wells", func(t *testing.T) {
-		m, err := GetStudentCwk(&OkStruct{}, "timetable", "")
+		m, err := GetStudentCwk(&OkStruct{}, "timetable", "sgd")
 
 		if m[0]["OK"] != "1" {
 			t.Errorf("Wanted 1 - got %v.", m)
@@ -97,7 +97,7 @@ func TestGetStudentCwk(t *testing.T) {
 	})
 
 	t.Run("All go wells with past", func(t *testing.T) {
-		m, err := GetStudentCwk(&OkStruct{}, "results", "")
+		m, err := GetStudentCwk(&OkStruct{}, "results", "sdg")
 
 		if m[0]["OK"] != "1" {
 			t.Errorf("Wanted 1 - got %v.", m)
@@ -109,7 +109,7 @@ func TestGetStudentCwk(t *testing.T) {
 	})
 
 	t.Run("Failes", func(t *testing.T) {
-		_, err := GetStudentCwk(&OkStruct{}, "nosw", "")
+		_, err := GetStudentCwk(&OkStruct{}, "nosw", "sdg")
 
 		if err == nil {
 			t.Error("Wanted no errors")
@@ -158,16 +158,13 @@ func TestGetModulesList(t *testing.T) {
 	}{
 		{&OkStruct{}, "", "", []map[string]string{}, utils.ErrSuspiciousInput},
 		{&OkStruct{}, "past", "dafh", []map[string]string{}, nil},
-		{&OkStruct{}, "staff", "1fasdf", []map[string]string{}, nil},
-		{&OkStruct{}, "staff", "\n", []map[string]string{}, utils.ErrSuspiciousInput},
+		{&OkStruct{}, "past", "\n", []map[string]string{}, utils.ErrSuspiciousInput},
 		{&OkStruct{}, "gdfhg", "sdfh", []map[string]string{}, utils.ErrUnexpectedChoice},
 		{&OkStruct{}, "now", "sdfh\vsdgs", []map[string]string{}, utils.ErrSuspiciousInput},
 		{&OkStruct{}, "past", "sdfh", []map[string]string{}, nil},
 		{&OkStruct{}, "now", "sdfh", []map[string]string{}, nil},
-		{&OkStruct{}, "staff", "sdfh", []map[string]string{}, nil},
 		{&ErrorStruct{}, "past", "sdfh", []map[string]string{}, errTest},
 		{&ErrorStruct{}, "now", "sdfh", []map[string]string{}, errTest},
-		{&ErrorStruct{}, "staff", "sdfh", []map[string]string{}, errTest},
 	}
 
 	for _, tt := range tests {
