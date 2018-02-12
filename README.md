@@ -2,6 +2,9 @@
 
 [Backlog](https://shonei.github.io/student-information-system/)
 
+### Documentation
+[![GoDoc](https://godoc.org/github.com/Shonei/student-information-system/go-packages/dbc?status.svg)](https://godoc.org/github.com/Shonei/student-information-system/go-packages/dbc)
+
 ### Prerequisites
 
 We will assume you have Golang, NodeJS and PostgreSQL installed as well as knowledgee of how to run basic commands in these enviourments. Furthermore go requires you to have git installed and linked with it. This is used to download go packages.
