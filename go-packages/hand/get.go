@@ -70,13 +70,19 @@ func GetProfile(f func(string) (map[string]string, error)) http.Handler {
 			switch err {
 			case utils.ErrSuspiciousInput:
 				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
-			case utils.ErrUnexpectedChoice:
+			case utils.ErrToManyRows:
+				// confuse attacker with misleading messeges.
+				http.Error(w, "No matches for input.", http.StatusBadRequest)
+			case utils.ErrEmptySQLSet:
+				m = map[string]string{}
+				goto canDealWith
 			default:
 				http.Error(w, "We were unable to retrieve the profile.", http.StatusInternalServerError)
 			}
 			return
 		}
 
+	canDealWith:
 		err = json.NewEncoder(w).Encode(m)
 		if err != nil {
 			http.Error(w, "We encountered an error parsing the students profile", http.StatusInternalServerError)
@@ -100,15 +106,16 @@ func BasicGet(f func(string) ([]map[string]string, error)) http.Handler {
 			switch err {
 			case utils.ErrSuspiciousInput:
 				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
-			case utils.ErrUnexpectedChoice:
-				log.Println("YOU HAVE MADE A WRONG CHOICE, FIX IT!!!!")
-				http.Error(w, "We encountered an unexpected error retrieving the data.", http.StatusInternalServerError)
+			case utils.ErrEmptySQLSet:
+				m = []map[string]string{}
+				goto canDealWith
 			default:
 				http.Error(w, "We encountered an unexpected error retrieving the data.", http.StatusInternalServerError)
 			}
 			return
 		}
 
+	canDealWith:
 		if err = json.NewEncoder(w).Encode(m); err != nil {
 			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
 			return

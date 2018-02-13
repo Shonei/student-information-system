@@ -5,10 +5,10 @@ import "errors"
 // ErrUnothorized can be returned from functions that handle authentication or authoriazation.
 var ErrUnothorized = errors.New("wrong usrname or password")
 
-// ErrUnexpectedChoice should never be send by the any function.
-// It is only send by functions in the bdc package that have a switch statement
-// that chooses between sql queries and we reach the default case.
-var ErrUnexpectedChoice = errors.New("no such parameter")
+// ErrToManyRows will be returned by functions that expect to find only
+// a single row in the output. This type of function can be about generating the
+// profile for a user.
+var ErrToManyRows = errors.New("no such parameter")
 
 // ErrSuspiciousInput returned by functions in the bdc package.
 // That happends when a function determines there are invalid characters in the input variable.

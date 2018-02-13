@@ -39,30 +39,30 @@ func main() {
 
 	// Student closures
 	getStudentPro := func(str string) (map[string]string, error) {
-		return dbc.GetProfile(db, "student", str)
+		return dbc.RunSingleRowQuery(db, "SELECT * FROM get_student_profile($1);", str)
 	}
 	getCwkResults := func(user string) ([]map[string]string, error) {
-		return dbc.GetStudentCwk(db, "results", user)
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_student_cwk_results($1);", user)
 	}
 	getCwkTimetable := func(user string) ([]map[string]string, error) {
-		return dbc.GetStudentCwk(db, "timetable", user)
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_student_cwk_timetable($1);", user)
 	}
 	getNowModules := func(user string) ([]map[string]string, error) {
-		return dbc.GetModulesList(db, "now", user)
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_student_current_modules($1);", user)
 	}
 	getPastModules := func(user string) ([]map[string]string, error) {
-		return dbc.GetModulesList(db, "past", user)
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_student_past_modules($1);", user)
 	}
 
 	// Staff closures
 	getStaffPro := func(str string) (map[string]string, error) {
-		return dbc.GetProfile(db, "staff", str)
+		return dbc.RunSingleRowQuery(db, "SELECT * FROM get_staff_profile($1);", str)
 	}
 	getStaffModules := func(str string) ([]map[string]string, error) {
-		return dbc.GetStaffModules(db, str)
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_staff_modules($1);", str)
 	}
 	getStaffTutees := func(str string) ([]map[string]string, error) {
-		return dbc.GetStaffTutees(db, str)
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_staff_tutees($1);", str)
 	}
 
 	r := mux.NewRouter()

@@ -28,35 +28,35 @@ INSERT INTO module(code, name, description, syllabus, semester, year_of_study, c
 INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(25509, 'JBOD firewall!', 'bypassing the hard drive wont do anything, we need to input the wireless SQL bus!', 'The EXE pixel is down, bypass the digital panel so we can generate the SAS firewall!', 1, 3, 5);
 INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(72065, 'cross-platform microchip!', 'Ill synthesize the wireless SMTP program, that should hard drive the JSON pixel!', 'Try to input the HDD application, maybe it will parse the wireless array!', 1, 3, 19);
 
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(10684, 'lecture', NOW(), 'HDD');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(10684, 'lab', NOW() + '2 hours', 'interactive');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(10684, 'lecture', NOW() + '1 day', 'generate');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(10684, 'lecture', NOW() + '1 week', 'generate');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(10684, 'tutorial', NOW() + '1 weeks', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(10684, 'lecture', NOW(), 'HDD');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(10684, 'lab', NOW() + '2 hours', 'interactive');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(10684, 'lecture', NOW() + '1 day', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(10684, 'lecture', NOW() + '1 week', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(10684, 'tutorial', NOW() + '1 weeks', 'generate');
 
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25351, 'lecture', NOW(), 'HDD');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25351, 'lab', NOW() + '2 hours', 'interactive');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25351, 'tutorial', NOW() + '5 day', 'generate');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25351, 'lecture', NOW() + '1 weeks', 'HDD');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25351, 'tutorial', NOW() + '2 week', 'HDD');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25351, 'lecture', NOW(), 'HDD');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25351, 'lab', NOW() + '2 hours', 'interactive');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25351, 'tutorial', NOW() + '5 day', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25351, 'lecture', NOW() + '1 weeks', 'HDD');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25351, 'tutorial', NOW() + '2 week', 'HDD');
 
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(86583, 'lecture', NOW(), 'generate');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(86583, 'lab', NOW() + '55 hours', 'interactive');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(86583, 'lecture', NOW() + '7 day', 'generate');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(86583, 'lecture', NOW() + '2 weeks', 'generate');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(86583, 'tutorial', NOW() + '1 weeks', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(86583, 'lecture', NOW(), 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(86583, 'lab', NOW() + '55 hours', 'interactive');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(86583, 'lecture', NOW() + '7 day', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(86583, 'lecture', NOW() + '2 weeks', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(86583, 'tutorial', NOW() + '1 weeks', 'generate');
 
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25509, 'lecture', NOW(), 'HDD');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25509, 'lab', NOW() + '8 hours', 'interactive');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25509, 'lecture', NOW() + '5 day', 'generate');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25509, 'lecture', NOW() + '1 weeks', 'interactive');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(25509, 'lab', NOW() + '2 weeks', 'interactive');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25509, 'lecture', NOW(), 'HDD');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25509, 'lab', NOW() + '8 hours', 'interactive');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25509, 'lecture', NOW() + '5 day', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25509, 'lecture', NOW() + '1 weeks', 'interactive');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(25509, 'lab', NOW() + '2 weeks', 'interactive');
 
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(72065, 'lecture', NOW(), 'HDD');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(72065, 'lecture', NOW() + '10 hours', 'interactive');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(72065, 'lecture', NOW() + '3 day', 'generate');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(72065, 'lecture', NOW() + '1 weeks 2 days', 'HDD');
-INSERT INTO timetable(module_code, m_type, l_time, room) VALUES(72065, 'lecture', NOW() + '1 weeks', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(72065, 'lecture', NOW(), 'HDD');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(72065, 'lecture', NOW() + '10 hours', 'interactive');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(72065, 'lecture', NOW() + '3 day', 'generate');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(72065, 'lecture', NOW() + '1 weeks 2 days', 'HDD');
+INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(72065, 'lecture', NOW() + '1 weeks', 'generate');
 
 INSERT INTO prerequisites(module_code, prerequisite_code) VALUES(25351, 10684);
 INSERT INTO prerequisites(module_code, prerequisite_code) VALUES(72065, 25351);
