@@ -29,25 +29,48 @@ func main() {
 	db := &utils.DB{temp}
 	defer db.Close()
 
-	singleParamQuery := func(user string) (string, error) { return dbc.SingleParamQuery(db, "salt", user) }
-	genAuthtoken := func(user, hash string) (map[string]string, error) { return dbc.GenAuthToken(db, user, hash) }
+	// All users closures
+	singleParamQuery := func(user string) (string, error) {
+		return dbc.SingleParamQuery(db, "salt", user)
+	}
+	genAuthtoken := func(user, hash string) (map[string]string, error) {
+		return dbc.GenAuthToken(db, user, hash)
+	}
 
-	getStudentPro := func(str string) (map[string]string, error) { return dbc.GetProfile(db, "student", str) }
-	getCwkResults := func(user string) ([]map[string]string, error) { return dbc.GetStudentCwk(db, "results", user) }
-	getCwkTimetable := func(user string) ([]map[string]string, error) { return dbc.GetStudentCwk(db, "timetable", user) }
-	getNowModules := func(user string) ([]map[string]string, error) { return dbc.GetModulesList(db, "now", user) }
-	getPastModules := func(user string) ([]map[string]string, error) { return dbc.GetModulesList(db, "past", user) }
+	// Student closures
+	getStudentPro := func(str string) (map[string]string, error) {
+		return dbc.GetProfile(db, "student", str)
+	}
+	getCwkResults := func(user string) ([]map[string]string, error) {
+		return dbc.GetStudentCwk(db, "results", user)
+	}
+	getCwkTimetable := func(user string) ([]map[string]string, error) {
+		return dbc.GetStudentCwk(db, "timetable", user)
+	}
+	getNowModules := func(user string) ([]map[string]string, error) {
+		return dbc.GetModulesList(db, "now", user)
+	}
+	getPastModules := func(user string) ([]map[string]string, error) {
+		return dbc.GetModulesList(db, "past", user)
+	}
 
-	getStaffPro := func(str string) (map[string]string, error) { return dbc.GetProfile(db, "staff", str) }
-	getStaffModules := func(str string) ([]map[string]string, error) { return dbc.GetStaffModules(db, str) }
-	getStaffTutees := func(str string) ([]map[string]string, error) { return dbc.GetStaffTutees(db, str) }
+	// Staff closures
+	getStaffPro := func(str string) (map[string]string, error) {
+		return dbc.GetProfile(db, "staff", str)
+	}
+	getStaffModules := func(str string) ([]map[string]string, error) {
+		return dbc.GetStaffModules(db, str)
+	}
+	getStaffTutees := func(str string) ([]map[string]string, error) {
+		return dbc.GetStaffTutees(db, str)
+	}
 
 	r := mux.NewRouter()
 	// Universal routes
 	r.Handle("/get/salt/{user}", hand.GetSalt(singleParamQuery)).Methods("GET")
 	r.Handle("/get/token/{user}", hand.GetToken(genAuthtoken)).Methods("GET")
 
-	// Studetn part of the API
+	// Student part of the API
 	r.Handle("/get/student/profile/{user}", mw.BasicAuth(hand.GetProfile(getStudentPro))).Methods("GET")
 	r.Handle("/get/student/cwk/timetable/{user}", mw.BasicAuth(hand.BasicGet(getCwkTimetable))).Methods("GET")
 	r.Handle("/get/student/cwk/results/{user}", mw.BasicAuth(hand.BasicGet(getCwkResults))).Methods("GET")

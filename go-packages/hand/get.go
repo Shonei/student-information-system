@@ -101,6 +101,8 @@ func BasicGet(f func(string) ([]map[string]string, error)) http.Handler {
 			case utils.ErrSuspiciousInput:
 				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
 			case utils.ErrUnexpectedChoice:
+				log.Println("YOU HAVE MADE A WRONG CHOICE, FIX IT!!!!")
+				http.Error(w, "We encountered an unexpected error retrieving the data.", http.StatusInternalServerError)
 			default:
 				http.Error(w, "We encountered an unexpected error retrieving the data.", http.StatusInternalServerError)
 			}

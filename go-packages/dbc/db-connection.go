@@ -126,7 +126,6 @@ func GetModulesList(db utils.DBAbstraction, choice, user string) ([]map[string]s
 // It only accepts a timetable or results as input.
 // It will return a  utils.ErrUnexpectedChoice otherwise.
 func GetStudentCwk(db utils.DBAbstraction, t, user string) ([]map[string]string, error) {
-	// check if courseowrk has a result or not. In results tap show only courseworks with results.
 	result := "SELECT coursework.module_code, coursework.cwk_name, coursework.percentage, coursework.marks, coursework_result.result FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id WHERE login_info.username = $1 AND coursework_result.result IS NOT NULL;"
 	timetable := "SELECT coursework.cwk_name, coursework.posted_on, coursework.deadline FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id  WHERE login_info.username = $1 AND coursework_result.result IS NULL;"
 
@@ -166,4 +165,87 @@ func GetStaffTutees(db utils.DBAbstraction, user string) ([]map[string]string, e
 	}
 
 	return db.SelectMulti(tutoring, user)
+}
+
+// GetInformation is a swwitch statement of the available queries.
+// The query parameter is used to choose from one of the available queries.
+// That choice should never be left to the end user but be done by the developers of the server.
+// The available options are:
+//  "staff_tutees", "staff_modules"
+//  "student_current_modules", "student_past_modules"
+//  "student_cwk_result", "student_cwk_timetable"
+func GetInformation(db utils.DBAbstraction, query, user string) ([]map[string]string, error) {
+	staffTutees := `
+		SELECT login_info.username, student.id, student.programme_code, to_char(tutor.suppervision_year, 'YYYY') AS year 
+		FROM tutor 
+		INNER JOIN student ON student.id = tutor.student_id 
+		INNER JOIN staff ON staff.id = tutor.staff_id 
+		INNER JOIN login_info ON login_info.id = student.id 
+		WHERE tutor.staff_id = (SELECT id FROM login_info WHERE username = $1);`
+
+	staffModules := `
+		SELECT module.code, module.name, teaching.staff_role 
+		FROM module 
+		INNER JOIN teaching ON teaching.module_code = module.code 
+		INNER JOIN staff ON staff.id = teaching.staff_id 
+		INNER JOIN login_info ON login_info.id = staff.id 
+		WHERE login_info.username = $1;`
+
+	studentCurrentModules := `
+		SELECT module.code, module.name, student_modules.study_year, student_modules.result 
+		FROM student_modules 
+		INNER JOIN module ON module.code = student_modules.module_code 
+		INNER JOIN student ON student.id = student_modules.student_id 
+		INNER JOIN login_info ON student_modules.student_id = login_info.id 
+		WHERE login_info.username = $1 
+		AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');`
+
+	studentPastModules := `
+		SELECT module.code, module.name, student_modules.study_year, student_modules.result 
+		FROM student_modules 
+		INNER JOIN module ON module.code = student_modules.module_code 
+		INNER JOIN student ON student.id = student_modules.student_id 
+		INNER JOIN login_info ON student_modules.student_id = login_info.id 
+		WHERE login_info.username = $1 
+		AND NOT to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');`
+
+	studentCwkResult := `
+		SELECT coursework.module_code, coursework.cwk_name, coursework.percentage, coursework.marks, coursework_result.result 
+		FROM coursework 
+		INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id 
+		INNER JOIN student ON coursework_result.student_id = student.id 
+		INNER JOIN login_info ON student.id = login_info.id 
+		INNER JOIN student_modules ON student_modules.student_id = student.id 
+		WHERE login_info.username = $1 
+		AND coursework_result.result IS NOT NULL;`
+
+	studentCwkTimetable := `
+		SELECT coursework.cwk_name, coursework.posted_on, coursework.deadline 
+		FROM coursework 
+		INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id 
+		INNER JOIN student ON coursework_result.student_id = student.id 
+		INNER JOIN login_info ON student.id = login_info.id 
+		INNER JOIN student_modules ON student_modules.student_id = student.id  
+		WHERE login_info.username = $1 AND coursework_result.result IS NULL;`
+
+	if !basicParser.MatchString(query) || !basicParser.MatchString(user) {
+		return nil, utils.ErrSuspiciousInput
+	}
+
+	switch query {
+	case "staff_tutees":
+		return db.SelectMulti(staffTutees, user)
+	case "staff_modules":
+		return db.SelectMulti(staffModules, user)
+	case "student_current_modules":
+		return db.SelectMulti(studentCurrentModules, user)
+	case "student_cwk_result":
+		return db.SelectMulti(studentCwkResult, user)
+	case "student_cwk_timetable":
+		return db.SelectMulti(studentCwkTimetable, user)
+	case "student_past_modules":
+		return db.SelectMulti(studentPastModules, user)
+	default:
+		return nil, utils.ErrUnexpectedChoice
+	}
 }
