@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import { wrapFetch as fetch } from './../helpers';
-import { Avatar, FlatButton } from 'material-ui';
+import React, { PureComponent } from 'react';
+import { wrapFetch } from './../helpers';
+import { Avatar, FlatButton, TextField, RaisedButton } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import CustomTable from './../CustomTable';
 
-class Staff extends Component {
+class Staff extends PureComponent {
   constructor() {
     super();
 
@@ -18,26 +18,29 @@ class Staff extends Component {
       id: '',
       last_name: '',
       middle_name: '',
-      phone: ''
+      phone: '',
+      errorMessage: ''
     };
 
+    this.search = '';
     this.handleStudentClick = this.handleStudentClick.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
   }
 
   componentDidMount() {
-    fetch('staff', '/get/staff/profile/')
+    wrapFetch('staff', '/get/staff/profile/')
       .then(j => this.setState(() => j))
       .catch(console.log);
 
-    fetch('staff', '/get/staff/modules/')
+    wrapFetch('staff', '/get/staff/modules/')
       .then(m => this.setState({ modules: m }))
       .catch(console.log);
 
-    fetch('staff', '/get/staff/tutees/')
+    wrapFetch('staff', '/get/staff/tutees/')
       .then(val => {
         val = val.map(student => {
           const user = student.username;
-          student.username = <FlatButton style={{ cursor: "pointer" }} onClick={() => this.handleStudentClick(user)} label={user}/>;
+          student.username = <FlatButton style={{ cursor: "pointer" }} onClick={() => this.handleStudentClick(user)} label={user} />;
           return student;
         });
         this.setState({ tutees: val });
@@ -50,12 +53,51 @@ class Staff extends Component {
     window.location.href = '/student';
   }
 
+  handleSearch(e) {
+    e.preventDefault();
+    if (this.search.length === 0) {
+      this.setState({ errorMessage: 'Can\'t search for empty values.' });
+      return;
+    }
+
+    return fetch('/search/' + this.search, {
+      credentials: 'same-origin',
+    }).then(res => {
+      if (!res.ok) {
+        return Promise.reject(res);
+      } else {
+        return res.json();
+      }
+    }).then(data => {
+      localStorage.setItem('search', JSON.stringify(data));
+      window.location.href = '/search';
+    }).catch(err => this.setState({ errorMessage : 'No results were found.'}));
+  }
+
   render() {
     const fullName = this.state.first_name + ' ' + this.state.middle_name + ' ' + this.state.last_name;
     const URL = "https://github.com/Shonei/student-information-system/blob/master/database.jpg?raw=true";
 
     return (
       <Grid fluid>
+        <Row end="xs">
+          <Col xs={6} >
+            <p style={{ color: 'red' }}>{this.state.errorMessage}</p>
+          </Col>
+          <Col xs={5} >
+            <TextField
+              hintText="Search"
+              onChange={(event, text) => this.search = text}
+            />
+            <RaisedButton
+              label="Search"
+              primary={true}
+              style={{ margin: 12 }}
+              onClick={this.handleSearch}
+            />
+          </Col>
+          <Col xs={1} />
+        </Row>
         <br />
         <br />
         <Row center="xs">

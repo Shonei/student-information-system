@@ -51,12 +51,12 @@ class Login extends Component {
         var h = new Date();
         h.setTime(h.getTime() + (2 * 60 * 60 * 1000));
         document.cookie = 'token=' + data.token + ";" + "expires=" + h.toUTCString() + ";path=/";
-        
+
         // Set user and access_level in the local storage so we can use it 
         // as a global shared state to manage the view.
         // This makes it so users have to always login once they leave the app.
         window.localStorage.setItem('access_level', data.level);
-        
+
         // a somewhat ugly change of path but it works.
         let loc = '/';
         if (data.level === '1') {
@@ -66,6 +66,7 @@ class Login extends Component {
           loc = '/staff';
           window.localStorage.setItem('staff', this.username);
         }
+        window.localStorage.setItem('loggedin', this.username);
         document.location.href = loc;
       })
       .catch(err => {

@@ -64,6 +64,9 @@ func main() {
 	getStaffTutees := func(str string) ([]map[string]string, error) {
 		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_staff_tutees($1);", str)
 	}
+	search := func(str string) (map[string][]map[string]string, error) {
+		return dbc.Search(db, str)
+	}
 
 	r := mux.NewRouter()
 	// Universal routes
@@ -78,9 +81,10 @@ func main() {
 	r.Handle("/get/student/modules/past/{user}", mw.BasicAuth(hand.BasicGet(getPastModules))).Methods("GET")
 
 	// Staff API
-	r.Handle("/get/staff/profile/{user}", mw.BasicAuth(hand.GetProfile(getStaffPro))).Methods("GET")
-	r.Handle("/get/staff/modules/{user}", mw.BasicAuth(hand.BasicGet(getStaffModules))).Methods("GET")
-	r.Handle("/get/staff/tutees/{user}", mw.BasicAuth(hand.BasicGet(getStaffTutees))).Methods("GET")
+	r.Handle("/get/staff/profile/{user}", mw.StaffOnly(hand.GetProfile(getStaffPro))).Methods("GET")
+	r.Handle("/get/staff/modules/{user}", mw.StaffOnly(hand.BasicGet(getStaffModules))).Methods("GET")
+	r.Handle("/get/staff/tutees/{user}", mw.StaffOnly(hand.BasicGet(getStaffTutees))).Methods("GET")
+	r.Handle("/search/{query}", hand.GetSearch(search)).Methods("GET")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))
@@ -89,10 +93,13 @@ func main() {
 	// static file server
 	r.PathPrefix("/student").Handler(http.StripPrefix("/student", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/staff").Handler(http.StripPrefix("/staff", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/search").Handler(http.StripPrefix("/search", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/"))).Methods("GET")
 
 	// listen on the router
 	http.Handle("/", r)
+
+	// fmt.Println(dbc.Search(db, "s"))
 
 	log.Println(http.ListenAndServe(":"+port, nil))
 }

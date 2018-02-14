@@ -88,3 +88,49 @@ func TestRunSingleRowQuery(t *testing.T) {
 		})
 	}
 }
+
+func TestSearch(t *testing.T) {
+	tests := []struct {
+		name  string
+		db    utils.DBAbstraction
+		query string
+		want  map[string][]map[string]string
+		err   error
+	}{
+		{"all goes well",
+			&OkStruct{},
+			"sh",
+			map[string][]map[string]string{
+				"programmes": []map[string]string{{"OK": "1"}},
+				"staff":      []map[string]string{{"OK": "1"}},
+				"modules":    []map[string]string{{"OK": "1"}},
+				"students":   []map[string]string{{"OK": "1"}},
+			},
+			nil},
+		{"invalid input", &OkStruct{}, "s%h", nil, utils.ErrSuspiciousInput},
+		{"We get empty map",
+			&ErrorStruct{},
+			"sh",
+			map[string][]map[string]string{
+				"programmes": []map[string]string{},
+				"staff":      []map[string]string{},
+				"modules":    []map[string]string{},
+				"students":   []map[string]string{},
+			},
+			nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Search(tt.db, tt.query)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Want %v - Got %v.", tt.want, got)
+			}
+
+			if err != tt.err {
+				t.Errorf("Want %v - Got %v.", tt.err, err)
+			}
+		})
+	}
+}

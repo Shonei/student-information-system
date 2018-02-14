@@ -1,6 +1,7 @@
 package dbc
 
 import (
+	"log"
 	"regexp"
 	"strconv"
 	"time"
@@ -102,29 +103,115 @@ func RunSingleRowQuery(db utils.DBAbstraction, query, user string) (map[string]s
 	return m[0], nil
 }
 
-func Search(db utils.DBAbstraction, user string) ([]map[string]string, error) {
-	if !basicParser.MatchString(user) {
+// Search performes a search in the database for staff, students, modules and porgrammes.
+// it returns an array of maps for each.
+// Sample output:
+//  map[
+//   programmes:[
+//  	map[name:SQL matrix! code:10684]
+//  	map[name:SCSI circuit! code:86583]
+//  	map[name:cross-platform microchip! code:72065]
+//   ]
+//   staff:[
+//  	map[name:Otha Clinton Dooley username:shyl4 id:62540]
+//   ]
+//   modules:[
+//  	map[name:WHY YOU NO NAME code:maiores ucas_code:18950]
+//  	map[name:WHY YOU NO NAME code:sit ucas_code:9080]
+//   ]
+//   students:[
+//  	map[name:Tianna Rosella Hettinger username:shyl0 id:72862]
+//  	map[name:Sid Rafael Kuhic username:shyl1 id:44148]
+//   ]
+//  ]
+func Search(db utils.DBAbstraction, queryString string) (map[string][]map[string]string, error) {
+	if !basicParser.MatchString(queryString) {
 		return nil, utils.ErrSuspiciousInput
 	}
 
+	// create the 4 channels
 	staff := make(chan []map[string]string)
 	students := make(chan []map[string]string)
 	modules := make(chan []map[string]string)
 	programmes := make(chan []map[string]string)
 
-	defer close(staff)
-	defer close(students)
-	defer close(modules)
-	defer close(programmes)
-
+	// initialize the output data
 	output := map[string][]map[string]string{}
 
-	select {
-	case output["staff"] = <-staff:
-	case output["students"] = <-students:
-	case output["modules"] = <-modules:
-	case output["programmes"] = <-programmes:
-	case <-time.After(1 * time.Second):
-		return nil, utils.ErrTimedOut
+	// start the 4 different searches
+	go doSearch(db, "SELECT * FROM search_staff($1);", queryString, staff)
+	go doSearch(db, "SELECT * FROM search_student($1);", queryString, students)
+	go doSearch(db, "SELECT * FROM search_programme($1);", queryString, programmes)
+	go doSearch(db, "SELECT * FROM search_module($1);", queryString, modules)
+
+	waitingChannels := 4
+
+	// forChannels: label the for loop so we can break out
+	// for loop reads from the channels until all the jobs complete
+	// or they time out
+forChannels:
+	for {
+		// selects and reads from channels
+		select {
+		case msg, ok := <-staff:
+			if !ok {
+				// nil so we don't select the channel agian
+				staff = nil
+				// deacrease the count of waiting channels
+				waitingChannels--
+				break
+			}
+			output["staff"] = msg
+		case msg, ok := <-students:
+			if !ok {
+				students = nil
+				waitingChannels--
+				break
+			}
+			output["students"] = msg
+		case msg, ok := <-modules:
+			if !ok {
+				modules = nil
+				waitingChannels--
+				break
+			}
+			output["modules"] = msg
+		case msg, ok := <-programmes:
+			if !ok {
+				programmes = nil
+				waitingChannels--
+				break
+			}
+			output["programmes"] = msg
+		case <-time.After(15 * time.Second):
+			log.Println("timed out")
+			return output, utils.ErrTimedOut
+		default:
+			// chack for nil channels
+			if waitingChannels == 0 {
+				// breaks the for loop
+				break forChannels
+			}
+		}
 	}
+
+	return output, nil
+}
+
+// executes a SQL query that takes a user as input
+// once the query is done it writes the responce to the channel and closes the channel
+// if an error occures it writes he 0 value to the channel
+func doSearch(db utils.DBAbstraction, query, user string, c chan []map[string]string) {
+	// close the channel after we are done
+	defer close(c)
+
+	m, err := db.SelectMulti(query, user)
+	if err != nil {
+		log.Println(err)
+		// don't send valid output if we get an error
+		c <- []map[string]string{}
+		return
+	}
+
+	c <- m
 }

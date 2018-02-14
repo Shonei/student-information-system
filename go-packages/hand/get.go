@@ -122,3 +122,30 @@ func BasicGet(f func(string) ([]map[string]string, error)) http.Handler {
 		}
 	})
 }
+
+// GetSearch is the search endpoint matching /search/{query} endpoint.
+// The succesful output of this will be a JSON object containing 4 properties for
+// staff, students, modules and programmes.
+func GetSearch(f func(string) (map[string][]map[string]string, error)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		m, err := f(vars["query"])
+		if err != nil {
+			log.Println(err)
+			// check error type and return
+			switch err {
+			case utils.ErrSuspiciousInput:
+				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
+			default:
+				http.Error(w, "We encountered an unexpected error retrieving the data.", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		if err = json.NewEncoder(w).Encode(m); err != nil {
+			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
+			return
+		}
+	})
+}
