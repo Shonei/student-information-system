@@ -2,7 +2,10 @@ package dbc
 
 import (
 	"errors"
+	"reflect"
 	"testing"
+
+	"github.com/Shonei/student-information-system/go-packages/utils"
 )
 
 type OkStruct struct{}
@@ -21,43 +24,18 @@ func (t *OkStruct) PreparedStmt(s string, args ...interface{}) error {
 
 type ErrorStruct struct{}
 
+var errTest = errors.New("not ok")
+
 func (t *ErrorStruct) Select(s string, args ...interface{}) (string, error) {
-	return "", errors.New("not ok")
+	return "", errTest
 }
 
 func (t *ErrorStruct) SelectMulti(s string, args ...interface{}) ([]map[string]string, error) {
-	return nil, errors.New("not ok")
+	return nil, errTest
 }
 
 func (t *ErrorStruct) PreparedStmt(s string, args ...interface{}) error {
-	return errors.New("not ok")
-}
-
-func TestSingleParamQuery(t *testing.T) {
-	t.Run("No error", func(t *testing.T) {
-		got, err := SingleParamQuery(&OkStruct{}, "salt", "")
-		if err != nil {
-			t.Error("Didn't want an error")
-		}
-
-		if got != "1" {
-			t.Errorf("Got %s - wanted ok", got)
-		}
-	})
-
-	t.Run("Returns error", func(t *testing.T) {
-		_, err := SingleParamQuery(&ErrorStruct{}, "salt", "")
-		if err == nil {
-			t.Error("Didn't want an error")
-		}
-
-		_, err = SingleParamQuery(&ErrorStruct{}, "", "")
-		if err != nil {
-			if _, ok := err.(*TokenError); !ok {
-				t.Error("Expecting a TokenError")
-			}
-		}
-	})
+	return errTest
 }
 
 func TestGenAuthToken(t *testing.T) {
@@ -67,8 +45,8 @@ func TestGenAuthToken(t *testing.T) {
 			t.Errorf("Got error we don't want error - %v", err)
 		}
 
-		if len(got["token"]) != 133 {
-			t.Errorf("Want 133 - %v", len(got["token"]))
+		if len(got["token"]) != 207 {
+			t.Errorf("Want 207 - %v", len(got["token"]))
 		}
 	})
 
@@ -80,110 +58,79 @@ func TestGenAuthToken(t *testing.T) {
 	})
 }
 
-func TestCheckToken(t *testing.T) {
-	t.Run("Valid token", func(t *testing.T) {
-		got, err := CheckToken(&OkStruct{}, "1:")
-		if err != nil {
-			t.Error("Got an error when we didn't want one")
-		}
+func TestRunSingleRowQuery(t *testing.T) {
+	tests := []struct {
+		name  string
+		db    utils.DBAbstraction
+		query string
+		user  string
+		want  map[string]string
+		err   error
+	}{
+		{"empty string for user", &OkStruct{}, "", "", nil, utils.ErrSuspiciousInput},
+		{"escape character in user", &OkStruct{}, "", "asdg\"", nil, utils.ErrSuspiciousInput},
+		{"unexpected character in user", &OkStruct{}, "", "sdf%", nil, utils.ErrSuspiciousInput},
+		{"empty string for user", &ErrorStruct{}, "", "sdg", nil, errTest},
+		{"empty string for user", &OkStruct{}, "", "sdf", map[string]string{"OK": "1"}, nil},
+	}
 
-		if got != 1 {
-			t.Error("Got %v - wanted 1", got)
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := RunSingleRowQuery(tt.db, tt.query, tt.user)
 
-	t.Run("We get an error", func(t *testing.T) {
-		_, err := CheckToken(&ErrorStruct{}, "1:")
-		if err == nil {
-			t.Error("We din't get an error.")
-		}
-	})
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Want %v - Got %v.", tt.want, got)
+			}
+
+			if err != tt.err {
+				t.Errorf("Want %v - Got %v.", tt.err, err)
+			}
+		})
+	}
 }
 
-func TestGetStudentPro(t *testing.T) {
-	t.Run("All goes well", func(t *testing.T) {
-		_, err := GetStudentPro(&ErrorStruct{}, "sdfhdsaf")
-		if err == nil {
-			t.Error("Got no error")
-		}
-	})
+func TestSearch(t *testing.T) {
+	tests := []struct {
+		name  string
+		db    utils.DBAbstraction
+		query string
+		want  map[string][]map[string]string
+		err   error
+	}{
+		{"all goes well",
+			&OkStruct{},
+			"sh",
+			map[string][]map[string]string{
+				"programmes": []map[string]string{{"OK": "1"}},
+				"staff":      []map[string]string{{"OK": "1"}},
+				"modules":    []map[string]string{{"OK": "1"}},
+				"students":   []map[string]string{{"OK": "1"}},
+			},
+			nil},
+		{"invalid input", &OkStruct{}, "s%h", nil, utils.ErrSuspiciousInput},
+		{"We get empty map",
+			&ErrorStruct{},
+			"sh",
+			map[string][]map[string]string{
+				"programmes": []map[string]string{},
+				"staff":      []map[string]string{},
+				"modules":    []map[string]string{},
+				"students":   []map[string]string{},
+			},
+			nil},
+	}
 
-	t.Run("It fails successfully", func(t *testing.T) {
-		m, err := GetStudentPro(&OkStruct{}, "sdg")
-		if err != nil {
-			t.Errorf("Expected no error got %v", err)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Search(tt.db, tt.query)
 
-		if m["OK"] != "1" {
-			t.Errorf("Wanted 1 got - %v", m)
-		}
-	})
-}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Want %v - Got %v.", tt.want, got)
+			}
 
-func TestGetStudentModules(t *testing.T) {
-	t.Run("All go wells", func(t *testing.T) {
-		m, err := GetStudentModules(&OkStruct{}, "now", "")
-
-		if m[0]["OK"] != "1" {
-			t.Errorf("Wanted 1 - got %v.", m)
-		}
-
-		if err != nil {
-			t.Error("Wanted no errors")
-		}
-	})
-
-	t.Run("All go wells with past", func(t *testing.T) {
-		m, err := GetStudentModules(&OkStruct{}, "past", "")
-
-		if m[0]["OK"] != "1" {
-			t.Errorf("Wanted 1 - got %v.", m)
-		}
-
-		if err != nil {
-			t.Error("Wanted no errors")
-		}
-	})
-
-	t.Run("Failes", func(t *testing.T) {
-		_, err := GetStudentModules(&OkStruct{}, "nosw", "")
-
-		if err == nil {
-			t.Error("Wanted no errors")
-		}
-	})
-}
-
-func TestGetStudentCwk(t *testing.T) {
-	t.Run("All go wells", func(t *testing.T) {
-		m, err := GetStudentCwk(&OkStruct{}, "timetable", "")
-
-		if m[0]["OK"] != "1" {
-			t.Errorf("Wanted 1 - got %v.", m)
-		}
-
-		if err != nil {
-			t.Error("Wanted no errors")
-		}
-	})
-
-	t.Run("All go wells with past", func(t *testing.T) {
-		m, err := GetStudentCwk(&OkStruct{}, "results", "")
-
-		if m[0]["OK"] != "1" {
-			t.Errorf("Wanted 1 - got %v.", m)
-		}
-
-		if err != nil {
-			t.Error("Wanted no errors")
-		}
-	})
-
-	t.Run("Failes", func(t *testing.T) {
-		_, err := GetStudentCwk(&OkStruct{}, "nosw", "")
-
-		if err == nil {
-			t.Error("Wanted no errors")
-		}
-	})
+			if err != tt.err {
+				t.Errorf("Want %v - Got %v.", tt.err, err)
+			}
+		})
+	}
 }

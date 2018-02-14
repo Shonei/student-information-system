@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import {
   Table,
   TableBody,
@@ -12,17 +13,11 @@ class CustomTable extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.handleClick = this.handleClick.bind(this);
     this.getHeader = this.getHeader.bind(this);
     this.getBody = this.getBody.bind(this);
-
-    // MUST HAVE order and headers
   }
 
-  handleClick(e, f) {
-    console.log(e, f);
-  }
-
+  // creates a table header row given an array of strings
   getHeader(arr) {
     return (
       < TableRow >
@@ -30,19 +25,24 @@ class CustomTable extends PureComponent {
       </TableRow >);
   }
 
+  // given an order and values it creates an table body
   getBody(order, values) {
     let arr = [];
 
-    if (!values) {
+    // check for empty or undefined values
+    if (!values || !order) {
       return;
     }
 
-    if (values.lenght < 1) {
+    // makes sure they are arrays 
+    if (values.lenght > 1 || order.lenght > 1) {
       return;
     }
 
+    // create the table body
     values.forEach((value, i) => {
-      let temp = order.map(e => <TableRowColumn key={value[e]}>{value[e]}</TableRowColumn>);
+      // create the tables body with a good enough unique key and check for empty values
+      let temp = order.map(e => <TableRowColumn key={Math.random()}>{value[e] ? value[e] : ''}</TableRowColumn>);
       arr.push(<TableRow hoverable={true} key={i}>{temp}</TableRow>);
     });
 
@@ -51,8 +51,9 @@ class CustomTable extends PureComponent {
 
   render() {
     return (
-      <Table onCellClick={this.handleClick}>
-        <TableHeader>
+      <Table>
+        <TableHeader
+          adjustForCheckbox={false}>
           {this.getHeader(this.props.headers)}
         </TableHeader>
         <TableBody displayRowCheckbox={false}>
@@ -62,5 +63,11 @@ class CustomTable extends PureComponent {
     );
   }
 }
+
+CustomTable.propTypes = {
+  // headers are needed so people can still know what info is stored in the table
+  headers: PropTypes.arrayOf(PropTypes.string).isRequired,
+  order: PropTypes.arrayOf(PropTypes.string),
+};
 
 export default CustomTable;

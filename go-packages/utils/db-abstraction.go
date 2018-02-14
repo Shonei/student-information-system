@@ -1,4 +1,4 @@
-package dba
+package utils
 
 import (
 	"database/sql"
@@ -91,5 +91,11 @@ func readRows(rows *sql.Rows) ([]map[string]string, error) {
 
 		ret = append(ret, result)
 	}
+
+	// maybe a slopy check for an empty result
+	if len(ret) == 0 {
+		return nil, ErrEmptySQLSet
+	}
+
 	return ret, nil
 }

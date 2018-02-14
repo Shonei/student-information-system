@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { wrapFetch as fetch } from './helpers';
+import { wrapFetch as fetch } from './../helpers';
 import { Avatar } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import Tables from './Tables';
@@ -9,13 +9,19 @@ class Student extends Component {
     super();
 
     this.state = {
-
+      first_name: '',
+      middle_name: '',
+      last_name: '',
+      email: '',
+      entry_year: '',
+      current_level: '',
+      id: ''
     };
   }
 
   componentDidMount() {
-    fetch('/get/student/profile/', 'GET')
-      .then(j => { this.setState(() => j); console.log(j) })
+    fetch('student', '/get/student/profile/')
+      .then(j => this.setState(() => j))
       .catch(console.log)
   }
 
@@ -34,8 +40,8 @@ class Student extends Component {
             <p><b>Middle name: </b>{this.state.middle_name}</p>
             <p><b>Last name: </b>{this.state.last_name}</p>
             <p><b>Email: </b>{this.state.email}</p>
-            <p><b>Entry year: </b>{this.state.entry_year}</p>
-            <p><b>Current level</b>{this.state.current_level}</p>
+            <p><b>Entry year: </b>{new Date(this.state.entry_year).toLocaleString()}</p>
+            <p><b>Current level: </b>{this.state.current_level}</p>
           </Col>
         </Row>
         <Tables></Tables>

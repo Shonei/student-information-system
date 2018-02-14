@@ -1,155 +1,217 @@
 package dbc
 
 import (
-	"crypto/hmac"
-	"crypto/rand"
-	"crypto/sha512"
-	"database/sql"
-	"encoding/hex"
-	"fmt"
-	"net/http"
+	"log"
+	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/Shonei/student-information-system/go-packages/dba"
+	"github.com/Shonei/student-information-system/go-packages/utils"
+
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
-// TokenError will be used as a message for http request containing a http code
-// a mostly human readable message.
-type TokenError struct {
-	HttpCode int
-	Message  string
-}
+// Used to validate all the username that will be used when accessing the DB
+var basicParser = regexp.MustCompile("^[a-zA-Z0-9]+$")
 
-func (t *TokenError) Error() string {
-	return string(t.HttpCode)
+// the custom claims created in the JWT token
+// those are the clasim expected by the authentication middleware
+// and must match the JSON representation
+type customToken struct {
+	User        string `json:"user"`
+	AccessLevel int    `json:"access_level"`
+	jwt.StandardClaims
 }
 
 // SingleParamQuery will execute a predefined sql query that takes a single
 // paramater and returns a single paramater with no additional modification to the data.
-// If it returns an empty string it would mean the query failed.
-func SingleParamQuery(db dba.DBAbstraction, query, param string) (string, error) {
+func SingleParamQuery(db utils.DBAbstraction, query, param string) (string, error) {
 	switch query {
 	case "salt":
 		return db.Select("Select salt from login_info where username = $1", param)
 	}
-	return "", &TokenError{404, "No such query"}
+	return "", utils.ErrSuspiciousInput
 }
 
-// GenAuthToken will return the token for a given user and save the
-// token in the database. If there is an error the function will
-// return an error value and an empty string.
-func GenAuthToken(db dba.DBAbstraction, user, hash string) (map[string]string, error) {
-	id, err := db.Select("SELECT id FROM login_info WHERE username = $1 AND user_pass = $2", user, hash)
-
-	// No id was found, assume they gave wrong password or username
+// GenAuthToken will authenticate the user based on the HMAC value fo the password
+// and he username. If they match the database results a map will be generated containing a token and
+// the access level for that user. The token will then be used for consecutive requests
+// to the server removing the need for sending personal information agian.
+func GenAuthToken(db utils.DBAbstraction, user, hash string) (map[string]string, error) {
+	level, err := db.Select("SELECT access_lvl FROM login_info WHERE username = $1 AND user_pass = $2", user, hash)
 	if err != nil {
-		return nil, &TokenError{403, "Wrong username or password"}
+		return nil, err
 	}
 
-	// get random bytes to generate hmac
-	key := make([]byte, 32)
-	_, err = rand.Read(key)
+	// No access_level was found, assume the worst case and exit
 	if err != nil {
-		return nil, &TokenError{500, "We encountered a problem generating the token. Please try again."}
+		return nil, utils.ErrUnothorized
 	}
 
-	// compute token
-	hashFunc := hmac.New(sha512.New, key)
-	_, _ = hashFunc.Write([]byte(user + ":" + hash + ":" + id))
-	b := hashFunc.Sum(nil)
-	token := hex.EncodeToString(b)
-	token = user + ":" + token
+	mySigningKey := []byte("AllYourBase")
 
-	lvl, _ := db.Select("SELECT access_lvl FROM login_info WHERE username = $1;", user)
-	j := map[string]string{"token": token, "level": lvl}
-
-	err = db.PreparedStmt("UPDATE login_info SET token = $1, expire_date = NOW() WHERE  username = $2 AND user_pass = $3", token, user, hash)
+	lvl, err := strconv.Atoi(level)
 	if err != nil {
-		return nil, &TokenError{500, "We encountered a problem generating the token. Please try again."}
+		return nil, err
 	}
+
+	// Create the Claims
+	claims := customToken{
+		user, lvl,
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(2 * time.Hour).Unix(),
+			Issuer:    "test",
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+	ss, err := token.SignedString(mySigningKey)
+
+	j := map[string]string{"token": ss, "level": level}
 
 	return j, nil
 }
 
-// CheckToken checks if the user has given a valid token and
-// returns the access level for that user
-// if the token doesn't exist it returns a TokenError
-func CheckToken(db dba.DBAbstraction, token string) (int, error) {
-	user := strings.Split(token, ":")[0]
-
-	username, err := db.Select("SELECT username FROM login_info WHERE token = $1", token)
-	fmt.Println(token)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return -1, &TokenError{http.StatusGatewayTimeout, "Token timed out."}
-		}
-		return -1, err
+// RunMultyRowQuery executes a query that is expected to return multiple rows.
+// It return a ErrSuspiciousInput if the user has unexpected characters.
+func RunMultyRowQuery(db utils.DBAbstraction, query, user string) ([]map[string]string, error) {
+	if !basicParser.MatchString(user) {
+		return nil, utils.ErrSuspiciousInput
 	}
-
-	if user != username {
-		return -1, &TokenError{http.StatusForbidden, "token doesn't match username"}
-	}
-
-	lvl, err := db.Select("SELECT access_lvl FROM login_info WHERE token = $1 AND username = $2", token, user)
-
-	i, err := strconv.Atoi(lvl)
-	if err != nil {
-		return 0, err
-	}
-	return i, nil
+	return db.SelectMulti(query, user)
 }
 
-// TokenCleanUp will delete the tokens from the database
-// that have expired. Each token has 2 hours to live after creation.
-func TokenCleanUp(db dba.DBAbstraction) {
-	// UPDATE login_info SET token = random()::text, expire_date = NOW();
-	query := "UPDATE login_info SET token = null, expire_date = null WHERE expire_date + '2 hours' < NOW();"
-	db.PreparedStmt(query)
-}
-
-// GetStudentPro returns a map containing relevant information for a students profile.
-func GetStudentPro(db dba.DBAbstraction, user string) (map[string]string, error) {
-	query := "SELECT student.id, first_name, middle_name, last_name, email, current_level, picture_url, entry_year FROM student INNER JOIN login_info ON (student.id = login_info.id) WHERE login_info.username = $1;"
+// RunSingleRowQuery executes a query that is expected to return a single row.
+// It returns a ErrSuspiciousInput if the user contains unexpected characters.
+// In addition if the responce from the query contains more the 1 row
+// it will return a ErrToManyRows.
+func RunSingleRowQuery(db utils.DBAbstraction, query, user string) (map[string]string, error) {
+	if !basicParser.MatchString(user) {
+		return nil, utils.ErrSuspiciousInput
+	}
 
 	m, err := db.SelectMulti(query, user)
+
 	if err != nil {
 		return nil, err
+	}
+
+	if len(m) > 1 {
+		return nil, utils.ErrToManyRows
 	}
 
 	return m[0], nil
 }
 
-// GetStudentModules returns an array of key/value pairs of the modules for a student
-func GetStudentModules(db dba.DBAbstraction, t, user string) ([]map[string]string, error) {
-	now := "SELECT module.code, module.name, student_modules.study_year, student_modules.result FROM student_modules INNER JOIN module ON module.code = student_modules.module_code INNER JOIN student ON student.id = student_modules.student_id INNER JOIN login_info ON student_modules.student_id = login_info.id WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = $2;"
-	past := "SELECT module.code, module.name, student_modules.study_year, student_modules.result FROM student_modules INNER JOIN module ON module.code = student_modules.module_code INNER JOIN student ON student.id = student_modules.student_id INNER JOIN login_info ON student_modules.student_id = login_info.id WHERE login_info.username = $1 AND NOT to_char(student_modules.study_year, 'YYYY') = $2;"
-	year := time.Now()
-
-	switch t {
-	case "now":
-		return db.SelectMulti(now, user, year.Year())
-	case "past":
-		return db.SelectMulti(past, user, string(year.Year()))
-	default:
-		return nil, &TokenError{404, "Wrong parameters"}
+// Search performes a search in the database for staff, students, modules and porgrammes.
+// it returns an array of maps for each.
+// Sample output:
+//  map[
+//   programmes:[
+//  	map[name:SQL matrix! code:10684]
+//  	map[name:SCSI circuit! code:86583]
+//  	map[name:cross-platform microchip! code:72065]
+//   ]
+//   staff:[
+//  	map[name:Otha Clinton Dooley username:shyl4 id:62540]
+//   ]
+//   modules:[
+//  	map[name:WHY YOU NO NAME code:maiores ucas_code:18950]
+//  	map[name:WHY YOU NO NAME code:sit ucas_code:9080]
+//   ]
+//   students:[
+//  	map[name:Tianna Rosella Hettinger username:shyl0 id:72862]
+//  	map[name:Sid Rafael Kuhic username:shyl1 id:44148]
+//   ]
+//  ]
+func Search(db utils.DBAbstraction, queryString string) (map[string][]map[string]string, error) {
+	if !basicParser.MatchString(queryString) {
+		return nil, utils.ErrSuspiciousInput
 	}
+
+	// create the 4 channels
+	staff := make(chan []map[string]string)
+	students := make(chan []map[string]string)
+	modules := make(chan []map[string]string)
+	programmes := make(chan []map[string]string)
+
+	// initialize the output data
+	output := map[string][]map[string]string{}
+
+	// start the 4 different searches
+	go doSearch(db, "SELECT * FROM search_staff($1);", queryString, staff)
+	go doSearch(db, "SELECT * FROM search_student($1);", queryString, students)
+	go doSearch(db, "SELECT * FROM search_programme($1);", queryString, programmes)
+	go doSearch(db, "SELECT * FROM search_module($1);", queryString, modules)
+
+	waitingChannels := 4
+
+	// forChannels: label the for loop so we can break out
+	// for loop reads from the channels until all the jobs complete
+	// or they time out
+forChannels:
+	for {
+		// selects and reads from channels
+		select {
+		case msg, ok := <-staff:
+			if !ok {
+				// nil so we don't select the channel agian
+				staff = nil
+				// deacrease the count of waiting channels
+				waitingChannels--
+				break
+			}
+			output["staff"] = msg
+		case msg, ok := <-students:
+			if !ok {
+				students = nil
+				waitingChannels--
+				break
+			}
+			output["students"] = msg
+		case msg, ok := <-modules:
+			if !ok {
+				modules = nil
+				waitingChannels--
+				break
+			}
+			output["modules"] = msg
+		case msg, ok := <-programmes:
+			if !ok {
+				programmes = nil
+				waitingChannels--
+				break
+			}
+			output["programmes"] = msg
+		case <-time.After(15 * time.Second):
+			log.Println("timed out")
+			return output, utils.ErrTimedOut
+		default:
+			// chack for nil channels
+			if waitingChannels == 0 {
+				// breaks the for loop
+				break forChannels
+			}
+		}
+	}
+
+	return output, nil
 }
 
-// GetStudentCwk will retrive the cwk table for a given student by a given name.
-// It can return both cwk results and cwk schedule based on the t(type) paramater.
-// It only accepts a timetable or results as input.
-func GetStudentCwk(db dba.DBAbstraction, t, user string) ([]map[string]string, error) {
-	result := "SELECT coursework.module_code, coursework.cwk_name, coursework.percentage, coursework.marks, coursework_result.result FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');"
-	timetable := "SELECT coursework.cwk_name, coursework.posted_on, coursework.deadline FROM coursework INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id INNER JOIN student ON coursework_result.student_id = student.id INNER JOIN login_info ON student.id = login_info.id INNER JOIN student_modules ON student_modules.student_id = student.id  WHERE login_info.username = $1 AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY');"
+// executes a SQL query that takes a user as input
+// once the query is done it writes the responce to the channel and closes the channel
+// if an error occures it writes he 0 value to the channel
+func doSearch(db utils.DBAbstraction, query, user string, c chan []map[string]string) {
+	// close the channel after we are done
+	defer close(c)
 
-	switch t {
-	case "timetable":
-		return db.SelectMulti(timetable, user)
-	case "results":
-		return db.SelectMulti(result, user)
-	default:
-		return nil, &TokenError{404, "Wrong parameters"}
+	m, err := db.SelectMulti(query, user)
+	if err != nil {
+		log.Println(err)
+		// don't send valid output if we get an error
+		c <- []map[string]string{}
+		return
 	}
+
+	c <- m
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { TextField, RaisedButton } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { createHmac } from 'crypto';
+// import fetch from 'node-fetch';
 
 class Login extends Component {
   constructor(props) {
@@ -24,13 +25,14 @@ class Login extends Component {
     }
   }
 
+  // given the salt it hashes a users password and returns
+  // a request to generate the token.
   hashPassword(data) {
     let hash = createHmac('sha512', data.salt);
     hash.update(this.password);
     const pass = hash.digest('hex');
 
-    return fetch('get/token/' + this.username, {
-      method: 'POST',
+    return fetch('/get/token/' + this.username, {
       credentials: 'same-origin',
       headers: {
         'Authorization': pass
@@ -38,28 +40,39 @@ class Login extends Component {
     });
   }
 
+  // called on button press
   handleLogIn() {
-    fetch('get/salt/' + this.username)
+    fetch('/get/salt/' + this.username)
       .then(this.fetchHTTPErrorCheck)
       .then(this.hashPassword)
       .then(this.fetchHTTPErrorCheck)
       .then(data => {
+        // set the token in hte cookie with a 2 hours time to live
         var h = new Date();
         h.setTime(h.getTime() + (2 * 60 * 60 * 1000));
         document.cookie = 'token=' + data.token + ";" + "expires=" + h.toUTCString() + ";path=/";
-        window.localStorage.setItem('access_level', data.level);
-        let loc = '/';
-        if(data.level ===  '1') {
-          loc = '/student';
-        } else if (parseInt(data.level, 10) > 1 ) {
-          loc = '/staff';
-        }
-        document.location.href = loc;
 
+        // Set user and access_level in the local storage so we can use it 
+        // as a global shared state to manage the view.
+        // This makes it so users have to always login once they leave the app.
+        window.localStorage.setItem('access_level', data.level);
+
+        // a somewhat ugly change of path but it works.
+        let loc = '/';
+        if (data.level === '1') {
+          loc = '/student';
+          window.localStorage.setItem('student', this.username);
+        } else if (parseInt(data.level, 10) > 1) {
+          loc = '/staff';
+          window.localStorage.setItem('staff', this.username);
+        }
+        window.localStorage.setItem('loggedin', this.username);
+        document.location.href = loc;
       })
       .catch(err => {
-        err.text()
-          .then(e => console.log(e))
+        console.log(err)
+        // err.text()
+        //   .then(e => console.log(e))
       });
   }
 

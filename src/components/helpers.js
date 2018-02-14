@@ -1,16 +1,10 @@
-function cookieCheck() {
-  let token = document.cookie.match(/token=[a-z:0-9]{120,134}/g);
-  if (token) {
-    // Add this token to fetch Authentication header
-    token = token[0].replace('token=', '');
-    return token;
-  }
-  return '';
-}
+// import fetch from 'node-fetch';
 
-function wrapFetch(url, m ='GET') {
-  const  token = cookieCheck();
-  const uname = token.split(':')[0];
+// a fetch wrapper to make using fetch easier
+// it parses the imput and rejects the a promise if there was an error
+// or returns the json responce as a promise
+function wrapFetch(user, url, m ='GET') {
+  const uname = window.localStorage.getItem(user);
   return fetch(url + uname, {
     method: m,
     credentials: 'same-origin',
@@ -23,4 +17,4 @@ function wrapFetch(url, m ='GET') {
   });
 }
 
-export {cookieCheck, wrapFetch};
+export { wrapFetch};
