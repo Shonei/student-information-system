@@ -22,7 +22,7 @@ func TestBasicAuth(t *testing.T) {
 		want   string
 	}{
 		{"Passes", 401, "", ""},
-		{"Passes", 401, "", "Invalid JWT"},
+		{"Passes", 401, "", "We were unable to validate your token."},
 	}
 
 	for _, tt := range tests {

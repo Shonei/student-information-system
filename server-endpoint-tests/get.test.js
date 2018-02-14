@@ -418,7 +418,7 @@ describe('Tests a studetn trying to get staff only content', () => {
       }
     }).then(res => {
       expect(res.ok).toBe(false);
-      expect(res.status).toEqual(500);
+      expect(res.status).toEqual(401);
     });
   });
 
