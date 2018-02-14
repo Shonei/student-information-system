@@ -16,8 +16,8 @@ INSERT INTO staff(id, first_name, middle_name, last_name, email, address1, addre
 INSERT INTO staff(id, first_name, middle_name, last_name, email, address1, address2, phone) VALUES(67622,'Brennan', 'Hershel', 'McCullough', 'Name88@hotmail.com', '67483', '297 Waters Stream', '(732) 878-9432 x32828');
 INSERT INTO staff(id, first_name, middle_name, last_name, email, address1, address2, phone) VALUES(62540, 'Otha', 'Clinton', 'Dooley', 'Florine_Dickens@yahoo.com', '17005-3298', '620 Zulauf Stream', '1-850-003-4705 x8358');
 
-INSERT INTO programme(code, UCAS_code, duration, manager, attendance, school) VALUES('maiores', '18950', 2, 37362, 'Full time', 'School of Computing');
-INSERT INTO programme(code, UCAS_code, duration, manager, attendance, school) VALUES('sit', '9080', 4, 62540, 'Part time', 'School of Computing');
+INSERT INTO programme(name, code, UCAS_code, duration, manager, attendance, school) VALUES('WHY YOU NO NAME', 'maiores', '18950', 2, 37362, 'Full time', 'School of Computing');
+INSERT INTO programme(name, code, UCAS_code, duration, manager, attendance, school) VALUES('WHY YOU NO NAME', 'sit', '9080', 4, 62540, 'Part time', 'School of Computing');
 
 INSERT INTO student(id, first_name, middle_name, last_name, email, current_level, programme_code, picture_url, gender, dob, entry_year, home_phone, home_address, local_phone, local_address) VALUES(72862, 'Tianna', 'Rosella', 'Hettinger', 'Carlotta.Dooley80@hotmail.com', 1, 'maiores', 'http://ahmad.biz', 'quam', '2017-04-11T01:53:41.507Z', '2018-01-18T16:13:21.331Z', '816-157-7910 x7604', '62994 Bradtke Glen', '254-492-4044', '53300 Mohr Manors');
 INSERT INTO student(id, first_name, middle_name, last_name, email, current_level, programme_code, picture_url, gender, dob, entry_year, home_phone, home_address, local_phone, local_address) VALUES(44148, 'Sid', 'Rafael', 'Kuhic', 'Karson29@yahoo.com', 3, 'sit', 'http://zella.biz', 'eos', '2017-07-14T05:35:41.170Z', '2018-01-18T20:27:14.228Z', '(830) 408-4820', '12313 Pollich Drive', '155-862-1376 x5170', '568 McGlynn Fall');

@@ -16,3 +16,6 @@ var ErrSuspiciousInput = errors.New("input has unexpected chracters")
 
 // ErrEmptySQLSet is returned if there were no results in the SQL multi select query.
 var ErrEmptySQLSet = errors.New("the result set is empty")
+
+// ErrTimedOut is returned when a query takes too long
+var ErrTimedOut = errors.New("search takes too long")

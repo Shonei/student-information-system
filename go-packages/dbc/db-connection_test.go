@@ -38,31 +38,6 @@ func (t *ErrorStruct) PreparedStmt(s string, args ...interface{}) error {
 	return errTest
 }
 
-func TestSingleParamQuery(t *testing.T) {
-	t.Run("No error", func(t *testing.T) {
-		got, err := SingleParamQuery(&OkStruct{}, "salt", "")
-		if err != nil {
-			t.Error("Didn't want an error")
-		}
-
-		if got != "1" {
-			t.Errorf("Got %s - wanted ok", got)
-		}
-	})
-
-	t.Run("Returns error", func(t *testing.T) {
-		_, err := SingleParamQuery(&ErrorStruct{}, "salt", "")
-		if err == nil {
-			t.Error("Didn't want an error")
-		}
-
-		_, err = SingleParamQuery(&ErrorStruct{}, "", "")
-		if err != utils.ErrUnexpectedChoice {
-			t.Error("Expecting a ErrUnexpectedChoice")
-		}
-	})
-}
-
 func TestGenAuthToken(t *testing.T) {
 	t.Run("No error", func(t *testing.T) {
 		got, err := GenAuthToken(&OkStruct{}, "Shyl", "")
@@ -83,99 +58,33 @@ func TestGenAuthToken(t *testing.T) {
 	})
 }
 
-func TestGetStudentCwk(t *testing.T) {
-	t.Run("All go wells", func(t *testing.T) {
-		m, err := GetStudentCwk(&OkStruct{}, "timetable", "sgd")
-
-		if m[0]["OK"] != "1" {
-			t.Errorf("Wanted 1 - got %v.", m)
-		}
-
-		if err != nil {
-			t.Error("Wanted no errors")
-		}
-	})
-
-	t.Run("All go wells with past", func(t *testing.T) {
-		m, err := GetStudentCwk(&OkStruct{}, "results", "sdg")
-
-		if m[0]["OK"] != "1" {
-			t.Errorf("Wanted 1 - got %v.", m)
-		}
-
-		if err != nil {
-			t.Error("Wanted no errors")
-		}
-	})
-
-	t.Run("Failes", func(t *testing.T) {
-		_, err := GetStudentCwk(&OkStruct{}, "nosw", "sdg")
-
-		if err == nil {
-			t.Error("Wanted no errors")
-		}
-	})
-}
-
-func TestGetProfile(t *testing.T) {
+func TestRunSingleRowQuery(t *testing.T) {
 	tests := []struct {
-		db           utils.DBAbstraction
-		choice, user string
-		val          map[string]string
-		err          error
+		name  string
+		db    utils.DBAbstraction
+		query string
+		user  string
+		want  map[string]string
+		err   error
 	}{
-		{&OkStruct{}, "staff", "", map[string]string{}, utils.ErrSuspiciousInput},
-		{&OkStruct{}, "staff", "dafh", map[string]string{}, nil},
-		{&OkStruct{}, "staff", "1fasdf", map[string]string{}, nil},
-		{&OkStruct{}, "staff", "\n", map[string]string{}, utils.ErrSuspiciousInput},
-		{&OkStruct{}, "staff", "sdfh\vsdgs", map[string]string{}, utils.ErrSuspiciousInput},
-		{&OkStruct{}, "student", "", map[string]string{}, utils.ErrSuspiciousInput},
-		{&OkStruct{}, "studnet", "dgfj", map[string]string{}, utils.ErrUnexpectedChoice},
-		{&OkStruct{}, "student", "sdggsd", map[string]string{}, nil},
-		{&ErrorStruct{}, "student", "sdggsd", map[string]string{}, errTest},
-		{&ErrorStruct{}, "staff", "sdggsd", map[string]string{}, errTest},
+		{"empty string for user", &OkStruct{}, "", "", nil, utils.ErrSuspiciousInput},
+		{"escape character in user", &OkStruct{}, "", "asdg\"", nil, utils.ErrSuspiciousInput},
+		{"unexpected character in user", &OkStruct{}, "", "sdf%", nil, utils.ErrSuspiciousInput},
+		{"empty string for user", &ErrorStruct{}, "", "sdg", nil, errTest},
+		{"empty string for user", &OkStruct{}, "", "sdf", map[string]string{"OK": "1"}, nil},
 	}
 
 	for _, tt := range tests {
-		val, err := GetProfile(tt.db, tt.choice, tt.user)
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := RunSingleRowQuery(tt.db, tt.query, tt.user)
 
-		if reflect.DeepEqual(val, tt.val) {
-			t.Errorf("Wanted %v - Got %v", tt.val, val)
-		}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Want %v - Got %v.", tt.want, got)
+			}
 
-		if err != tt.err {
-			t.Errorf("Wanted %v - Got %v", tt.err, err)
-		}
-	}
-}
-
-func TestGetModulesList(t *testing.T) {
-	tests := []struct {
-		db           utils.DBAbstraction
-		choice, user string
-		val          []map[string]string
-		err          error
-	}{
-		{&OkStruct{}, "", "", []map[string]string{}, utils.ErrSuspiciousInput},
-		{&OkStruct{}, "past", "dafh", []map[string]string{}, nil},
-		{&OkStruct{}, "past", "\n", []map[string]string{}, utils.ErrSuspiciousInput},
-		{&OkStruct{}, "gdfhg", "sdfh", []map[string]string{}, utils.ErrUnexpectedChoice},
-		{&OkStruct{}, "now", "sdfh\vsdgs", []map[string]string{}, utils.ErrSuspiciousInput},
-		{&OkStruct{}, "past", "sdfh", []map[string]string{}, nil},
-		{&OkStruct{}, "now", "sdfh", []map[string]string{}, nil},
-		{&ErrorStruct{}, "past", "sdfh", []map[string]string{}, errTest},
-		{&ErrorStruct{}, "now", "sdfh", []map[string]string{}, errTest},
-	}
-
-	for _, tt := range tests {
-		val, err := GetModulesList(tt.db, tt.choice, tt.user)
-
-		if reflect.DeepEqual(val, tt.val) {
-			t.Errorf("Wanted %v - Got %v", tt.val, val)
-		}
-
-		if err != tt.err {
-			t.Errorf("Wanted %v - Got %v", tt.err, err)
-		}
+			if err != tt.err {
+				t.Errorf("Want %v - Got %v.", tt.err, err)
+			}
+		})
 	}
 }

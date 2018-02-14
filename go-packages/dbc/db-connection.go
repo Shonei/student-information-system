@@ -29,7 +29,7 @@ func SingleParamQuery(db utils.DBAbstraction, query, param string) (string, erro
 	case "salt":
 		return db.Select("Select salt from login_info where username = $1", param)
 	}
-	return "", utils.ErrUnexpectedChoice
+	return "", utils.ErrSuspiciousInput
 }
 
 // GenAuthToken will authenticate the user based on the HMAC value fo the password
@@ -71,6 +71,8 @@ func GenAuthToken(db utils.DBAbstraction, user, hash string) (map[string]string,
 	return j, nil
 }
 
+// RunMultyRowQuery executes a query that is expected to return multiple rows.
+// It return a ErrSuspiciousInput if the user has unexpected characters.
 func RunMultyRowQuery(db utils.DBAbstraction, query, user string) ([]map[string]string, error) {
 	if !basicParser.MatchString(user) {
 		return nil, utils.ErrSuspiciousInput
@@ -78,6 +80,10 @@ func RunMultyRowQuery(db utils.DBAbstraction, query, user string) ([]map[string]
 	return db.SelectMulti(query, user)
 }
 
+// RunSingleRowQuery executes a query that is expected to return a single row.
+// It returns a ErrSuspiciousInput if the user contains unexpected characters.
+// In addition if the responce from the query contains more the 1 row
+// it will return a ErrToManyRows.
 func RunSingleRowQuery(db utils.DBAbstraction, query, user string) (map[string]string, error) {
 	if !basicParser.MatchString(user) {
 		return nil, utils.ErrSuspiciousInput
@@ -94,4 +100,31 @@ func RunSingleRowQuery(db utils.DBAbstraction, query, user string) (map[string]s
 	}
 
 	return m[0], nil
+}
+
+func Search(db utils.DBAbstraction, user string) ([]map[string]string, error) {
+	if !basicParser.MatchString(user) {
+		return nil, utils.ErrSuspiciousInput
+	}
+
+	staff := make(chan []map[string]string)
+	students := make(chan []map[string]string)
+	modules := make(chan []map[string]string)
+	programmes := make(chan []map[string]string)
+
+	defer close(staff)
+	defer close(students)
+	defer close(modules)
+	defer close(programmes)
+
+	output := map[string][]map[string]string{}
+
+	select {
+	case output["staff"] = <-staff:
+	case output["students"] = <-students:
+	case output["modules"] = <-modules:
+	case output["programmes"] = <-programmes:
+	case <-time.After(1 * time.Second):
+		return nil, utils.ErrTimedOut
+	}
 }

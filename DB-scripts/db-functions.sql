@@ -128,7 +128,38 @@ AS $$
   SELECT make_name(staff.first_name, staff.middle_name, staff.last_name) AS name, login_info.username, login_info.id
   FROM staff
   INNER JOIN login_info ON staff.id = login_info.id
-  WHERE login_info.username ~* '$1'
-  OR login_info.id::TEXT ~* '$1'
-  OR make_name(staff.first_name, staff.middle_name, staff.last_name) ~* '$1' $$
+  WHERE login_info.username ~* $1
+  OR login_info.id::TEXT ~* $1
+  OR make_name(staff.first_name, staff.middle_name, staff.last_name) ~* $1 $$
+LANGUAGE SQL;
+
+
+CREATE OR REPLACE FUNCTION search_student(TEXT) 
+RETURNS TABLE(name TEXT, username TEXT, id INT)
+AS $$
+  SELECT make_name(student.first_name, student.middle_name, student.last_name) AS name, login_info.username, login_info.id
+  FROM student
+  INNER JOIN login_info ON student.id = login_info.id
+  WHERE login_info.username ~* $1
+  OR login_info.id::TEXT ~* $1
+  OR make_name(student.first_name, student.middle_name, student.last_name) ~* $1 $$
+LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION search_programme(TEXT) 
+RETURNS TABLE(name TEXT, code TEXT, UCAS_code TEXT)
+AS $$
+  SELECT  programme.name, programme.code, programme.UCAS_code
+  FROM programme
+  WHERE programme.name ~* $1
+  OR programme.code ~* $1
+  OR programme.UCAS_code ~* $1 $$
+LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION search_module(TEXT) 
+RETURNS TABLE(name TEXT, code TEXT)
+AS $$
+  SELECT  module.name, module.code
+  FROM module
+  WHERE module.name ~* $1
+  OR module.code ~* $1 $$
 LANGUAGE SQL;

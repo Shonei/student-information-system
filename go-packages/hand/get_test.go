@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/Shonei/student-information-system/go-packages/utils"
 )
 
 func TestGetSalt(t *testing.T) {
@@ -111,6 +113,9 @@ func TestGetProfile(t *testing.T) {
 	}{
 		{"Passes", func(s string) (map[string]string, error) { return map[string]string{"hello": "test"}, nil }, 200, `{"hello":"test"}`},
 		{"fails", func(s string) (map[string]string, error) { return nil, errors.New("sgd") }, 500, `We were unable to retrieve the profile`},
+		{"no rows returned", func(s string) (map[string]string, error) { return nil, utils.ErrEmptySQLSet }, 200, `{}`},
+		{"Suspicious input", func(s string) (map[string]string, error) { return nil, utils.ErrSuspiciousInput }, 400, `Input contains special characters.`},
+		{"too many rows", func(s string) (map[string]string, error) { return nil, utils.ErrToManyRows }, 400, `No matches for input.`},
 	}
 
 	for _, tt := range tests {
@@ -132,7 +137,7 @@ func TestGetProfile(t *testing.T) {
 			}
 
 			if res.StatusCode != tt.status {
-				t.Error("Status is not internalservarerror as expected")
+				t.Error("Expected '%v' - got '%v'", tt.status, res.StatusCode)
 			}
 
 			b, err := ioutil.ReadAll(res.Body)
@@ -157,6 +162,8 @@ func TestBasicGet(t *testing.T) {
 	}{
 		{"Passes", func(s string) ([]map[string]string, error) { return []map[string]string{{"hello": "test"}}, nil }, 200, `[{"hello":"test"}]`},
 		{"fails", func(s string) ([]map[string]string, error) { return nil, errors.New("sgd") }, 500, `We encountered an unexpected error retrieving the data.`},
+		{"no rows returned", func(s string) ([]map[string]string, error) { return nil, utils.ErrEmptySQLSet }, 200, `[]`},
+		{"Suspicious input", func(s string) ([]map[string]string, error) { return nil, utils.ErrSuspiciousInput }, 400, `Input contains special characters.`},
 	}
 
 	for _, tt := range tests {
