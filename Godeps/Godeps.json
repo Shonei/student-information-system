@@ -4,6 +4,11 @@
 	"GodepVersion": "v79",
 	"Deps": [
 		{
+			"ImportPath": "github.com/dgrijalva/jwt-go",
+			"Comment": "v3.1.0",
+			"Rev": "dbeaa9332f19a944acb5736b4456cfcc02140e29"
+		},
+		{
 			"ImportPath": "github.com/gorilla/mux",
 			"Comment": "v1.6.0-6-g5ab525f",
 			"Rev": "5ab525f4fb1678e197ae59401e9050fa0b6cb5fd"
@@ -17,11 +22,6 @@
 			"ImportPath": "github.com/lib/pq/oid",
 			"Comment": "go1.0-cutoff-191-gb609790",
 			"Rev": "b609790bd85edf8e9ab7e0f8912750a786177bcf"
-		},
-		{
-			"ImportPath": "github.com/robfig/cron",
-			"Comment": "v1-60-g2315d57",
-			"Rev": "2315d5715e36303a941d907f038da7f7c44c773b"
 		}
 	]
 }
