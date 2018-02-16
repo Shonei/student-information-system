@@ -50,19 +50,16 @@ class Staff extends PureComponent {
   }
 
   handlePersonClick(user) {
-    let href = '';
     let itemName = '';
     if (this.state.value === 'students') {
-      href = '/student';
       itemName = 'student';
     } else if (this.state.value === 'staff') {
-      href = '/staff';
       itemName = 'staff';
     } else {
       return;
     }
     localStorage.setItem(itemName, user);
-    window.location.href = itemName;
+    window.location.href = '/' + itemName;
   }
 
   getPerson(person) {
@@ -112,24 +109,22 @@ class Staff extends PureComponent {
 
   render() {
     return (
-      <div>
-        <Tabs
-          value={this.state.value}
-          onChange={this.handleChange}>
-          <Tab label="Students" value="students">
-            {this.getList("students", this.tables[this.state.value], this.getPerson)}
-          </Tab>
-          <Tab label="Staff" value="staff">
-            {this.getList("staff", this.tables[this.state.value], this.getPerson)}
-          </Tab>
-          <Tab label="Modules" value="modules">
-            {this.getList("modules", this.tables[this.state.value], this.getModule)}
-          </Tab>
-          <Tab label="Programmes" value="programmes">
-            {this.getList("programmes", this.tables[this.state.value], this.getProgramme)}
-          </Tab>
-        </Tabs>
-      </div>
+      <Tabs
+        value={this.state.value}
+        onChange={this.handleChange}>
+        <Tab label="Students" value="students">
+          {this.getList("students", this.tables[this.state.value], this.getPerson)}
+        </Tab>
+        <Tab label="Staff" value="staff">
+          {this.getList("staff", this.tables[this.state.value], this.getPerson)}
+        </Tab>
+        <Tab label="Modules" value="modules">
+          {this.getList("modules", this.tables[this.state.value], this.getModule)}
+        </Tab>
+        <Tab label="Programmes" value="programmes">
+          {this.getList("programmes", this.tables[this.state.value], this.getProgramme)}
+        </Tab>
+      </Tabs>
     );
   }
 }

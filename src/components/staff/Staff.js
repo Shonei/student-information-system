@@ -22,9 +22,7 @@ class Staff extends PureComponent {
       errorMessage: ''
     };
 
-    this.search = '';
     this.handleStudentClick = this.handleStudentClick.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
   }
 
   componentDidMount() {
@@ -53,53 +51,12 @@ class Staff extends PureComponent {
     window.location.href = '/student';
   }
 
-  handleSearch(e) {
-    e.preventDefault();
-    if (this.search.length === 0) {
-      this.setState({ errorMessage: 'Can\'t search for empty values.' });
-      return;
-    }
-
-    return fetch('/search/' + this.search, {
-      credentials: 'same-origin',
-    }).then(res => {
-      if (!res.ok) {
-        return Promise.reject(res);
-      } else {
-        return res.json();
-      }
-    }).then(data => {
-      localStorage.setItem('search', JSON.stringify(data));
-      window.location.href = '/search';
-    }).catch(err => this.setState({ errorMessage : 'No results were found.'}));
-  }
-
   render() {
     const fullName = this.state.first_name + ' ' + this.state.middle_name + ' ' + this.state.last_name;
     const URL = "https://github.com/Shonei/student-information-system/blob/master/database.jpg?raw=true";
 
     return (
       <Grid fluid>
-        <Row end="xs">
-          <Col xs={6} >
-            <p style={{ color: 'red' }}>{this.state.errorMessage}</p>
-          </Col>
-          <Col xs={5} >
-            <TextField
-              hintText="Search"
-              onChange={(event, text) => this.search = text}
-            />
-            <RaisedButton
-              label="Search"
-              primary={true}
-              style={{ margin: 12 }}
-              onClick={this.handleSearch}
-            />
-          </Col>
-          <Col xs={1} />
-        </Row>
-        <br />
-        <br />
         <Row center="xs">
           <Col xs={12} md={3}>
             <Avatar src={URL}

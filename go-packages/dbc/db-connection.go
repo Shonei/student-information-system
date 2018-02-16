@@ -1,6 +1,7 @@
 package dbc
 
 import (
+	"encoding/json"
 	"log"
 	"regexp"
 	"strconv"
@@ -78,7 +79,15 @@ func RunMultyRowQuery(db utils.DBAbstraction, query, user string) ([]map[string]
 	if !basicParser.MatchString(user) {
 		return nil, utils.ErrSuspiciousInput
 	}
-	return db.SelectMulti(query, user)
+
+	m, err := db.SelectMulti(query, user)
+
+	// we only care if there is no data
+	if err == utils.ErrEmptySQLSet {
+		return []map[string]string{}, nil
+	}
+
+	return m, err
 }
 
 // RunSingleRowQuery executes a query that is expected to return a single row.
@@ -93,6 +102,9 @@ func RunSingleRowQuery(db utils.DBAbstraction, query, user string) (map[string]s
 	m, err := db.SelectMulti(query, user)
 
 	if err != nil {
+		if err == utils.ErrEmptySQLSet {
+			return map[string]string{}, nil
+		}
 		return nil, err
 	}
 
@@ -214,4 +226,49 @@ func doSearch(db utils.DBAbstraction, query, user string, c chan []map[string]st
 	}
 
 	c <- m
+}
+
+// GetModuleDetails makes use of the RunSingleRowQuery to extract the information
+// about a module and it formats it into a utils.module struct.
+// That struct can later be used to create a json representation of the data.
+func GetModuleDetails(db utils.DBAbstraction, query, code string) (utils.Module, error) {
+	m, err := RunSingleRowQuery(db, query, code)
+	if err != nil {
+		return utils.Module{}, err
+	}
+
+	module, err := formatModule(m)
+	if err != nil {
+		return utils.Module{}, err
+	}
+
+	return module, nil
+}
+
+// creates the utils.Module datastructure out of the map[string]string representation.
+// This allows us to send properly formated JSON for the request.
+func formatModule(m map[string]string) (utils.Module, error) {
+	module := utils.Module{}
+
+	// Unmarshal the JSON string into the struct
+	// This is needed so we can later on create a single representation of the
+	// JSON object for the module
+	if err := json.Unmarshal([]byte(m["cwks"]), &module.Cwks); err != nil {
+		return utils.Module{}, err
+	}
+
+	if err := json.Unmarshal([]byte(m["exam"]), &module.Exam); err != nil {
+		return utils.Module{}, err
+	}
+
+	// copy the non json strings as normal data
+	module.Code = m["code"]
+	module.Description = m["description"]
+	module.Syllabus = m["syllabus"]
+	module.Name = m["name"]
+	module.Credits = m["credits"]
+	module.Semester = m["semester"]
+	module.Year = m["year"]
+
+	return module, nil
 }

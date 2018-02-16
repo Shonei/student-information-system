@@ -64,6 +64,15 @@ func main() {
 	getStaffTutees := func(str string) ([]map[string]string, error) {
 		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_staff_tutees($1);", str)
 	}
+	getModuleDetails := func(str string) (utils.Module, error) {
+		return dbc.GetModuleDetails(db, "SELECT * FROM get_module_details($1);", str)
+	}
+	getCourseworkDetails := func(str string) ([]map[string]string, error) {
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_cwk_details($1);", str)
+	}
+	getStudentsOnCwk := func(str string) ([]map[string]string, error) {
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_cwk_students($1);", str)
+	}
 	search := func(str string) (map[string][]map[string]string, error) {
 		return dbc.Search(db, str)
 	}
@@ -84,6 +93,9 @@ func main() {
 	r.Handle("/get/staff/profile/{user}", mw.StaffOnly(hand.GetProfile(getStaffPro))).Methods("GET")
 	r.Handle("/get/staff/modules/{user}", mw.StaffOnly(hand.BasicGet(getStaffModules))).Methods("GET")
 	r.Handle("/get/staff/tutees/{user}", mw.StaffOnly(hand.BasicGet(getStaffTutees))).Methods("GET")
+	r.Handle("/get/module/{code}", hand.GetForModule(getModuleDetails)).Methods("GET")
+	r.Handle("/get/cwk/{code}", hand.GetForCode(getCourseworkDetails)).Methods("GET")
+	r.Handle("/get/cwk/students/{code}", hand.GetForCode(getStudentsOnCwk)).Methods("GET")
 	r.Handle("/search/{query}", hand.GetSearch(search)).Methods("GET")
 
 	// Routes in place for testing purposes
@@ -98,8 +110,6 @@ func main() {
 
 	// listen on the router
 	http.Handle("/", r)
-
-	// fmt.Println(dbc.Search(db, "s"))
 
 	log.Println(http.ListenAndServe(":"+port, nil))
 }

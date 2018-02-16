@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Login from './Login';
 import Staff from './staff/Staff';
 import Search from './staff/Search';
+import SearchBar from './staff/SearchBar';
 
 const styles = {
   cursor: 'pointer',
@@ -14,7 +15,16 @@ class NavBar extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      accessLevel: 0
+    };
+
     this.handleHomeClick = this.handleHomeClick.bind(this);
+  }
+
+  componentDidMount() {
+    const lvl = localStorage.getItem('access_level');
+    this.setState({ accessLevel: parseInt(lvl, 10) });
   }
 
   // Clears all global state and cookies
@@ -26,16 +36,15 @@ class NavBar extends Component {
 
   // Based on the access level take the user to their home page
   handleHomeClick() {
-    let lvl = localStorage.getItem('access_level');
     let loc = '/';
     let user = window.localStorage.getItem('loggedin');
-    if (lvl === '1') {
+    if (this.state.accessLevel === 1) {
       loc = '/student';
       window.localStorage.setItem('student', user);
-    } else {
+    } else if (this.state.accessLevel > 1) {
       loc = '/staff';
       window.localStorage.setItem('staff', user);
-    } 
+    }
     document.location.href = loc;
   }
 
@@ -49,6 +58,7 @@ class NavBar extends Component {
           iconElementRight={<FlatButton label="Logoff"
             onClick={this.handleLogoff} />}>
         </AppBar>
+        {this.state.accessLevel > 1 ? <SearchBar></SearchBar> : <div />}
         <Router>
           <div>
             <Route exact path="/" render={() => <Login></Login>} />

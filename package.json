@@ -6,6 +6,7 @@
   "dependencies": {
     "bcrypt": "^1.0.3",
     "crypto": "^1.0.1",
+    "draft-js": "^0.10.5",
     "faker": "^4.1.0",
     "material-ui": "^0.20.0",
     "pg": "^7.4.0",

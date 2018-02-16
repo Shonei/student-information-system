@@ -22,20 +22,22 @@ func (t *OkStruct) PreparedStmt(s string, args ...interface{}) error {
 	return nil
 }
 
-type ErrorStruct struct{}
+type ErrorStruct struct {
+	Err error
+}
 
 var errTest = errors.New("not ok")
 
 func (t *ErrorStruct) Select(s string, args ...interface{}) (string, error) {
-	return "", errTest
+	return "", t.Err
 }
 
 func (t *ErrorStruct) SelectMulti(s string, args ...interface{}) ([]map[string]string, error) {
-	return nil, errTest
+	return nil, t.Err
 }
 
 func (t *ErrorStruct) PreparedStmt(s string, args ...interface{}) error {
-	return errTest
+	return t.Err
 }
 
 func TestGenAuthToken(t *testing.T) {
@@ -51,7 +53,14 @@ func TestGenAuthToken(t *testing.T) {
 	})
 
 	t.Run("Returning an error", func(t *testing.T) {
-		_, err := GenAuthToken(&ErrorStruct{}, "Shyl", "")
+		_, err := GenAuthToken(&ErrorStruct{errTest}, "Shyl", "")
+		if err == nil {
+			t.Errorf("Got error don't want error")
+		}
+	})
+
+	t.Run("Returning an error", func(t *testing.T) {
+		_, err := GenAuthToken(&ErrorStruct{utils.ErrEmptySQLSet}, "Shyl", "")
 		if err == nil {
 			t.Errorf("Got error don't want error")
 		}
@@ -70,8 +79,9 @@ func TestRunSingleRowQuery(t *testing.T) {
 		{"empty string for user", &OkStruct{}, "", "", nil, utils.ErrSuspiciousInput},
 		{"escape character in user", &OkStruct{}, "", "asdg\"", nil, utils.ErrSuspiciousInput},
 		{"unexpected character in user", &OkStruct{}, "", "sdf%", nil, utils.ErrSuspiciousInput},
-		{"empty string for user", &ErrorStruct{}, "", "sdg", nil, errTest},
-		{"empty string for user", &OkStruct{}, "", "sdf", map[string]string{"OK": "1"}, nil},
+		{"errTest", &ErrorStruct{errTest}, "", "sdg", nil, errTest},
+		{"ErrEmptySQLSet", &ErrorStruct{utils.ErrEmptySQLSet}, "", "sdg", map[string]string{}, nil},
+		{"goes ok", &OkStruct{}, "", "sdf", map[string]string{"OK": "1"}, nil},
 	}
 
 	for _, tt := range tests {
@@ -109,7 +119,7 @@ func TestSearch(t *testing.T) {
 			nil},
 		{"invalid input", &OkStruct{}, "s%h", nil, utils.ErrSuspiciousInput},
 		{"We get empty map",
-			&ErrorStruct{},
+			&ErrorStruct{errTest},
 			"sh",
 			map[string][]map[string]string{
 				"programmes": []map[string]string{},

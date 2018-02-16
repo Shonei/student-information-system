@@ -112,8 +112,7 @@ func TestGetProfile(t *testing.T) {
 		want   string
 	}{
 		{"Passes", func(s string) (map[string]string, error) { return map[string]string{"hello": "test"}, nil }, 200, `{"hello":"test"}`},
-		{"fails", func(s string) (map[string]string, error) { return nil, errors.New("sgd") }, 500, `We were unable to retrieve the profile`},
-		{"no rows returned", func(s string) (map[string]string, error) { return nil, utils.ErrEmptySQLSet }, 200, `{}`},
+		{"fails", func(s string) (map[string]string, error) { return nil, errors.New("sgd") }, 500, `We encountered an unexpected error retrieving the data.`},
 		{"Suspicious input", func(s string) (map[string]string, error) { return nil, utils.ErrSuspiciousInput }, 400, `Input contains special characters.`},
 		{"too many rows", func(s string) (map[string]string, error) { return nil, utils.ErrToManyRows }, 400, `No matches for input.`},
 	}
@@ -137,7 +136,7 @@ func TestGetProfile(t *testing.T) {
 			}
 
 			if res.StatusCode != tt.status {
-				t.Error("Expected '%v' - got '%v'", tt.status, res.StatusCode)
+				t.Errorf("Expected '%v' - got '%v'", tt.status, res.StatusCode)
 			}
 
 			b, err := ioutil.ReadAll(res.Body)
@@ -160,15 +159,73 @@ func TestBasicGet(t *testing.T) {
 		status int
 		want   string
 	}{
-		{"Passes", func(s string) ([]map[string]string, error) { return []map[string]string{{"hello": "test"}}, nil }, 200, `[{"hello":"test"}]`},
-		{"fails", func(s string) ([]map[string]string, error) { return nil, errors.New("sgd") }, 500, `We encountered an unexpected error retrieving the data.`},
-		{"no rows returned", func(s string) ([]map[string]string, error) { return nil, utils.ErrEmptySQLSet }, 200, `[]`},
-		{"Suspicious input", func(s string) ([]map[string]string, error) { return nil, utils.ErrSuspiciousInput }, 400, `Input contains special characters.`},
+		{"Passes", func(s string) ([]map[string]string, error) {
+			return []map[string]string{{"hello": "test"}}, nil
+		}, 200, `[{"hello":"test"}]`},
+		{"fails", func(s string) ([]map[string]string, error) {
+			return nil, errors.New("sgd")
+		}, 500, `We encountered an unexpected error retrieving the data.`},
+		{"Suspicious input", func(s string) ([]map[string]string, error) {
+			return nil, utils.ErrSuspiciousInput
+		}, 400, `Input contains special characters.`},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ts := httptest.NewServer(BasicGet(tt.f))
+			defer ts.Close()
+			var u bytes.Buffer
+			u.WriteString(string(ts.URL))
+
+			req, _ := http.NewRequest("GET", u.String(), nil)
+
+			res, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Error("Error in http.Get")
+			}
+
+			if res != nil {
+				defer res.Body.Close()
+			}
+
+			if res.StatusCode != tt.status {
+				t.Error("Status is not internalservarerror as expected")
+			}
+
+			b, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				t.Error("Error in ReadAll")
+			}
+
+			str := string(b)
+			if !strings.Contains(str, tt.want) {
+				t.Errorf("Expected '%v' - got '%v'", tt.want, str)
+			}
+		})
+	}
+}
+
+func TestSearch(t *testing.T) {
+	tests := []struct {
+		name   string
+		f      func(string) (map[string][]map[string]string, error)
+		status int
+		want   string
+	}{
+		{"Passes", func(s string) (map[string][]map[string]string, error) {
+			return map[string][]map[string]string{"name": []map[string]string{{"hello": "test"}}}, nil
+		}, 200, `{"name":[{"hello":"test"}]}`},
+		{"fails", func(s string) (map[string][]map[string]string, error) {
+			return nil, errors.New("sgd")
+		}, 500, `We encountered an unexpected error retrieving the data.`},
+		{"Suspicious input", func(s string) (map[string][]map[string]string, error) {
+			return nil, utils.ErrSuspiciousInput
+		}, 400, `Input contains special characters.`},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ts := httptest.NewServer(GetSearch(tt.f))
 			defer ts.Close()
 			var u bytes.Buffer
 			u.WriteString(string(ts.URL))

@@ -67,27 +67,11 @@ func GetProfile(f func(string) (map[string]string, error)) http.Handler {
 
 		m, err := f(vars["user"])
 		if err != nil {
-			switch err {
-			case utils.ErrSuspiciousInput:
-				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
-			case utils.ErrToManyRows:
-				// confuse attacker with misleading messeges.
-				http.Error(w, "No matches for input.", http.StatusBadRequest)
-			case utils.ErrEmptySQLSet:
-				m = map[string]string{}
-				goto canDealWith
-			default:
-				http.Error(w, "We were unable to retrieve the profile.", http.StatusInternalServerError)
-			}
+			writeError(w, err)
 			return
 		}
 
-	canDealWith:
-		err = json.NewEncoder(w).Encode(m)
-		if err != nil {
-			http.Error(w, "We encountered an error parsing the students profile", http.StatusInternalServerError)
-			return
-		}
+		writeJOSN(w, m)
 	})
 }
 
@@ -101,25 +85,11 @@ func BasicGet(f func(string) ([]map[string]string, error)) http.Handler {
 
 		m, err := f(vars["user"])
 		if err != nil {
-			log.Println(err)
-			// check error type and return
-			switch err {
-			case utils.ErrSuspiciousInput:
-				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
-			case utils.ErrEmptySQLSet:
-				m = []map[string]string{}
-				goto canDealWith
-			default:
-				http.Error(w, "We encountered an unexpected error retrieving the data.", http.StatusInternalServerError)
-			}
+			writeError(w, err)
 			return
 		}
 
-	canDealWith:
-		if err = json.NewEncoder(w).Encode(m); err != nil {
-			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
-			return
-		}
+		writeJOSN(w, m)
 	})
 }
 
@@ -132,20 +102,69 @@ func GetSearch(f func(string) (map[string][]map[string]string, error)) http.Hand
 
 		m, err := f(vars["query"])
 		if err != nil {
-			log.Println(err)
-			// check error type and return
-			switch err {
-			case utils.ErrSuspiciousInput:
-				http.Error(w, "Input contains special characters.", http.StatusBadRequest)
-			default:
-				http.Error(w, "We encountered an unexpected error retrieving the data.", http.StatusInternalServerError)
-			}
+			writeError(w, err)
 			return
 		}
 
-		if err = json.NewEncoder(w).Encode(m); err != nil {
-			http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
+		writeJOSN(w, m)
+	})
+}
+
+// GetForModule might be removed later on
+func GetForModule(f func(string) (utils.Module, error)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		m, err := f(vars["code"])
+		if err != nil {
+			writeError(w, err)
 			return
 		}
+
+		writeJOSN(w, m)
 	})
+}
+
+// GetForCode is the same as BasicGet but it reads a different parameter
+// GetForCode expects to find a {code} parameter in the URL.
+func GetForCode(f func(string) ([]map[string]string, error)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		m, err := f(vars["code"])
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+
+		writeJOSN(w, m)
+	})
+}
+
+// Writes the interface as a json encoded string to the http responce.
+// if the JSON couldn't be parsed it writes a http 500
+// Internal Server Error to the responce.
+// Developers have to make sure to call this function last.
+func writeJOSN(w http.ResponseWriter, v interface{}) {
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		http.Error(w, "We cound't encode the retrieved information.", http.StatusInternalServerError)
+		return
+	}
+}
+
+// writes the error recieved from the function that interacts with a database
+// it write the error to the http.ResponseWrite and because of that
+// you have to make sure to not write anything elso to it after that
+func writeError(w http.ResponseWriter, err error) {
+	log.Println(err)
+	// check error type and return
+	switch err {
+	case utils.ErrSuspiciousInput:
+		http.Error(w, "Input contains special characters.", http.StatusBadRequest)
+	case utils.ErrToManyRows:
+		// confuse attacker with misleading messeges.
+		http.Error(w, "No matches for input.", http.StatusBadRequest)
+	default:
+		http.Error(w, "We encountered an unexpected error retrieving the data.", http.StatusInternalServerError)
+	}
 }

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { TextField, RaisedButton } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { createHmac } from 'crypto';
-// import fetch from 'node-fetch';
 
 class Login extends Component {
   constructor(props) {

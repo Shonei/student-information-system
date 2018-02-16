@@ -22,11 +22,33 @@ INSERT INTO programme(name, code, UCAS_code, duration, manager, attendance, scho
 INSERT INTO student(id, first_name, middle_name, last_name, email, current_level, programme_code, picture_url, gender, dob, entry_year, home_phone, home_address, local_phone, local_address) VALUES(72862, 'Tianna', 'Rosella', 'Hettinger', 'Carlotta.Dooley80@hotmail.com', 1, 'maiores', 'http://ahmad.biz', 'quam', '2017-04-11T01:53:41.507Z', '2018-01-18T16:13:21.331Z', '816-157-7910 x7604', '62994 Bradtke Glen', '254-492-4044', '53300 Mohr Manors');
 INSERT INTO student(id, first_name, middle_name, last_name, email, current_level, programme_code, picture_url, gender, dob, entry_year, home_phone, home_address, local_phone, local_address) VALUES(44148, 'Sid', 'Rafael', 'Kuhic', 'Karson29@yahoo.com', 3, 'sit', 'http://zella.biz', 'eos', '2017-07-14T05:35:41.170Z', '2018-01-18T20:27:14.228Z', '(830) 408-4820', '12313 Pollich Drive', '155-862-1376 x5170', '568 McGlynn Fall');
 
-INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(10684, 'SQL matrix!', 'You cant navigate the bus without connecting the open-source FTP bandwidth!', 'If we override the monitor, we can get to the SAS interface through the cross-platform IB card!', 1, 1, 49);
-INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(86583, 'SCSI circuit!', 'Use the mobile HDD feed, then you can parse the digital panel!', 'We need to program the back-end SCSI system!', 2, 1, 26);
-INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(25351, 'XML driver!', 'Try to bypass the FTP bandwidth, maybe it will connect the optical port!', 'connecting the array wont do anything, we need to bypass the optical XML array!', 2, 2, 72);
-INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(25509, 'JBOD firewall!', 'bypassing the hard drive wont do anything, we need to input the wireless SQL bus!', 'The EXE pixel is down, bypass the digital panel so we can generate the SAS firewall!', 1, 3, 5);
-INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(72065, 'cross-platform microchip!', 'Ill synthesize the wireless SMTP program, that should hard drive the JSON pixel!', 'Try to input the HDD application, maybe it will parse the wireless array!', 1, 3, 19);
+INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(10684, 'SQL matrix!', lorem(), lorem(), 1, 1, 49);
+INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(86583, 'SCSI circuit!', lorem(), lorem(), 2, 1, 26);
+INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(25351, 'XML driver!', lorem(), lorem(), 2, 2, 72);
+INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(25509, 'JBOD firewall!', lorem(), lorem(), 1, 3, 5);
+INSERT INTO module(code, name, description, syllabus, semester, year_of_study, credits) VALUES(72065, 'cross-platform microchip!', lorem(), lorem(), 1, 3, 19);
+
+INSERT INTO exam(code , module_code, percentage, type, description) VALUES(34633, 10684, 75, 'open book', lorem());
+INSERT INTO exam(code , module_code, percentage, type, description) VALUES(45762456, 86583, 75, 'open book', lorem());
+INSERT INTO exam(code , module_code, percentage, type, description) VALUES(2456, 25351, 75, 'open book', lorem());
+INSERT INTO exam(code , module_code, percentage, type, description) VALUES(245652, 25509, 75, 'open book', lorem());
+INSERT INTO exam(code , module_code, percentage, type, description) VALUES(34630, 72065, 75, 'open book', lorem());
+
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(1, 20, 20, 45762456,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(2, 20, 20, 45762456,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(3, 20, 20, 45762456,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(1, 20, 20, 2456,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(2, 20, 20, 2456,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(3, 20, 20, 2456,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(1, 20, 20, 245652,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(2, 20, 20, 245652,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(3, 20, 20, 245652,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(1, 20, 20, 34633,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(2, 20, 20, 34633,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
+INSERT INTO questions(number, marks, weight, exam_code, question) VALUES(3, 20, 20, 34633,'Elementum nibh morbi quam quis in vitae, blandit tortor fusce tempor, consectetuer tellus nec odio?');
 
 INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(10684, 'lecture', NOW(), 'HDD');
 INSERT INTO timetable(module_code, meeting_type, meeting_time, room) VALUES(10684, 'lab', NOW() + '2 hours', 'interactive');
@@ -62,27 +84,16 @@ INSERT INTO prerequisites(module_code, prerequisite_code) VALUES(25351, 10684);
 INSERT INTO prerequisites(module_code, prerequisite_code) VALUES(72065, 25351);
 INSERT INTO prerequisites(module_code, prerequisite_code) VALUES(72065, 86583);
 
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(10684, 39041, 'productivity', NOW() + '10 hours', NOW() + '10 days', 10, 100);
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(10684, 84152, 'sky blue', NOW() + '9 hours', NOW() + '9 days', 10, 100);
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(25351, 72519, 'Tasty Plastic Ball', NOW() + '8 hours', NOW() + '8 days', 20, 100);
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(25351, 88157, 'Grenada', NOW() + '7 hours', NOW() + '5 days', 20, 100);
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(86583, 91860, 'real-time', NOW() + '6 hours', NOW() + '6 days', 15, 100);
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(86583, 21939, 'Paanga', NOW() + '5 hours', NOW() + '55 days', 15, 100);
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(86583, 76445, 'withdrawal', NOW() + '4 hours', NOW() + '21 days', 20, 100);
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(25509, 39669, 'withdrawal', NOW() + '3 hours', NOW() + '33 days', 50, 100);
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(72065, 42037, 'Cotton', NOW() + '2 hours', NOW() + '5 days', 10, 100);
-INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks) VALUES(72065, 71573, 'Customer', NOW() + '1 hours', NOW() + '85 days', 20, 100);
-
-INSERT INTO coursework_result(coursework_id, student_id, result, handed_in) VALUES(39041, 72862, 54, '2017-08-06T08:24:20.781Z');
-INSERT INTO coursework_result(coursework_id, student_id, result, handed_in) VALUES(84152, 72862, 65, '2017-08-06T08:24:20.781Z');
-INSERT INTO coursework_result(coursework_id, student_id) VALUES(91860, 72862);
-INSERT INTO coursework_result(coursework_id, student_id) VALUES(88157, 72862);
-INSERT INTO coursework_result(coursework_id, student_id, result, handed_in) VALUES(91860, 72862, 67, '2017-08-06T08:24:20.781Z');
-INSERT INTO coursework_result(coursework_id, student_id, result, handed_in) VALUES(21939, 72862, 42, '2017-08-06T08:24:20.781Z');
-INSERT INTO coursework_result(coursework_id, student_id, result, handed_in) VALUES(76445, 44148, 78, '2017-08-06T08:24:20.781Z');
-INSERT INTO coursework_result(coursework_id, student_id) VALUES(39669, 44148);
-INSERT INTO coursework_result(coursework_id, student_id, result, handed_in) VALUES(42037, 44148, 73, '2017-08-06T08:24:20.781Z');
-INSERT INTO coursework_result(coursework_id, student_id, result, handed_in) VALUES(71573, 44148, 45, '2017-08-06T08:24:20.781Z');
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(10684, 39041, 'productivity', NOW() + '10 hours', NOW() + '10 days', 10, 100, lorem());
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(10684, 84152, 'sky blue', NOW() + '9 hours', NOW() + '9 days', 10, 100, lorem());
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(25351, 72519, 'Tasty Plastic Ball', NOW() + '8 hours', NOW() + '8 days', 20, 100, lorem());
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(25351, 88157, 'Grenada', NOW() + '7 hours', NOW() + '5 days', 20, 100, lorem());
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(86583, 91860, 'real-time', NOW() + '6 hours', NOW() + '6 days', 15, 100, lorem());
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(86583, 21939, 'Paanga', NOW() + '5 hours', NOW() + '55 days', 15, 100, lorem());
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(86583, 76445, 'withdrawal', NOW() + '4 hours', NOW() + '21 days', 20, 100, lorem());
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(25509, 39669, 'withdrawal', NOW() + '3 hours', NOW() + '33 days', 50, 100, lorem());
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(72065, 42037, 'Cotton', NOW() + '2 hours', NOW() + '5 days', 10, 100, lorem());
+INSERT INTO coursework(module_code, id, cwk_name, posted_on, deadline, percentage, marks, description) VALUES(72065, 71573, 'Customer', NOW() + '1 hours', NOW() + '85 days', 20, 100, lorem());
 
 INSERT INTO teaching(staff_id, module_code, staff_role) VALUES(37362, 10684, 'leading');
 INSERT INTO teaching(staff_id, module_code, staff_role) VALUES(67622, 25351, 'leading');
