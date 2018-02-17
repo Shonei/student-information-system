@@ -196,6 +196,19 @@ AS $$
   WHERE coursework.id = $1 $$ 
 LANGUAGE SQL;
 
+-- update students cwk result
+CREATE OR REPLACE FUNCTION update_student_cwk(INT, DATE, INT, INT)
+RETURNS BOOLEAN AS $$
+BEGIN 
+  UPDATE coursework_result
+  SET result = $1, handed_in = $2
+  WHERE coursework_id = $3
+  AND student_id = $4;
+  RETURN TRUE;
+END;
+$$
+LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION lorem() RETURNS TEXT AS $$
   RETURN 'Lorem ipsum dolor sit amet, tincidunt vel massa in eu fermentum, leo tortor nec, nec tellus ut dictum in et urna. Sollicitudin rhoncus mi eros mauris magna nisl, dis lorem tincidunt, maecenas nec vestibulum non at, posuere justo placerat velit sed. Et sapien a, mus feugiat nunc. In id vel, vitae ipsum vitae maecenas ante vel. Mi eu, non vulputate, urna facilisis volutpat, sed malesuada id adipiscing placerat posuere donec, iaculis natus rhoncus sed. Leo est ac proin nulla aliquam fermentum, amet donec ornare, a conubia semper, id montes tellus. Et sagittis risus, sollicitudin at sem risus, quis ultricies dictum et tempus, vestibulum augue velit vehicula nec, massa felis vel. Fames porta, ultrices urna etiam quis, in justo sit, proin ac nam, ipsum vitae. Sem augue wisi nec quam, nulla augue eros et egestas integer lectus.';
 LANGUAGE SQL;

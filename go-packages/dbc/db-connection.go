@@ -272,3 +272,12 @@ func formatModule(m map[string]string) (utils.Module, error) {
 
 	return module, nil
 }
+
+func UpdateCwkResults(db utils.DBAbstraction, cwk utils.CwkUpdate) error {
+	return db.PreparedStmt(
+		"SELECT * FROM update_student_cwk($1, $2, $3, $4);",
+		cwk.Result,
+		cwk.HandedIn,
+		cwk.CwkID,
+		cwk.StudentID)
+}

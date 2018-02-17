@@ -25,7 +25,7 @@ class Staff extends PureComponent {
   }
 
   componentDidMount() {
-    let results = localStorage.getItem('search');
+    let results = sessionStorage.getItem('search');
     results = JSON.parse(results);
 
     this.tables['students'] = results.students ? results.students : [];
@@ -58,7 +58,7 @@ class Staff extends PureComponent {
     } else {
       return;
     }
-    localStorage.setItem(itemName, user);
+    sessionStorage.setItem(itemName, user);
     window.location.href = '/' + itemName;
   }
 

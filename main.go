@@ -76,6 +76,9 @@ func main() {
 	search := func(str string) (map[string][]map[string]string, error) {
 		return dbc.Search(db, str)
 	}
+	updateCwk := func(cwk utils.CwkUpdate) error {
+		return dbc.UpdateCwkResults(db, cwk)
+	}
 
 	r := mux.NewRouter()
 	// Universal routes
@@ -97,6 +100,7 @@ func main() {
 	r.Handle("/get/cwk/{code}", hand.GetForCode(getCourseworkDetails)).Methods("GET")
 	r.Handle("/get/cwk/students/{code}", hand.GetForCode(getStudentsOnCwk)).Methods("GET")
 	r.Handle("/search/{query}", hand.GetSearch(search)).Methods("GET")
+	r.Handle("/update/cwk/results", hand.Update(updateCwk)).Methods("POST")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))
@@ -106,6 +110,7 @@ func main() {
 	r.PathPrefix("/student").Handler(http.StripPrefix("/student", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/staff").Handler(http.StripPrefix("/staff", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/search").Handler(http.StripPrefix("/search", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/module").Handler(http.StripPrefix("/module", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/"))).Methods("GET")
 
 	// listen on the router

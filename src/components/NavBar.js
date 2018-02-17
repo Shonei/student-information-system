@@ -6,6 +6,7 @@ import Login from './Login';
 import Staff from './staff/Staff';
 import Search from './staff/Search';
 import SearchBar from './staff/SearchBar';
+import Module from './module/Module';
 
 const styles = {
   cursor: 'pointer',
@@ -23,27 +24,27 @@ class NavBar extends Component {
   }
 
   componentDidMount() {
-    const lvl = localStorage.getItem('access_level');
+    const lvl = sessionStorage.getItem('access_level');
     this.setState({ accessLevel: parseInt(lvl, 10) });
   }
 
   // Clears all global state and cookies
   handleLogoff(user) {
     document.cookie = '';
-    localStorage.clear();
+    sessionStorage.clear();
     document.location.href = '/';
   }
 
   // Based on the access level take the user to their home page
   handleHomeClick() {
     let loc = '/';
-    let user = window.localStorage.getItem('loggedin');
+    let user = window.sessionStorage.getItem('loggedin');
     if (this.state.accessLevel === 1) {
       loc = '/student';
-      window.localStorage.setItem('student', user);
+      window.sessionStorage.setItem('student', user);
     } else if (this.state.accessLevel > 1) {
       loc = '/staff';
-      window.localStorage.setItem('staff', user);
+      window.sessionStorage.setItem('staff', user);
     }
     document.location.href = loc;
   }
@@ -65,6 +66,7 @@ class NavBar extends Component {
             <Route exact path="/student" render={() => <Student></Student>} />
             <Route exact path="/staff" render={() => <Staff></Staff>} />
             <Route exact path="/search" render={() => <Search></Search>} />
+            <Route exact path="/module" render={() => <Module></Module>} />
           </div>
         </Router>
       </div>

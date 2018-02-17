@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { wrapFetch } from './../helpers';
-import { Avatar, FlatButton, TextField, RaisedButton } from 'material-ui';
+import { Avatar, FlatButton } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import CustomTable from './../CustomTable';
 
@@ -47,7 +47,7 @@ class Staff extends PureComponent {
   }
 
   handleStudentClick(username) {
-    window.localStorage.setItem('student', username);
+    window.sessionStorage.setItem('student', username);
     window.location.href = '/student';
   }
 

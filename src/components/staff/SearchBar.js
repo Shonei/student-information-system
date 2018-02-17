@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { wrapFetch } from './../helpers';
 import { RaisedButton, TextField } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 
@@ -31,7 +30,7 @@ class SearchBar extends Component {
         return res.json();
       }
     }).then(data => {
-      localStorage.setItem('search', JSON.stringify(data));
+      sessionStorage.setItem('search', JSON.stringify(data));
       window.location.href = '/search';
     }).catch(err => this.setState({ errorMessage: 'No results were found.' }));
   }

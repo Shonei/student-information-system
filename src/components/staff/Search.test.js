@@ -7,7 +7,7 @@ import { MuiThemeProvider as mui } from 'material-ui/styles/MuiThemeProvider';
 
 configure({ adapter: new Adapter() });
 
-window.localStorage = {
+window.sessionStorage = {
   getItem: jest.fn(cb => '{}')
 };
 
