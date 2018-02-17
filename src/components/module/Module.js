@@ -17,8 +17,8 @@ class Module extends PureComponent {
 
   componentDidMount() {
     let moduleId = window.sessionStorage.getItem('module');
-    // FIX THIS
-    fetch('/get/module/' + '25351', {
+
+    fetch('/get/module/' + moduleId, {
       method: 'GET',
       credentials: 'same-origin',
     }).then(e => e.json())

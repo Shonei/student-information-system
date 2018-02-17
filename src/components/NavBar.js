@@ -7,6 +7,7 @@ import Staff from './staff/Staff';
 import Search from './staff/Search';
 import SearchBar from './staff/SearchBar';
 import Module from './module/Module';
+import Coursework from './coursework/Coursework';
 
 const styles = {
   cursor: 'pointer',
@@ -67,6 +68,7 @@ class NavBar extends Component {
             <Route exact path="/staff" render={() => <Staff></Staff>} />
             <Route exact path="/search" render={() => <Search></Search>} />
             <Route exact path="/module" render={() => <Module></Module>} />
+            <Route exact path="/coursework" render={() => <Coursework></Coursework>} />
           </div>
         </Router>
       </div>

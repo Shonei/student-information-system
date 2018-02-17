@@ -1,11 +1,18 @@
 import React, { PureComponent } from 'react';
 import { Row, Col } from 'react-flexbox-grid';
-import { Divider } from 'material-ui';
+import { Divider, FlatButton } from 'material-ui';
 import PropTypes from 'prop-types';
 
 class CwkList extends PureComponent {
   constructor(props) {
     super(props);
+
+    this.handleCwkClick = this.handleCwkClick.bind(this);
+  }
+
+  handleCwkClick(id) {
+    window.sessionStorage.setItem('coursework', id);
+    window.location.href = '/coursework';
   }
 
   getCourseworks(cwks) {
@@ -13,7 +20,7 @@ class CwkList extends PureComponent {
       return (
         <Row key={index}>
           <Col xs>
-            <p>{value.id}</p>
+            <FlatButton style={{ cursor: "pointer" }} onClick={() => this.handleCwkClick(value.id)} label={value.id} />
           </ Col>
           <Col xs >
             <p>{value.cwk_name}</p>

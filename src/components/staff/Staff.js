@@ -23,6 +23,7 @@ class Staff extends PureComponent {
     };
 
     this.handleStudentClick = this.handleStudentClick.bind(this);
+    this.handleModuleClick = this.handleModuleClick.bind(this);
   }
 
   componentDidMount() {
@@ -31,7 +32,14 @@ class Staff extends PureComponent {
       .catch(console.log);
 
     wrapFetch('staff', '/get/staff/modules/')
-      .then(m => this.setState({ modules: m }))
+      .then(m => {
+        m = m.map(module => {
+          const code = module.code;
+          module.code = <FlatButton style={{ cursor: "pointer" }} onClick={() => this.handleModuleClick(code)} label={code} />;
+          return module;
+        });
+        this.setState({ modules: m });
+      })
       .catch(console.log);
 
     wrapFetch('staff', '/get/staff/tutees/')
@@ -49,6 +57,12 @@ class Staff extends PureComponent {
   handleStudentClick(username) {
     window.sessionStorage.setItem('student', username);
     window.location.href = '/student';
+  }
+
+
+  handleModuleClick(id) {
+    window.sessionStorage.setItem('module', id);
+    window.location.href = '/module';
   }
 
   render() {
