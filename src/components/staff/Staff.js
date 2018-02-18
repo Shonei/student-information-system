@@ -68,7 +68,7 @@ class Staff extends PureComponent {
   render() {
     const fullName = this.state.first_name + ' ' + this.state.middle_name + ' ' + this.state.last_name;
     const URL = "https://github.com/Shonei/student-information-system/blob/master/database.jpg?raw=true";
-
+    console.log('sdgdsg')
     return (
       <Grid fluid>
         <Row center="xs">

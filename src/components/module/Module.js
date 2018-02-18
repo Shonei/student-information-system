@@ -27,7 +27,6 @@ class Module extends PureComponent {
   }
 
   getExam(exams) {
-    console.log(exams);
     return exams.map((value, index) => {
       return (
         <Row key={index}>
@@ -46,7 +45,6 @@ class Module extends PureComponent {
   }
 
   render() {
-    console.log(this.state)
     return (
       <Grid fluid>
         <Row center="xs">

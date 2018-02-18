@@ -22,6 +22,7 @@ class Staff extends PureComponent {
     this.getModule = this.getModule.bind(this);
     this.getProgramme = this.getProgramme.bind(this);
     this.handlePersonClick = this.handlePersonClick.bind(this);
+    this.handleModuleClick = this.handleModuleClick.bind(this);
   }
 
   componentDidMount() {
@@ -62,6 +63,11 @@ class Staff extends PureComponent {
     window.location.href = '/' + itemName;
   }
 
+  handleModuleClick(id) {
+    window.sessionStorage.setItem('module', id);
+    window.location.href = '/module';
+  }
+
   getPerson(person) {
     return (
       <ListItem
@@ -97,6 +103,10 @@ class Staff extends PureComponent {
   getModule(m) {
     return (
       <ListItem
+        onClick={event => {
+          event.preventDefault();
+          this.handleModuleClick(m.code);
+        }}
         key={m.code}
         leftAvatar={<Avatar>{m.name.charAt(0)}</Avatar>}
         primaryText={m.name}

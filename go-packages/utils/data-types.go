@@ -22,9 +22,10 @@ type Exam struct {
 
 // Cwk is the basic list representation of a coursework for a given module
 type Cwk struct {
-	Id    int    `json:"id,omitempty"`
-	Name  string `json:"cwk_name,omitempty"`
-	Marks int    `json:"marks,omitempty"`
+	Id         int    `json:"id,omitempty"`
+	Name       string `json:"cwk_name,omitempty"`
+	Marks      int    `json:"marks,omitempty"`
+	Percentage int    `json:"percentage,omitempty"`
 }
 
 // CwkUpdate is the data needed to update a students cwk results

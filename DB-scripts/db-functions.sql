@@ -169,7 +169,7 @@ CREATE OR REPLACE FUNCTION get_module_details(TEXT)
 RETURNS TABLE(code TEXT, name TEXT, description TEXT, syllabus TEXT, semester INT, year INT, credits INT, cwks JSON, exam JSON)
 AS $$
   SELECT module.code , module.name , module.description , module.syllabus , module.semester , module.year_of_study AS year , module.credits,
-  to_json(ARRAY(SELECT row_to_json(r) FROM (SELECT id, cwk_name, marks FROM coursework WHERE module_code = $1) r)) as cwks,
+  to_json(ARRAY(SELECT row_to_json(r) FROM (SELECT id, cwk_name, marks, percentage FROM coursework WHERE module_code = $1) r)) as cwks,
   to_json(ARRAY(SELECT row_to_json(r) FROM (SELECT code, percentage, type FROM exam WHERE module_code = $1) r)) as exam
   FROM module
   WHERE module.code = $1 $$
@@ -185,10 +185,11 @@ AS $$
 LANGUAGE SQL;
 
 -- get students taking coursework
+-- STUDENT.ID IS DUPLICATED
 CREATE OR REPLACE FUNCTION get_cwk_students(INT) 
-RETURNS TABLE(student_id INT, result INT, id INT, username TEXT, marks INT, percentage INT)
+RETURNS TABLE(student_id INT, result INT, username TEXT, handed_in DATE)
 AS $$
-  SELECT coursework_result.student_id, coursework_result.result, student.id, login_info.username, coursework.marks, coursework.percentage
+  SELECT coursework_result.student_id, coursework_result.result, login_info.username, coursework_result.handed_in
   FROM coursework
   INNER JOIN coursework_result ON coursework_result.coursework_id = coursework.id
   INNER JOIN student ON student.id = coursework_result.student_id

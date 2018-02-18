@@ -28,6 +28,9 @@ class CwkList extends PureComponent {
           <Col xs>
             <p>{value.marks}</p>
           </ Col>
+          <Col xs>
+            <p>{value.percentage}</p>
+          </ Col>
         </Row>
       );
     });
@@ -49,6 +52,9 @@ class CwkList extends PureComponent {
             </Col>
             <Col xs>
               <p><b>Available marks</b></p>
+            </ Col>
+            <Col xs>
+              <p><b>%</b></p>
             </ Col>
           </Row>
           {this.getCourseworks(this.props.cwk)}
