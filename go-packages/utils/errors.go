@@ -19,3 +19,5 @@ var ErrEmptySQLSet = errors.New("the result set is empty")
 
 // ErrTimedOut is returned when a query takes too long
 var ErrTimedOut = errors.New("search takes too long")
+
+var ErrTypeMismatch = errors.New("got an unexpected type")

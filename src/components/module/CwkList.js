@@ -1,38 +1,23 @@
 import React, { PureComponent } from 'react';
 import { Row, Col } from 'react-flexbox-grid';
-import { Divider, FlatButton } from 'material-ui';
+import { Divider, FlatButton, TextField } from 'material-ui';
 import PropTypes from 'prop-types';
+import CwkRow from './CwkRow';
 
 class CwkList extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.handleCwkClick = this.handleCwkClick.bind(this);
-  }
-
-  handleCwkClick(id) {
-    window.sessionStorage.setItem('coursework', id);
-    window.location.href = '/coursework';
+    this.getCourseworks = this.getCourseworks.bind(this);
   }
 
   getCourseworks(cwks) {
     return cwks.map((value, index) => {
-      return (
-        <Row key={index}>
-          <Col xs>
-            <FlatButton style={{ cursor: "pointer" }} onClick={() => this.handleCwkClick(value.id)} label={value.id} />
-          </ Col>
-          <Col xs >
-            <p>{value.cwk_name}</p>
-          </Col>
-          <Col xs>
-            <p>{value.marks}</p>
-          </ Col>
-          <Col xs>
-            <p>{value.percentage}</p>
-          </ Col>
-        </Row>
-      );
+      return <CwkRow
+      key={index} 
+      editing={this.props.editing}
+      cwk={value}
+      onChange={this.props.onChange}/>;
     });
   }
 
@@ -67,6 +52,7 @@ class CwkList extends PureComponent {
 
 CwkList.propTypes = {
   cwk: PropTypes.arrayOf(PropTypes.object).isRequired,
+  editing: PropTypes.bool.isRequired
 };
 
 export default CwkList;

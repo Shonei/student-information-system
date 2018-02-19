@@ -2,6 +2,7 @@ package dbc
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"regexp"
 	"strconv"
@@ -280,4 +281,18 @@ func UpdateCwkResults(db utils.DBAbstraction, cwk utils.CwkUpdate) error {
 		cwk.HandedIn,
 		cwk.CwkID,
 		cwk.StudentID)
+}
+
+func UpdateExamPercentage(db utils.DBAbstraction, exam utils.Exam) error {
+	fmt.Println(exam)
+	return db.PreparedStmt("UPDATE exam SET percentage = $1 WHERE code = $2;",
+		exam.Percentage,
+		exam.Code)
+}
+
+func UpdateCwkPercentage(db utils.DBAbstraction, cwk utils.Cwk) error {
+	return db.PreparedStmt("UPDATE coursework SET percentage = $1, marks = $2 WHERE code = $3;",
+		cwk.Percentage,
+		cwk.Marks,
+		cwk.Id)
 }

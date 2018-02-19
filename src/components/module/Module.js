@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Grid, Row, Col } from 'react-flexbox-grid';
-import { Paper, Divider } from 'material-ui';
+import { Paper, Divider, RaisedButton, TextField } from 'material-ui';
 import CwkList from './CwkList';
 
 class Module extends PureComponent {
@@ -9,10 +9,17 @@ class Module extends PureComponent {
 
     this.state = {
       exam: [],
-      cwks: []
+      cwks: [],
+      editing: false,
     };
 
+    this.updateExams = {};
+    this.updateCwks = {};
+
+    this.updateCwkList = this.updateCwkList.bind(this);
     this.getExam = this.getExam.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.postdata = this.postDate.bind(this);
   }
 
   componentDidMount() {
@@ -26,6 +33,51 @@ class Module extends PureComponent {
       .catch(console.error)
   }
 
+  postDate(url, data) {
+    fetch(url, {
+      credentials: 'same-origin',
+      method: "POST",
+      body: JSON.stringify(data)
+    }).then(res => {
+      if (!res.ok) {
+        return res.text();
+      } else {
+        // server doesn't send any data on a success
+        // We switch from editing mode and give them the option to edit the results again
+        return Promise.resolve();
+      }
+    });
+  }
+
+  handleClick() {
+    if (this.state.editing) {
+      // we have to send post requests to update the databse
+      let request = [];
+
+      Object.keys(this.updateExams).forEach(key => {
+        let obj = {
+          percentage: parseInt(key),
+          code: this.updateExams[key]
+        };
+        console.log(obj)
+
+        request.push(this.postDate('/update/exam/percentage', obj));
+      });
+      Promise.all([request])
+        .then(console.log)
+        .catch(console.error);
+    }
+    this.setState(prev => ({ editing: !prev.editing }));
+  }
+
+  updateCwkList(code, m, p) {
+    this.updateCwks[code] = {
+      marks: m,
+      percentage: p
+    };
+    console.log(this.updateCwks);
+  }
+
   getExam(exams) {
     return exams.map((value, index) => {
       return (
@@ -34,7 +86,14 @@ class Module extends PureComponent {
             <p>{value.code}</p>
           </ Col>
           <Col xs >
-            <p>{value.percentage}</p>
+            {this.state.editing ? <TextField
+              style={{ maxWidth: '60px' }}
+              hintText={'%'}
+              onChange={(e, v) => this.updateExams[value.code] = v}
+              defaultValue={value.percentage}
+              type={'number'} /> :
+              <p>{value.percentage}</p>
+            }
           </Col>
           <Col xs>
             <p>{value.type}</p>
@@ -95,6 +154,10 @@ class Module extends PureComponent {
           <Col xs={2} />
           <Col xs={8} >
             <h3>Exam:</h3>
+            <RaisedButton
+              style={{ cursor: "pointer" }}
+              onClick={this.handleClick}
+              label={this.state.editing ? "Update" : "Edit"} />
             <Divider />
             <Row>
               <Col xs>
@@ -112,7 +175,10 @@ class Module extends PureComponent {
           <Col xs={2} />
         </Row>
         <br />
-        <CwkList cwk={this.state.cwks} />
+        <CwkList
+          cwk={this.state.cwks}
+          editing={this.state.editing}
+          onChange={this.updateCwkList} />
       </Grid>
     );
   }

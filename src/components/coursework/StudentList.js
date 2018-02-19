@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import StudentRow from './StudentRow';
+import { Divider } from 'material-ui';
 
 class StudentList extends PureComponent {
   constructor() {
@@ -52,6 +53,7 @@ class StudentList extends PureComponent {
           <Col xs={2} />
           <Col xs={8}>
             <h2>Students</h2>
+            <Divider />
           </Col>
           <Col xs={2} />
         </Row>

@@ -79,6 +79,12 @@ func main() {
 	updateCwk := func(cwk utils.CwkUpdate) error {
 		return dbc.UpdateCwkResults(db, cwk)
 	}
+	updateExamPercent := func(exam utils.Exam) error {
+		return dbc.UpdateExamPercentage(db, exam)
+	}
+	updateCwkPercent := func(cwk utils.Cwk) error {
+		return dbc.UpdateCwkPercentage(db, cwk)
+	}
 
 	r := mux.NewRouter()
 	// Universal routes
@@ -101,6 +107,8 @@ func main() {
 	r.Handle("/get/cwk/students/{code}", hand.GetForCode(getStudentsOnCwk)).Methods("GET")
 	r.Handle("/search/{query}", hand.GetSearch(search)).Methods("GET")
 	r.Handle("/update/cwk/results", hand.Update(updateCwk)).Methods("POST")
+	r.Handle("/update/exam/percentage", hand.UpdateExam(updateExamPercent)).Methods("POST")
+	r.Handle("/update/cwk/percentage", hand.UpdateCwk(updateCwkPercent)).Methods("POST")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))

@@ -10,11 +10,9 @@ class StudentRow extends PureComponent {
     this.state = {
       result: ' ',
       handed_in: '',
-      buttonLabel: ' ',
       edit: false
     };
 
-    this.enableEdit = this.enableEdit.bind(this);
     this.handleUpdateCwkResult = this.handleUpdateCwkResult.bind(this);
     this.shouldEdit = this.shouldEdit.bind(this);
   }
@@ -22,14 +20,12 @@ class StudentRow extends PureComponent {
   componentDidMount() {
     // if the results are vailable we make the option to edit them available
     // if the results are missing we just give the option to update them by default
-    if (this.props.student.result) {
-      this.setState({ buttonLabel: 'Edit' });
-      this.setState({ result: this.props.student.result });
-    } else {
+    if (!this.props.student.result) {
       this.setState({ edit: true });
-      this.setState({ buttonLabel: 'Update' });
     }
-
+    
+    // we copy the props onto the state so we can edit it freely
+    this.setState({ result: this.props.student.result });
     this.setState({ handed_in: this.props.student.handed_in });
   }
 
@@ -53,15 +49,8 @@ class StudentRow extends PureComponent {
         // server doesn't send any data on a success
         // We switch from editing mode and give them the option to edit the results again
         this.setState({ edit: false });
-        this.setState({ buttonLabel: 'Edit' });
       }
     }).catch(console.log)
-  }
-
-  enableEdit() {
-    // switches to edit mode where the user can update the results and date.
-    this.setState({ edit: true });
-    this.setState({ buttonLabel: 'Update' });
   }
 
   // Based on wheter or not the user is editing the the result or the data
@@ -99,10 +88,10 @@ class StudentRow extends PureComponent {
         </ Col>
         <Col xs>
           <RaisedButton
-            label={this.state.buttonLabel}
+            label={this.state.edit ? "Update" : "Edit"}
             primary={true}
             style={{ margin: 12 }}
-            onClick={this.state.edit ? this.handleUpdateCwkResult : this.enableEdit}
+            onClick={this.state.edit ? this.handleUpdateCwkResult : () => this.setState({ edit: true })}
           />
         </ Col>
       </Row>
