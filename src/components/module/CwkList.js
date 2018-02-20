@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Row, Col } from 'react-flexbox-grid';
-import { Divider, FlatButton, TextField } from 'material-ui';
+import { Divider } from 'material-ui';
 import PropTypes from 'prop-types';
 import CwkRow from './CwkRow';
 

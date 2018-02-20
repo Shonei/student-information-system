@@ -45,18 +45,17 @@ func (db *DB) SelectMulti(s string, args ...interface{}) ([]map[string]string, e
 // It won't return data after the statement has been return but only
 // return an error if one has occured.
 func (db *DB) PreparedStmt(s string, args ...interface{}) error {
-	stmt, err := db.Prepare(s)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(args...)
+	result, err := db.Exec(s, args...)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	rows, err := result.RowsAffected()
+	if rows < 1 {
+		return ErrEmptySQLSet
+	}
+
+	return err
 }
 
 // Reads the data from sqlRows into a []map[string]string

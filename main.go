@@ -124,7 +124,8 @@ func main() {
 
 	// listen on the router
 	http.Handle("/", r)
-
+	// e := utils.Exam{"34630", 4546, "sdgs"}
+	// fmt.Println(dbc.UpdateExamPercentage(db, e))
 	log.Println(http.ListenAndServe(":"+port, nil))
 }
 

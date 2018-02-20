@@ -210,6 +210,26 @@ END;
 $$
 LANGUAGE plpgsql;
 
+-- Creates the update exam % query
+CREATE OR REPLACE FUNCTION change_exam_percentage(INT, TEXT) 
+RETURNS BOOLEAN AS $$
+BEGIN 
+  UPDATE exam SET percentage = $1 WHERE code = $2;
+  RETURN TRUE;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- creates function to update cwk marks and %
+CREATE OR REPLACE FUNCTION change_cwk_marks_and_percent(INT, INT, INT) 
+RETURNS BOOLEAN AS $$
+BEGIN 
+  UPDATE coursework SET percentage = $1, marks = $2 WHERE id = $3;
+  RETURN TRUE;
+END;
+$$
+LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION lorem() RETURNS TEXT AS $$
   RETURN 'Lorem ipsum dolor sit amet, tincidunt vel massa in eu fermentum, leo tortor nec, nec tellus ut dictum in et urna. Sollicitudin rhoncus mi eros mauris magna nisl, dis lorem tincidunt, maecenas nec vestibulum non at, posuere justo placerat velit sed. Et sapien a, mus feugiat nunc. In id vel, vitae ipsum vitae maecenas ante vel. Mi eu, non vulputate, urna facilisis volutpat, sed malesuada id adipiscing placerat posuere donec, iaculis natus rhoncus sed. Leo est ac proin nulla aliquam fermentum, amet donec ornare, a conubia semper, id montes tellus. Et sagittis risus, sollicitudin at sem risus, quis ultricies dictum et tempus, vestibulum augue velit vehicula nec, massa felis vel. Fames porta, ultrices urna etiam quis, in justo sit, proin ac nam, ipsum vitae. Sem augue wisi nec quam, nulla augue eros et egestas integer lectus.';
 LANGUAGE SQL;

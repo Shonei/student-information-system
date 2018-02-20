@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
-import { Grid, Row, Col } from 'react-flexbox-grid';
-import { Divider, RaisedButton, TextField } from 'material-ui';
+import { Row, Col } from 'react-flexbox-grid';
+import { RaisedButton, TextField } from 'material-ui';
 import PropTypes from 'prop-types';
 
 class StudentRow extends PureComponent {

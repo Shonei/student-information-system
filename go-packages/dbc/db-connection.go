@@ -284,14 +284,15 @@ func UpdateCwkResults(db utils.DBAbstraction, cwk utils.CwkUpdate) error {
 }
 
 func UpdateExamPercentage(db utils.DBAbstraction, exam utils.Exam) error {
-	fmt.Println(exam)
-	return db.PreparedStmt("UPDATE exam SET percentage = $1 WHERE code = $2;",
-		exam.Percentage,
-		exam.Code)
+	if !basicParser.MatchString(exam.Code) {
+		return utils.ErrSuspiciousInput
+	}
+	fmt.Println(exam.Percentage, " - ", exam.Code)
+	return db.PreparedStmt("SELECT * FROM change_exam_percentage($1, $2);", exam.Percentage, exam.Code)
 }
 
 func UpdateCwkPercentage(db utils.DBAbstraction, cwk utils.Cwk) error {
-	return db.PreparedStmt("UPDATE coursework SET percentage = $1, marks = $2 WHERE code = $3;",
+	return db.PreparedStmt("SELECT * FROM change_cwk_marks_and_percent($1, $2, $3);",
 		cwk.Percentage,
 		cwk.Marks,
 		cwk.Id)

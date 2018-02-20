@@ -33,8 +33,8 @@ class Module extends PureComponent {
       .catch(console.error)
   }
 
-  postDate(url, data) {
-    fetch(url, {
+  postDate(url, data, type) {
+    return fetch(url, {
       credentials: 'same-origin',
       method: "POST",
       body: JSON.stringify(data)
@@ -44,7 +44,8 @@ class Module extends PureComponent {
       } else {
         // server doesn't send any data on a success
         // We switch from editing mode and give them the option to edit the results again
-        return Promise.resolve();
+        data.type = type;
+        return Promise.resolve(data);
       }
     });
   }
@@ -56,15 +57,46 @@ class Module extends PureComponent {
 
       Object.keys(this.updateExams).forEach(key => {
         let obj = {
-          percentage: parseInt(key),
-          code: this.updateExams[key]
+          percentage: parseInt(this.updateExams[key], 10),
+          code: key
         };
-        console.log(obj)
 
-        request.push(this.postDate('/update/exam/percentage', obj));
+        request.push(this.postDate('/update/exam/percentage', obj, 'exam'));
       });
-      Promise.all([request])
-        .then(console.log)
+
+      Object.keys(this.updateCwks).forEach(key => {
+        let obj = {
+          id: parseInt(key, 10),
+          marks: parseInt(this.updateCwks[key].marks, 10),
+          percentage: parseInt(this.updateCwks[key].percentage, 10)
+        };
+
+        request.push(this.postDate('/update/cwk/percentage', obj, 'cwk'));
+      });
+
+      Promise.all(request)
+        .then(arr => {
+          arr.forEach(val => {
+            if (val.type === 'cwk') {
+              let index = this.state.cwks.findIndex(v => v.id === val.id);
+              if (index > -1) {
+                this.setState(prev => {
+                  prev.cwks[index].percentage = val.percentage;
+                  prev.cwks[index].marks = val.marks;
+                  return prev;
+                });
+              }
+            } else if (val.type === 'exam') {
+              let index = this.state.exam.findIndex(v => v.code == val.code);
+              if(index > -1) {
+                this.setState(prev => {
+                  prev.exam[index].percentage = val.percentage;
+                  return prev;
+                });
+              }
+            }
+          });
+        })
         .catch(console.error);
     }
     this.setState(prev => ({ editing: !prev.editing }));
@@ -75,7 +107,6 @@ class Module extends PureComponent {
       marks: m,
       percentage: p
     };
-    console.log(this.updateCwks);
   }
 
   getExam(exams) {
