@@ -9,13 +9,25 @@ type DB struct {
 	*sql.DB
 }
 
+type Select interface {
+	Select(string, ...interface{}) (string, error)
+}
+
+type SelectMulti interface {
+	SelectMulti(string, ...interface{}) ([]map[string]string, error)
+}
+
+type Execute interface {
+	Execute(string, ...interface{}) error
+}
+
 // DBAbstraction hides the database access.
 // It should make testing the server easier
 // as we can mock the responce from this layer.
 type DBAbstraction interface {
-	Select(string, ...interface{}) (string, error)
-	SelectMulti(string, ...interface{}) ([]map[string]string, error)
-	PreparedStmt(string, ...interface{}) error
+	Select
+	SelectMulti
+	Execute
 }
 
 // Select is a basic query function that expect to recieve a single string
@@ -41,10 +53,10 @@ func (db *DB) SelectMulti(s string, args ...interface{}) ([]map[string]string, e
 	return m, nil
 }
 
-// PreparedStmt will be the abstacction for update and insert queries.
+// Execute will be the abstacction for update and insert queries.
 // It won't return data after the statement has been return but only
 // return an error if one has occured.
-func (db *DB) PreparedStmt(s string, args ...interface{}) error {
+func (db *DB) Execute(s string, args ...interface{}) error {
 	result, err := db.Exec(s, args...)
 	if err != nil {
 		return err

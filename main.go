@@ -76,13 +76,13 @@ func main() {
 	search := func(str string) (map[string][]map[string]string, error) {
 		return dbc.Search(db, str)
 	}
-	updateCwk := func(cwk utils.CwkUpdate) error {
+	updateCwk := func(cwk utils.DecoderExecuter) error {
 		return dbc.UpdateCwkResults(db, cwk)
 	}
-	updateExamPercent := func(exam utils.Exam) error {
+	updateExamPercent := func(exam utils.DecoderExecuter) error {
 		return dbc.UpdateExamPercentage(db, exam)
 	}
-	updateCwkPercent := func(cwk utils.Cwk) error {
+	updateCwkPercent := func(cwk utils.DecoderExecuter) error {
 		return dbc.UpdateCwkPercentage(db, cwk)
 	}
 
@@ -106,9 +106,9 @@ func main() {
 	r.Handle("/get/cwk/{code}", hand.GetForCode(getCourseworkDetails)).Methods("GET")
 	r.Handle("/get/cwk/students/{code}", hand.GetForCode(getStudentsOnCwk)).Methods("GET")
 	r.Handle("/search/{query}", hand.GetSearch(search)).Methods("GET")
-	r.Handle("/update/cwk/results", hand.Update(updateCwk)).Methods("POST")
-	r.Handle("/update/exam/percentage", hand.UpdateExam(updateExamPercent)).Methods("POST")
-	r.Handle("/update/cwk/percentage", hand.UpdateCwk(updateCwkPercent)).Methods("POST")
+	r.Handle("/update/cwk/results", hand.Update(&utils.CwkUpdate{}, updateCwk)).Methods("POST")
+	r.Handle("/update/exam/percentage", hand.Update(&utils.Exam{}, updateExamPercent)).Methods("POST")
+	r.Handle("/update/cwk/percentage", hand.Update(&utils.Cwk{}, updateCwkPercent)).Methods("POST")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))

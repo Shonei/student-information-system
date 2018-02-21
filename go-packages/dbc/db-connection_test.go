@@ -18,7 +18,7 @@ func (t *OkStruct) SelectMulti(s string, args ...interface{}) ([]map[string]stri
 	return []map[string]string{{"OK": "1"}}, nil
 }
 
-func (t *OkStruct) PreparedStmt(s string, args ...interface{}) error {
+func (t *OkStruct) Execute(s string, args ...interface{}) error {
 	return nil
 }
 
@@ -36,7 +36,7 @@ func (t *ErrorStruct) SelectMulti(s string, args ...interface{}) ([]map[string]s
 	return nil, t.Err
 }
 
-func (t *ErrorStruct) PreparedStmt(s string, args ...interface{}) error {
+func (t *ErrorStruct) Execute(s string, args ...interface{}) error {
 	return t.Err
 }
 

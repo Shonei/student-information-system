@@ -2,7 +2,6 @@ package dbc
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"regexp"
 	"strconv"
@@ -27,7 +26,7 @@ type customToken struct {
 
 // SingleParamQuery will execute a predefined sql query that takes a single
 // paramater and returns a single paramater with no additional modification to the data.
-func SingleParamQuery(db utils.DBAbstraction, query, param string) (string, error) {
+func SingleParamQuery(db utils.Select, query, param string) (string, error) {
 	switch query {
 	case "salt":
 		return db.Select("Select salt from login_info where username = $1", param)
@@ -39,7 +38,7 @@ func SingleParamQuery(db utils.DBAbstraction, query, param string) (string, erro
 // and he username. If they match the database results a map will be generated containing a token and
 // the access level for that user. The token will then be used for consecutive requests
 // to the server removing the need for sending personal information agian.
-func GenAuthToken(db utils.DBAbstraction, user, hash string) (map[string]string, error) {
+func GenAuthToken(db utils.Select, user, hash string) (map[string]string, error) {
 	level, err := db.Select("SELECT access_lvl FROM login_info WHERE username = $1 AND user_pass = $2", user, hash)
 	if err != nil {
 		return nil, err
@@ -76,7 +75,7 @@ func GenAuthToken(db utils.DBAbstraction, user, hash string) (map[string]string,
 
 // RunMultyRowQuery executes a query that is expected to return multiple rows.
 // It return a ErrSuspiciousInput if the user has unexpected characters.
-func RunMultyRowQuery(db utils.DBAbstraction, query, user string) ([]map[string]string, error) {
+func RunMultyRowQuery(db utils.SelectMulti, query, user string) ([]map[string]string, error) {
 	if !basicParser.MatchString(user) {
 		return nil, utils.ErrSuspiciousInput
 	}
@@ -95,7 +94,7 @@ func RunMultyRowQuery(db utils.DBAbstraction, query, user string) ([]map[string]
 // It returns a ErrSuspiciousInput if the user contains unexpected characters.
 // In addition if the responce from the query contains more the 1 row
 // it will return a ErrToManyRows.
-func RunSingleRowQuery(db utils.DBAbstraction, query, user string) (map[string]string, error) {
+func RunSingleRowQuery(db utils.SelectMulti, query, user string) (map[string]string, error) {
 	if !basicParser.MatchString(user) {
 		return nil, utils.ErrSuspiciousInput
 	}
@@ -137,7 +136,7 @@ func RunSingleRowQuery(db utils.DBAbstraction, query, user string) (map[string]s
 //  	map[name:Sid Rafael Kuhic username:shyl1 id:44148]
 //   ]
 //  ]
-func Search(db utils.DBAbstraction, queryString string) (map[string][]map[string]string, error) {
+func Search(db utils.SelectMulti, queryString string) (map[string][]map[string]string, error) {
 	if !basicParser.MatchString(queryString) {
 		return nil, utils.ErrSuspiciousInput
 	}
@@ -214,7 +213,7 @@ forChannels:
 // executes a SQL query that takes a user as input
 // once the query is done it writes the responce to the channel and closes the channel
 // if an error occures it writes he 0 value to the channel
-func doSearch(db utils.DBAbstraction, query, user string, c chan []map[string]string) {
+func doSearch(db utils.SelectMulti, query, user string, c chan []map[string]string) {
 	// close the channel after we are done
 	defer close(c)
 
@@ -230,9 +229,9 @@ func doSearch(db utils.DBAbstraction, query, user string, c chan []map[string]st
 }
 
 // GetModuleDetails makes use of the RunSingleRowQuery to extract the information
-// about a module and it formats it into a utils.module struct.
+// about a module and it formats it into a utils.Module struct.
 // That struct can later be used to create a json representation of the data.
-func GetModuleDetails(db utils.DBAbstraction, query, code string) (utils.Module, error) {
+func GetModuleDetails(db utils.SelectMulti, query, code string) (utils.Module, error) {
 	m, err := RunSingleRowQuery(db, query, code)
 	if err != nil {
 		return utils.Module{}, err
@@ -272,28 +271,4 @@ func formatModule(m map[string]string) (utils.Module, error) {
 	module.Year = m["year"]
 
 	return module, nil
-}
-
-func UpdateCwkResults(db utils.DBAbstraction, cwk utils.CwkUpdate) error {
-	return db.PreparedStmt(
-		"SELECT * FROM update_student_cwk($1, $2, $3, $4);",
-		cwk.Result,
-		cwk.HandedIn,
-		cwk.CwkID,
-		cwk.StudentID)
-}
-
-func UpdateExamPercentage(db utils.DBAbstraction, exam utils.Exam) error {
-	if !basicParser.MatchString(exam.Code) {
-		return utils.ErrSuspiciousInput
-	}
-	fmt.Println(exam.Percentage, " - ", exam.Code)
-	return db.PreparedStmt("SELECT * FROM change_exam_percentage($1, $2);", exam.Percentage, exam.Code)
-}
-
-func UpdateCwkPercentage(db utils.DBAbstraction, cwk utils.Cwk) error {
-	return db.PreparedStmt("SELECT * FROM change_cwk_marks_and_percent($1, $2, $3);",
-		cwk.Percentage,
-		cwk.Marks,
-		cwk.Id)
 }
