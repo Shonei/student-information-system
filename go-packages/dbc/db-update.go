@@ -1,22 +1,65 @@
 package dbc
 
 import (
+	"encoding/json"
+
 	"github.com/Shonei/student-information-system/go-packages/utils"
 )
 
-// UpdateCwkResults updates a students cwk results based on the data send.
-// This function is also used to insert the date when the coursework was submitted.
-// This can be done by omiting the 'result' from ht eJSON object.
-func UpdateCwkResults(db utils.Execute, exec utils.DecoderExecuter) error {
-	return exec.Execute(db, "SELECT * FROM update_student_cwk($1, $2, $3, $4);")
+// ExamPercent is the type that represents the data needed to
+// update the oercentage of an exam.
+type ExamPercent struct {
+	Code       string `json:"code,omitempty"`
+	Percentage int    `json:"percentage,omitempty"`
 }
 
-// UpdateExamPercentage is used to modify the weight of the exam as a whole
-func UpdateExamPercentage(db utils.Execute, exec utils.DecoderExecuter) error {
-	return exec.Execute(db, "SELECT * FROM change_exam_percentage($1, $2);")
+func (e *ExamPercent) Decode(d *json.Decoder) error {
+	return d.Decode(e)
 }
 
-// UpdateCwkPercentage is used to modify the weight of the cwk asw ell as the total marks
-func UpdateCwkPercentage(db utils.Execute, exec utils.DecoderExecuter) error {
-	return exec.Execute(db, "SELECT * FROM change_cwk_marks_and_percent($1, $2, $3);")
+func (e *ExamPercent) Execute(db utils.Execute) error {
+	return db.Execute(
+		"SELECT * FROM change_exam_percentage($1, $2);",
+		e.Percentage,
+		e.Code)
+}
+
+// CwkMarks is the data needed to update the marks or the percentage of a cwk.
+type CwkMarks struct {
+	Id         int `json:"id,omitempty"`
+	Marks      int `json:"marks,omitempty"`
+	Percentage int `json:"percentage,omitempty"`
+}
+
+func (c *CwkMarks) Decode(d *json.Decoder) error {
+	return d.Decode(c)
+}
+
+func (c *CwkMarks) Execute(db utils.Execute) error {
+	return db.Execute(
+		"SELECT * FROM change_cwk_marks_and_percent($1, $2, $3);",
+		c.Percentage,
+		c.Marks,
+		c.Id)
+}
+
+// CwkResult is the data needed to update a students cwk results
+type CwkResult struct {
+	StudentID int    `json:"student_id"`
+	CwkID     int    `json:"cwk_id"`
+	Result    int    `json:"result"`
+	HandedIn  string `json:"handed_in"`
+}
+
+func (c *CwkResult) Decode(d *json.Decoder) error {
+	return d.Decode(c)
+}
+
+func (c *CwkResult) Execute(db utils.Execute) error {
+	return db.Execute(
+		"SELECT * FROM update_student_cwk($1, $2, $3, $4);",
+		c.Result,
+		c.HandedIn,
+		c.CwkID,
+		c.StudentID)
 }

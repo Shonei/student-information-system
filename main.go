@@ -76,14 +76,8 @@ func main() {
 	search := func(str string) (map[string][]map[string]string, error) {
 		return dbc.Search(db, str)
 	}
-	updateCwk := func(cwk utils.DecoderExecuter) error {
-		return dbc.UpdateCwkResults(db, cwk)
-	}
-	updateExamPercent := func(exam utils.DecoderExecuter) error {
-		return dbc.UpdateExamPercentage(db, exam)
-	}
-	updateCwkPercent := func(cwk utils.DecoderExecuter) error {
-		return dbc.UpdateCwkPercentage(db, cwk)
+	update := func(v utils.DecoderExecuter) error {
+		return v.Execute(db)
 	}
 
 	r := mux.NewRouter()
@@ -106,9 +100,9 @@ func main() {
 	r.Handle("/get/cwk/{code}", hand.GetForCode(getCourseworkDetails)).Methods("GET")
 	r.Handle("/get/cwk/students/{code}", hand.GetForCode(getStudentsOnCwk)).Methods("GET")
 	r.Handle("/search/{query}", hand.GetSearch(search)).Methods("GET")
-	r.Handle("/update/cwk/results", hand.Update(&utils.CwkUpdate{}, updateCwk)).Methods("POST")
-	r.Handle("/update/exam/percentage", hand.Update(&utils.Exam{}, updateExamPercent)).Methods("POST")
-	r.Handle("/update/cwk/percentage", hand.Update(&utils.Cwk{}, updateCwkPercent)).Methods("POST")
+	r.Handle("/update/cwk/results", hand.Update(&dbc.CwkResult{}, update)).Methods("POST")
+	r.Handle("/update/exam/percentage", hand.Update(&dbc.ExamPercent{}, update)).Methods("POST")
+	r.Handle("/update/cwk/percentage", hand.Update(&dbc.CwkMarks{}, update)).Methods("POST")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))
@@ -124,8 +118,7 @@ func main() {
 
 	// listen on the router
 	http.Handle("/", r)
-	// e := utils.Exam{"34630", 4546, "sdgs"}
-	// fmt.Println(dbc.UpdateExamPercentage(db, e))
+
 	log.Println(http.ListenAndServe(":"+port, nil))
 }
 
