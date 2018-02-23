@@ -4,14 +4,23 @@ import (
 	"encoding/json"
 )
 
+// Decoder is given a json.Decoder with the data from an http request to be read
+// into the fields of the data type implamenting the interface.
 type Decoder interface {
 	Decode(*json.Decoder) error
 }
 
+// Executer is the interface for update the databse.
+// Data types implamenting it need to define a sql query and give it all the
+// data it needs as well as make checks to the data before hand.
 type Executer interface {
 	Execute(Execute) error
 }
 
+// DecoderExecuter is the interface that a struct needs to implament in order to
+// be able to use the Update http handler.
+// The struct needs to provide valid json description because the Decoder uses
+// the json.Decoder to read the data.
 type DecoderExecuter interface {
 	Decoder
 	Executer

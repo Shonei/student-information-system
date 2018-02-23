@@ -20,5 +20,5 @@ var ErrEmptySQLSet = errors.New("the result set is empty")
 // ErrTimedOut is returned when a query takes too long
 var ErrTimedOut = errors.New("search takes too long")
 
-// ErrtypeMismatch is returned when data cant be converted to struct
+// ErrTypeMismatch is returned when data cant be converted to struct
 var ErrTypeMismatch = errors.New("got an unexpected type")

@@ -18,6 +18,10 @@ func (e *ExamPercent) Decode(d *json.Decoder) error {
 }
 
 func (e *ExamPercent) Execute(db utils.Execute) error {
+	if e.Percentage > 100 {
+		return utils.ErrSuspiciousInput
+	}
+
 	return db.Execute(
 		"SELECT * FROM change_exam_percentage($1, $2);",
 		e.Percentage,
@@ -36,6 +40,9 @@ func (c *CwkMarks) Decode(d *json.Decoder) error {
 }
 
 func (c *CwkMarks) Execute(db utils.Execute) error {
+	if c.Percentage > 100 {
+		return utils.ErrSuspiciousInput
+	}
 	return db.Execute(
 		"SELECT * FROM change_cwk_marks_and_percent($1, $2, $3);",
 		c.Percentage,

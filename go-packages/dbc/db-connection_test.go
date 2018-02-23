@@ -144,3 +144,48 @@ func TestSearch(t *testing.T) {
 		})
 	}
 }
+
+type T struct {
+	Map []map[string]string
+	Err error
+}
+
+func (t *T) SelectMulti(s string, args ...interface{}) ([]map[string]string, error) {
+	return t.Map, t.Err
+}
+
+func TestGetModuleDetails(t *testing.T) {
+
+	tests := []struct {
+		name  string
+		db    utils.SelectMulti
+		query string
+		want  utils.Module
+		err   error
+	}{
+		{"All goes well",
+			&T{Map: []map[string]string{{"cwks": `[{"id":5}]`, "exam": `[{"code":"Exam"}]`}}}, "d",
+			utils.Module{Exam: []utils.Exam{utils.Exam{Code: "Exam"}}, Cwks: []utils.Cwk{utils.Cwk{Id: 5}}}, nil},
+		{"Reads no data from DB",
+			&T{Err: utils.ErrEmptySQLSet}, "d",
+			utils.Module{}, nil},
+		{"Fails to read data from DB",
+			&T{Err: utils.ErrToManyRows}, "d",
+			utils.Module{}, utils.ErrToManyRows},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := GetModuleDetails(tt.db, tt.query)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Want %v - Got %v.", tt.want, got)
+			}
+
+			if err != tt.err {
+				t.Errorf("Want %v - Got %v.", tt.err, err)
+			}
+		})
+	}
+}

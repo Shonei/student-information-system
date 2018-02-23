@@ -136,12 +136,12 @@ func RunSingleRowQuery(db utils.SelectMulti, query, user string) (map[string]str
 //  	map[name:Sid Rafael Kuhic username:shyl1 id:44148]
 //   ]
 //  ]
-func Search(db utils.SelectMulti, queryString string) (map[string][]map[string]string, error) {
-	if !basicParser.MatchString(queryString) {
+func Search(db utils.SelectMulti, searchParam string) (map[string][]map[string]string, error) {
+	if !basicParser.MatchString(searchParam) {
 		return nil, utils.ErrSuspiciousInput
 	}
 
-	// create the 4 channels
+	// create the 4 channels where we will recieve the data
 	staff := make(chan []map[string]string)
 	students := make(chan []map[string]string)
 	modules := make(chan []map[string]string)
@@ -150,11 +150,11 @@ func Search(db utils.SelectMulti, queryString string) (map[string][]map[string]s
 	// initialize the output data
 	output := map[string][]map[string]string{}
 
-	// start the 4 different searches
-	go doSearch(db, "SELECT * FROM search_staff($1);", queryString, staff)
-	go doSearch(db, "SELECT * FROM search_student($1);", queryString, students)
-	go doSearch(db, "SELECT * FROM search_programme($1);", queryString, programmes)
-	go doSearch(db, "SELECT * FROM search_module($1);", queryString, modules)
+	// start the 4 different searches in different goroutines
+	go doSearch(db, "SELECT * FROM search_staff($1);", searchParam, staff)
+	go doSearch(db, "SELECT * FROM search_student($1);", searchParam, students)
+	go doSearch(db, "SELECT * FROM search_programme($1);", searchParam, programmes)
+	go doSearch(db, "SELECT * FROM search_module($1);", searchParam, modules)
 
 	waitingChannels := 4
 
@@ -171,6 +171,7 @@ forChannels:
 				staff = nil
 				// deacrease the count of waiting channels
 				waitingChannels--
+				// break so we don't overwrite the data withan empty map
 				break
 			}
 			output["staff"] = msg
@@ -195,7 +196,7 @@ forChannels:
 				break
 			}
 			output["programmes"] = msg
-		case <-time.After(15 * time.Second):
+		case <-time.After(1 * time.Second):
 			log.Println("timed out")
 			return output, utils.ErrTimedOut
 		default:
@@ -214,7 +215,7 @@ forChannels:
 // once the query is done it writes the responce to the channel and closes the channel
 // if an error occures it writes he 0 value to the channel
 func doSearch(db utils.SelectMulti, query, user string, c chan []map[string]string) {
-	// close the channel after we are done
+	// close the channel after we are done to signal the select
 	defer close(c)
 
 	m, err := db.SelectMulti(query, user)
@@ -231,10 +232,14 @@ func doSearch(db utils.SelectMulti, query, user string, c chan []map[string]stri
 // GetModuleDetails makes use of the RunSingleRowQuery to extract the information
 // about a module and it formats it into a utils.Module struct.
 // That struct can later be used to create a json representation of the data.
-func GetModuleDetails(db utils.SelectMulti, query, code string) (utils.Module, error) {
-	m, err := RunSingleRowQuery(db, query, code)
+func GetModuleDetails(db utils.SelectMulti, code string) (utils.Module, error) {
+	m, err := RunSingleRowQuery(db, "SELECT * FROM get_module_details($1);", code)
 	if err != nil {
 		return utils.Module{}, err
+	}
+
+	if len(m) == 0 {
+		return utils.Module{}, nil
 	}
 
 	module, err := formatModule(m)
@@ -252,7 +257,7 @@ func formatModule(m map[string]string) (utils.Module, error) {
 
 	// Unmarshal the JSON string into the struct
 	// This is needed so we can later on create a single representation of the
-	// JSON object for the module
+	// struct as a JON object for the module
 	if err := json.Unmarshal([]byte(m["cwks"]), &module.Cwks); err != nil {
 		return utils.Module{}, err
 	}

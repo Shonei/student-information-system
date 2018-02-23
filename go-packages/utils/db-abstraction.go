@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 // DB is custom struct to abstract the database
@@ -9,10 +10,15 @@ type DB struct {
 	*sql.DB
 }
 
+// Select is a databse interface that returns a single value
+// used to get the salt or uesrname of a user.
 type Select interface {
 	Select(string, ...interface{}) (string, error)
 }
 
+// SelectMulti is used to read multiple lines.
+// The read data will be prased and read into a map
+// for ease of use and parsing.
 type SelectMulti interface {
 	SelectMulti(string, ...interface{}) ([]map[string]string, error)
 }
@@ -63,6 +69,7 @@ func (db *DB) Execute(s string, args ...interface{}) error {
 	}
 
 	rows, err := result.RowsAffected()
+	fmt.Println(rows)
 	if rows < 1 {
 		return ErrEmptySQLSet
 	}

@@ -8,6 +8,9 @@ import (
 	"github.com/Shonei/student-information-system/go-packages/utils"
 )
 
+// Update handles update request for the Databse.
+// It handles creating a JSON decoder and passing it to the DecoderExecuter
+// and then calling the f function to write the data to the databse
 func Update(d utils.DecoderExecuter, f func(utils.DecoderExecuter) error) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := d.Decode(json.NewDecoder(r.Body)); err != nil {
