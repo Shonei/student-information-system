@@ -14,7 +14,7 @@ import (
 func Update(d utils.DecoderExecuter, f func(utils.DecoderExecuter) error) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := d.Decode(json.NewDecoder(r.Body)); err != nil {
-			log.Println(err)
+			log.Println("Decode err - ", err)
 			http.Error(w, "We couldn't read the data.", http.StatusBadRequest)
 			return
 		}
