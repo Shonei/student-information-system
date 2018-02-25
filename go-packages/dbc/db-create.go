@@ -4,13 +4,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+	"reflect"
 	"regexp"
 
 	"github.com/Shonei/student-information-system/go-packages/utils"
 )
 
 // Validas input such as descriptions that allow for punctuation
-var punctuationParser = regexp.MustCompile("^[a-zA-Z0-9?.,!@'\"(){}-_+=%&* ]+$")
+var punctuationParser = regexp.MustCompile(`^[a-zA-Z0-9?.,!@'"(){\}\-\_+=%&* ]+$`)
 
 // NewModule is the data that is needed to create a new module.
 // It includes the information about the module.
@@ -36,7 +37,7 @@ func (module *NewModule) Decode(j *json.Decoder) error {
 
 // Create is used to add the newmodule to the databse.
 // It must be called after Decode or there won't be any data to add.
-func (module *NewModule) Create(tx *sql.Tx) error {
+func (module *NewModule) AddModule(tx *sql.Tx) error {
 	if err := moduleSecurityCheck(module); err != nil {
 		log.Println(err)
 		return utils.ErrSuspiciousInput
@@ -59,14 +60,12 @@ func (module *NewModule) Create(tx *sql.Tx) error {
 
 	if err != nil {
 		log.Println(err)
-		tx.Rollback()
 		return utils.ErrSQLFailed
 	}
 
 	// Crete the exam
 	if err := module.Exam.AddExam(tx, module.Code); err != nil {
 		log.Println(err)
-		tx.Rollback()
 		return err
 	}
 
@@ -74,7 +73,6 @@ func (module *NewModule) Create(tx *sql.Tx) error {
 	for _, val := range module.Cwks {
 		if err := val.AddCwk(tx, module.Code); err != nil {
 			log.Println(err)
-			tx.Rollback()
 			return err
 		}
 	}
@@ -83,12 +81,10 @@ func (module *NewModule) Create(tx *sql.Tx) error {
 	for _, val := range module.TeachingStaff {
 		if err := val.AddStaff(tx, module.Code); err != nil {
 			log.Println(err)
-			tx.Rollback()
 			return err
 		}
 	}
 
-	tx.Commit()
 	return nil
 }
 
@@ -114,7 +110,7 @@ func (e *NewExam) AddExam(tx *sql.Tx, moduleCode int) error {
 
 	createExam := `
 		INSERT INTO exam(code , module_code, percentage, type, description) 
-		VALUES($1, $2, $3, $4, $5;`
+		VALUES($1, $2, $3, $4, $5);`
 
 	_, err := tx.Exec(
 		createExam,
@@ -143,6 +139,7 @@ type NewCwk struct {
 	Marks       int    `json:"marks"`
 }
 
+// AddCwk adds a new cwk to the given transaction and check for validity of data
 func (c *NewCwk) AddCwk(tx *sql.Tx, moduleCode int) error {
 	if err := cwkSecurityCheck(c); err != nil {
 		log.Println(err)
@@ -169,6 +166,7 @@ func (c *NewCwk) AddCwk(tx *sql.Tx, moduleCode int) error {
 		c.Description)
 
 	if err != nil {
+		log.Println(err)
 		return utils.ErrSQLFailed
 	}
 
@@ -181,8 +179,9 @@ type AddStaff struct {
 	Role string `json:"role"`
 }
 
+// AddStaff links existing staff to the passed module
 func (s *AddStaff) AddStaff(tx *sql.Tx, moduleCode int) error {
-	if s == (&AddStaff{}) {
+	if reflect.DeepEqual(s, &AddStaff{}) {
 		return nil
 	}
 
@@ -201,6 +200,7 @@ func (s *AddStaff) AddStaff(tx *sql.Tx, moduleCode int) error {
 		s.Role)
 
 	if err != nil {
+		log.Println(err)
 		return utils.ErrSQLFailed
 	}
 
@@ -225,10 +225,10 @@ func moduleSecurityCheck(m *NewModule) error {
 	return nil
 }
 
+// makes sure the exam is safe to put into the database
 func examSecurityCheck(e *NewExam) error {
-	temp := &NewExam{}
 	// check if struct is empty
-	if e == temp {
+	if reflect.DeepEqual(e, &NewExam{}) {
 		return utils.ErrEmptyStruct
 	}
 
@@ -247,10 +247,14 @@ func examSecurityCheck(e *NewExam) error {
 	return nil
 }
 
+// makes sure the cwk has only valid data
 func cwkSecurityCheck(c *NewCwk) error {
-	temp := &NewCwk{}
-	if c == temp {
+	if reflect.DeepEqual(c, &NewCwk{}) {
 		return utils.ErrEmptyStruct
+	}
+
+	if c.Percentage > 100 {
+		return utils.ErrSuspiciousInput
 	}
 
 	if !punctuationParser.MatchString(c.Description) ||
