@@ -18,7 +18,7 @@ var punctuationParser = regexp.MustCompile(`^[a-zA-Z0-9?.,!@'"(){\}\-\_+=%&* ]+$
 // In addition thi struct will hold the information to create a
 // coursework and exam and assotiate it with the module.
 type NewModule struct {
-	Code          int        `json:"code"`
+	Code          string     `json:"code"`
 	Name          string     `json:"name"`
 	Description   string     `json:"description"`
 	Syllabus      string     `json:"syllabus"`
@@ -37,7 +37,7 @@ func (module *NewModule) Decode(j *json.Decoder) error {
 
 // Create is used to add the newmodule to the databse.
 // It must be called after Decode or there won't be any data to add.
-func (module *NewModule) AddModule(tx *sql.Tx) error {
+func (module *NewModule) Create(tx *sql.Tx) error {
 	if err := moduleSecurityCheck(module); err != nil {
 		log.Println(err)
 		return utils.ErrSuspiciousInput
@@ -98,7 +98,7 @@ type NewExam struct {
 }
 
 // AddExam is used to add a new exam in assosiation with a module.
-func (e *NewExam) AddExam(tx *sql.Tx, moduleCode int) error {
+func (e *NewExam) AddExam(tx *sql.Tx, moduleCode string) error {
 	if err := examSecurityCheck(e); err != nil {
 		log.Println(err)
 		if err == utils.ErrEmptyStruct {
@@ -140,7 +140,7 @@ type NewCwk struct {
 }
 
 // AddCwk adds a new cwk to the given transaction and check for validity of data
-func (c *NewCwk) AddCwk(tx *sql.Tx, moduleCode int) error {
+func (c *NewCwk) AddCwk(tx *sql.Tx, moduleCode string) error {
 	if err := cwkSecurityCheck(c); err != nil {
 		log.Println(err)
 		if err == utils.ErrEmptyStruct {
@@ -180,7 +180,7 @@ type AddStaff struct {
 }
 
 // AddStaff links existing staff to the passed module
-func (s *AddStaff) AddStaff(tx *sql.Tx, moduleCode int) error {
+func (s *AddStaff) AddStaff(tx *sql.Tx, moduleCode string) error {
 	if reflect.DeepEqual(s, &AddStaff{}) {
 		return nil
 	}

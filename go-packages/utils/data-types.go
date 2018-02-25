@@ -38,7 +38,7 @@ type DecoderExecuter interface {
 // entries in the databse.
 type DecoderCreator interface {
 	Decoder
-	Executer
+	Creator
 }
 
 // Module respresents all the information about a given module.

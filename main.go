@@ -80,6 +80,21 @@ func main() {
 		return v.Execute(db)
 	}
 
+	create := func(v utils.DecoderCreator) error {
+		tx, err := db.Begin()
+		if err != nil {
+			return utils.ErrSQLFailed
+		}
+
+		if err := v.Create(tx); err != nil {
+			tx.Rollback()
+			return utils.ErrSQLFailed
+		}
+
+		tx.Commit()
+		return nil
+	}
+
 	r := mux.NewRouter()
 	// Universal routes
 	r.Handle("/get/salt/{user}", hand.GetSalt(singleParamQuery)).Methods("GET")
@@ -97,6 +112,8 @@ func main() {
 	r.Handle("/get/staff/profile/{user}", mw.StaffOnly(hand.GetProfile(getStaffPro))).Methods("GET")
 	r.Handle("/get/staff/modules/{user}", mw.StaffOnly(hand.BasicGet(getStaffModules))).Methods("GET")
 	r.Handle("/get/staff/tutees/{user}", mw.StaffOnly(hand.BasicGet(getStaffTutees))).Methods("GET")
+
+	// ADD AUTH MIDLLEWARE
 	r.Handle("/get/module/{code}", hand.GetForModule(getModuleDetails)).Methods("GET")
 	r.Handle("/get/cwk/{code}", hand.GetForCode(getCourseworkDetails)).Methods("GET")
 	r.Handle("/get/cwk/students/{code}", hand.GetForCode(getStudentsOnCwk)).Methods("GET")
@@ -104,6 +121,7 @@ func main() {
 	r.Handle("/update/cwk/results", hand.Update(&dbc.CwkResult{}, update)).Methods("POST")
 	r.Handle("/update/exam/percentage", hand.Update(&dbc.ExamPercent{}, update)).Methods("POST")
 	r.Handle("/update/cwk/percentage", hand.Update(&dbc.CwkMarks{}, update)).Methods("POST")
+	r.Handle("/add/module", hand.Create(&dbc.NewModule{}, create)).Methods("POST")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))
@@ -115,6 +133,7 @@ func main() {
 	r.PathPrefix("/search").Handler(http.StripPrefix("/search", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/module").Handler(http.StripPrefix("/module", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/coursework").Handler(http.StripPrefix("/coursework", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/create/module").Handler(http.StripPrefix("/create/module", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/"))).Methods("GET")
 
 	// listen on the router

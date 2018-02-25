@@ -39,7 +39,17 @@ class SearchBar extends Component {
     return (
       <Grid fluid>
         <Row end="xs">
-          <Col xs={6} >
+          <Col xs={2} >
+            <RaisedButton
+              label="Create Module"
+              primary={true}
+              style={{ margin: 12 }}
+              onClick={() => {
+                window.location.href = '\\create\\module';
+              }}
+            />
+          </Col>
+          <Col xs={5} >
             <p style={{ color: 'red' }}>{this.state.errorMessage}</p>
           </Col>
           <Col xs={5} >

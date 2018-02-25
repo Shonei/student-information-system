@@ -159,17 +159,17 @@ func TestCreateFunctions(t *testing.T) {
 	t.Run("testing AddStaff", func(t *testing.T) {
 		tests := []struct {
 			name  string
-			code  int
+			code  string
 			want  error
 			staff *AddStaff
 		}{
-			{"all goes well", 10684, nil,
+			{"all goes well", "10684", nil,
 				&AddStaff{37362, "hello"}},
-			{"syspicious input", 10684, utils.ErrSuspiciousInput,
+			{"syspicious input", "10684", utils.ErrSuspiciousInput,
 				&AddStaff{37362, "hello$"}},
-			{"no staff", 10684, nil,
+			{"no staff", "10684", nil,
 				&AddStaff{}},
-			{"Wrong module code", 1684, utils.ErrSQLFailed,
+			{"Wrong module code", "1684", utils.ErrSQLFailed,
 				&AddStaff{37362, "hello"}},
 		}
 
@@ -193,11 +193,11 @@ func TestCreateFunctions(t *testing.T) {
 	t.Run("testing AddCwk", func(t *testing.T) {
 		tests := []struct {
 			name string
-			code int
+			code string
 			want error
 			cwk  *NewCwk
 		}{
-			{"all goes well", 10684, nil,
+			{"all goes well", "10684", nil,
 				&NewCwk{
 					Id:          39141,
 					Name:        "sgds",
@@ -206,7 +206,7 @@ func TestCreateFunctions(t *testing.T) {
 					Percentage:  30,
 					Description: "slkjdhgsdlkghds",
 					Marks:       40}},
-			{"same cwk code", 10684, utils.ErrSQLFailed,
+			{"same cwk code", "10684", utils.ErrSQLFailed,
 				&NewCwk{
 					Id:          39041,
 					Name:        "sgds",
@@ -215,7 +215,7 @@ func TestCreateFunctions(t *testing.T) {
 					Percentage:  30,
 					Description: "slkjdhgsdlkghds",
 					Marks:       40}},
-			{"wrong date", 10684, utils.ErrSQLFailed,
+			{"wrong date", "10684", utils.ErrSQLFailed,
 				&NewCwk{
 					Id:          39141,
 					Name:        "sgds",
@@ -224,7 +224,7 @@ func TestCreateFunctions(t *testing.T) {
 					Percentage:  30,
 					Description: "slkjdhgsdlkghds",
 					Marks:       40}},
-			{"empty struct", 10684, nil,
+			{"empty struct", "10684", nil,
 				&NewCwk{}},
 		}
 
@@ -248,19 +248,19 @@ func TestCreateFunctions(t *testing.T) {
 	t.Run("testing AddExam", func(t *testing.T) {
 		tests := []struct {
 			name string
-			code int
+			code string
 			want error
 			exam *NewExam
 		}{
-			{"all goes well", 10684, nil,
+			{"all goes well", "10684", nil,
 				&NewExam{
 					Code:        "sdgf",
 					Type:        "sdgsdgd",
 					Percentage:  30,
 					Description: "slkjdhgsdlkghds"}},
-			{"No data provided", 10684, nil,
+			{"No data provided", "10684", nil,
 				&NewExam{}},
-			{"use already existing code", 10684, utils.ErrSQLFailed,
+			{"use already existing code", "10684", utils.ErrSQLFailed,
 				&NewExam{
 					Code:        "34633",
 					Type:        "sdgsdgd",
@@ -293,7 +293,7 @@ func TestCreateFunctions(t *testing.T) {
 		}{
 			{"all goes well", nil,
 				&NewModule{
-					Code:        235235,
+					Code:        "235235",
 					Name:        "sdgsdgd",
 					Syllabus:    "sdgsg46dfg",
 					Description: "slkjdhgsdlkghds",
@@ -302,7 +302,7 @@ func TestCreateFunctions(t *testing.T) {
 					Credit:      20}},
 			{"same code", utils.ErrSQLFailed,
 				&NewModule{
-					Code:        86583,
+					Code:        "86583",
 					Name:        "sdgsdgd",
 					Syllabus:    "sdgsg46dfg",
 					Description: "slkjdhgsdlkghds",
@@ -318,7 +318,7 @@ func TestCreateFunctions(t *testing.T) {
 					t.Error("Can't crete transaction")
 				}
 
-				err = tt.module.AddModule(tx)
+				err = tt.module.Create(tx)
 				if err != tt.want {
 					t.Errorf("Want %v - Got %v", tt.want, err)
 				}
