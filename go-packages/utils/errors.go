@@ -22,3 +22,9 @@ var ErrTimedOut = errors.New("search takes too long")
 
 // ErrTypeMismatch is returned when data cant be converted to struct
 var ErrTypeMismatch = errors.New("got an unexpected type")
+
+// ErrSQLFailed is return when an insert or update fails
+var ErrSQLFailed = errors.New("SQL query failes")
+
+// ErrEmptyStruct is returned by security check functions when they are empty
+var ErrEmptyStruct = errors.New("struct doesn't contain data")

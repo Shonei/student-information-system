@@ -13,10 +13,12 @@ type ExamPercent struct {
 	Percentage int    `json:"percentage,omitempty"`
 }
 
+// Decode reads in data from a json Decoder
 func (e *ExamPercent) Decode(d *json.Decoder) error {
 	return d.Decode(e)
 }
 
+// Execute updates the database and performs necessary security checks
 func (e *ExamPercent) Execute(db utils.Execute) error {
 	if e.Percentage > 100 {
 		return utils.ErrSuspiciousInput
@@ -35,10 +37,12 @@ type CwkMarks struct {
 	Percentage int `json:"percentage,omitempty"`
 }
 
+// Decode reads in data from a json Decoder
 func (c *CwkMarks) Decode(d *json.Decoder) error {
 	return d.Decode(c)
 }
 
+// Execute updates the database and performs necessary security checks
 func (c *CwkMarks) Execute(db utils.Execute) error {
 	if c.Percentage > 100 {
 		return utils.ErrSuspiciousInput
@@ -58,10 +62,12 @@ type CwkResult struct {
 	HandedIn  string `json:"handed_in"`
 }
 
+// Decode reads in data from a json Decoder
 func (c *CwkResult) Decode(d *json.Decoder) error {
 	return d.Decode(c)
 }
 
+// Execute updates the database and performs necessary security checks
 func (c *CwkResult) Execute(db utils.Execute) error {
 	return db.Execute(
 		"SELECT * FROM update_student_cwk($1, $2, $3, $4);",

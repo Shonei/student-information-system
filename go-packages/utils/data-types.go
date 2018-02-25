@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql"
 	"encoding/json"
 )
 
@@ -10,11 +11,18 @@ type Decoder interface {
 	Decode(*json.Decoder) error
 }
 
-// Executer is the interface for update the databse.
+// Executer is the interface for updating the databse.
 // Data types implamenting it need to define a sql query and give it all the
 // data it needs as well as make checks to the data before hand.
 type Executer interface {
 	Execute(Execute) error
+}
+
+// Creator is theinterface for adding new data to the databse.
+// Implamentations of it need to make sure to provide all the nessesary data
+// and make security checks before creating the new entry.
+type Creator interface {
+	Create(*sql.Tx) error
 }
 
 // DecoderExecuter is the interface that a struct needs to implament in order to
@@ -22,6 +30,13 @@ type Executer interface {
 // The struct needs to provide valid json description because the Decoder uses
 // the json.Decoder to read the data.
 type DecoderExecuter interface {
+	Decoder
+	Executer
+}
+
+// DecoderCreator defines the functionality that is needed to create new
+// entries in the databse.
+type DecoderCreator interface {
 	Decoder
 	Executer
 }
