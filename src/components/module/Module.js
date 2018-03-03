@@ -1,19 +1,24 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { Paper, Divider, RaisedButton, TextField } from 'material-ui';
 import CwkList from './CwkList';
+import { orange500 } from 'material-ui/styles/colors';
 
-class Module extends PureComponent {
+class Module extends Component {
   constructor(props) {
     super(props);
 
+    this.borderStyle = {
+      borderColor: orange500,
+      borderWidth: '2px'
+    };
+
     this.state = {
-      exam: [],
+      exam: {},
       cwks: [],
       editing: false,
     };
 
-    this.updateExams = {};
     this.updateCwks = {};
 
     this.updateCwkList = this.updateCwkList.bind(this);
@@ -29,8 +34,11 @@ class Module extends PureComponent {
       method: 'GET',
       credentials: 'same-origin',
     }).then(e => e.json())
-      .then(module => this.setState(() => module))
-      .catch(console.error)
+      .then(module => this.setState(() => {
+        module.exam = module.exam[0];
+        return module;
+      }))
+      .catch(console.error);
   }
 
   postDate(url, data, type) {
@@ -52,17 +60,9 @@ class Module extends PureComponent {
 
   handleClick() {
     if (this.state.editing) {
-      // we have to send post requests to update the databse
       let request = [];
 
-      Object.keys(this.updateExams).forEach(key => {
-        let obj = {
-          percentage: parseInt(this.updateExams[key], 10),
-          code: key
-        };
-
-        request.push(this.postDate('/update/exam/percentage', obj, 'exam'));
-      });
+      request.push(this.postDate('/update/exam/percentage', this.state.exam, 'exam'));
 
       Object.keys(this.updateCwks).forEach(key => {
         let obj = {
@@ -74,6 +74,7 @@ class Module extends PureComponent {
         request.push(this.postDate('/update/cwk/percentage', obj, 'cwk'));
       });
 
+      // wait for all request to resolve to update the state
       Promise.all(request)
         .then(arr => {
           arr.forEach(val => {
@@ -87,13 +88,10 @@ class Module extends PureComponent {
                 });
               }
             } else if (val.type === 'exam') {
-              let index = this.state.exam.findIndex(v => v.code == val.code);
-              if(index > -1) {
-                this.setState(prev => {
-                  prev.exam[index].percentage = val.percentage;
-                  return prev;
-                });
-              }
+              this.setState(prev => {
+                prev.exam.percentage = val.percentage;
+                return prev;
+              });
             }
           });
         })
@@ -109,29 +107,44 @@ class Module extends PureComponent {
     };
   }
 
-  getExam(exams) {
-    return exams.map((value, index) => {
-      return (
-        <Row key={index}>
-          <Col xs>
-            <p>{value.code}</p>
-          </ Col>
-          <Col xs >
-            {this.state.editing ? <TextField
-              style={{ maxWidth: '60px' }}
-              hintText={'%'}
-              onChange={(e, v) => this.updateExams[value.code] = v}
-              defaultValue={value.percentage}
-              type={'number'} /> :
-              <p>{value.percentage}</p>
-            }
-          </Col>
-          <Col xs>
-            <p>{value.type}</p>
-          </ Col>
-        </Row>
-      );
-    });
+  getExam() {
+    // empty object check
+    if (!this.state.exam) {
+      return;
+    }
+    const value = this.state.exam;
+    return (
+      <Row >
+        <Col xs>
+          <p>{value.code}</p>
+        </ Col>
+        <Col xs >
+          {this.state.editing ? <TextField
+            id={parseInt(Math.random() * 10, 10) + ''}
+            style={{ maxWidth: '60px' }}
+            onChange={(e, v) => {
+              this.setState(prev => {
+                if (v < 0 || v > 100) {
+                  return prev;
+                }
+                prev.exam.code = value.code;
+                prev.exam.percentage = parseInt(v, 10);
+                prev.examErr = '';
+                return prev;
+              });
+            }}
+            value={value.percentage}
+            underlineStyle={this.borderStyle}
+            underlineFocusStyle={this.borderStyle}
+            type={'number'} /> :
+            <p>{value.percentage}</p>
+          }
+        </Col>
+        <Col xs>
+          <p>{value.type}</p>
+        </ Col>
+      </Row>
+    );
   }
 
   render() {
@@ -143,29 +156,29 @@ class Module extends PureComponent {
           </Col>
         </Row>
         <Row>
-          <Col xs={2} />
-          <Col xs={8}>
+          <Col xs={1} />
+          <Col xs={10}>
             <h3>Description</h3>
             <Paper style={{ padding: 10, textAlign: 'justify' }}>
               <p>{this.state.description}</p>
             </Paper>
           </Col>
-          <Col xs={2} />
+          <Col xs={1} />
         </Row>
         <br />
         <Row>
-          <Col xs={2} />
-          <Col xs={8}>
+          <Col xs={1} />
+          <Col xs={10}>
             <h3>Syllabus</h3>
             <Paper style={{ padding: 10, textAlign: 'justify' }}>
               <p>{this.state.syllabus}</p>
             </Paper>
           </Col>
-          <Col xs={2} />
+          <Col xs={1} />
         </Row>
         <br />
         <Row start="xs">
-          <Col xs={2} />
+          <Col xs={1} />
           <Col xs>
             <h3>Semester</h3>
             <p>{this.state.semester}</p>
@@ -178,17 +191,35 @@ class Module extends PureComponent {
             <h3>Credits</h3>
             <p>{this.state.credits}</p>
           </ Col>
-          <Col xs={2} />
+          <Col xs={1} />
+        </Row>
+        <br />
+        <Row start="xs" around="xs">
+          <Col xs={1} />
+          <Col xs>
+            <Row around="xs">
+              <Col xs>
+                <h2>Assesment:</h2>
+              </Col>
+              <Col xs>
+                <RaisedButton
+                  style={{ cursor: "pointer" }}
+                  onClick={this.handleClick}
+                  primary={true}
+                  label={this.state.editing ? "Update" : "Edit"} />
+              </ Col>
+            </Row>
+            <Divider />
+          </ Col>
+          <Col xs={1} />
+        </Row>
+        <Row>
         </Row>
         <br />
         <Row start="xs">
-          <Col xs={2} />
-          <Col xs={8} >
+          <Col xs={1} />
+          <Col xs={10} >
             <h3>Exam:</h3>
-            <RaisedButton
-              style={{ cursor: "pointer" }}
-              onClick={this.handleClick}
-              label={this.state.editing ? "Update" : "Edit"} />
             <Divider />
             <Row>
               <Col xs>
@@ -201,9 +232,9 @@ class Module extends PureComponent {
                 <p><b>Type</b></p>
               </ Col>
             </Row>
-            {this.getExam(this.state.exam)}
+            {this.getExam()}
           </ Col>
-          <Col xs={2} />
+          <Col xs={1} />
         </Row>
         <br />
         <CwkList

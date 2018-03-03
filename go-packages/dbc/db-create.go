@@ -222,6 +222,11 @@ func moduleSecurityCheck(m *NewModule) error {
 		return utils.ErrSuspiciousInput
 	}
 
+	// check for negative credits
+	if m.Credit < 0 {
+		return utils.ErrSuspiciousInput
+	}
+
 	return nil
 }
 
@@ -240,7 +245,7 @@ func examSecurityCheck(e *NewExam) error {
 	}
 
 	// we cant have more then 100%
-	if e.Percentage > 100 {
+	if e.Percentage > 100 || e.Percentage < 0 {
 		return utils.ErrSuspiciousInput
 	}
 
@@ -253,7 +258,7 @@ func cwkSecurityCheck(c *NewCwk) error {
 		return utils.ErrEmptyStruct
 	}
 
-	if c.Percentage > 100 {
+	if c.Percentage > 100 || c.Percentage < 0 {
 		return utils.ErrSuspiciousInput
 	}
 

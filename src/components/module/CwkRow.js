@@ -2,14 +2,24 @@ import React, { PureComponent } from 'react';
 import { Row, Col } from 'react-flexbox-grid';
 import { FlatButton, TextField } from 'material-ui';
 import PropTypes from 'prop-types';
+import { orange500 } from 'material-ui/styles/colors';
 
 class CwkRow extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.borderStyle = {
+      borderColor: orange500,
+      borderWidth: '2px'
+    };
+
     this.state = {
       marks: null,
       percentage: null
+    };
+
+    this.style = {
+      color: orange500,
     };
 
     this.getValue = this.getValue.bind(this);
@@ -29,11 +39,19 @@ class CwkRow extends PureComponent {
   }
 
   handleMarksChange(event, value) {
+    // check for negative marks
+    if(value < 0) {
+      return;
+    }
     this.setState({ marks: value });
     this.props.onChange(this.props.cwk.id, value, this.state.percentage);
   }
 
   handlePercentChange(event, value) {
+    // % goes from 0 to 100
+    if(value > 100 || value < 0) {
+      return;
+    }
     this.setState({ percentage: value });
     this.props.onChange(this.props.cwk.id, this.state.marks, value);
   }
@@ -41,10 +59,13 @@ class CwkRow extends PureComponent {
   getValue(value, hint, func) {
     if (this.props.editing) {
       return <TextField
-        style={{ maxWidth: '60px' }}
+        id={parseInt(Math.random() * 10, 10) + ''}
+        style={{ maxWidth: '100px' }}
         hintText={hint}
         onChange={func}
-        defaultValue={value}
+        value={value}
+        underlineStyle={this.borderStyle}
+        underlineFocusStyle={this.borderStyle}
         type={'number'} />;
     } else {
       return <p>{value}</p>;
@@ -58,6 +79,7 @@ class CwkRow extends PureComponent {
           <FlatButton
             style={{ cursor: "pointer" }}
             onClick={() => this.handleCwkClick(this.props.cwk.id)}
+            secondary={true}
             label={this.props.cwk.id} />
         </ Col>
         <Col xs >

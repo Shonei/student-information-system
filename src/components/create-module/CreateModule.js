@@ -2,36 +2,49 @@ import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { TextField, Divider, RaisedButton } from 'material-ui';
 import CreateCwk from './CreateCwk';
+import {
+  cyan900, cyan700
+} from 'material-ui/styles/colors';
 
 class CreateModule extends Component {
   constructor(props) {
     super(props);
 
+    this.hintStyle = {
+      color: cyan700,
+      fontSize: '20px'
+    };
+
+    this.underlineStyle = {
+      borderColor: cyan900
+      // borderColor: '#00BCFF'
+    };
+
     this.cwk = {
-      id: 0,
+      id: parseInt(Math.random() * 1000),
       name: '',
       posted_on: '',
       deadline: '',
-      percentage: 0,
-      marks: 0,
+      percentage: 10,
+      marks: 20,
       description: ''
-    }
+    };
 
     this.state = {
       code: '',
       name: '',
       description: '',
       syllabus: '',
-      semester: 0,
-      year_of_study: 0,
-      credit: 0,
+      semester: 1,
+      year_of_study: 1,
+      credit: 10,
       exam: {
         code: '',
-        percentage: 0,
+        percentage: 80,
         type: '',
         description: ''
       },
-      cwks: [this.cwk]
+      cwks: [Object.assign({}, this.cwk)]
     };
 
     this.createCwkList = this.createCwkList.bind(this);
@@ -69,6 +82,7 @@ class CreateModule extends Component {
         onPercentageChange={this.onCwkPercentageChange}
         onDescriptionChange={this.onCwkDescriptionChange}
         onMarksChange={this.onCwkMarksChange}
+        cwk={this.state.cwks[index]}
         key={i}
         index={i} />);
     }
@@ -78,6 +92,7 @@ class CreateModule extends Component {
 
   onCwkIdChange(i, v) {
     this.setState(p => {
+      console.log(i);
       p.cwks[i].id = parseInt(v);
       return p;
     });
@@ -134,29 +149,44 @@ class CreateModule extends Component {
           </Col>
         </Row>
         <Row center="xs">
-          <Col xs={2} />
+          <Col xs={1} />
           <Col xs>
             <TextField
-              hintText="Module code"
+              value={this.state.code}
+              floatingLabelText="Module code"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
               onChange={(e, v) => this.setState({ code: v })}
               type={"text"}
             />
           </Col>
           <Col xs>
             <TextField
-              hintText="Module name"
+              value={this.state.name}
+              floatingLabelText="Module name"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
               onChange={(e, v) => this.setState({ name: v })}
               type={"text"}
             />
           </Col>
-          <Col xs={2} />
+          <Col xs={1} />
         </Row>
         <br />
         <Row center="xs">
-          <Col xs={2} />
+          <Col xs={1} />
           <Col xs>
             <TextField
-              hintText="Module description"
+              value={this.state.description}
+              floatingLabelText="Module description"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
               onChange={(e, v) => this.setState({ description: v })}
               multiLine={true}
               rows={1}
@@ -164,14 +194,19 @@ class CreateModule extends Component {
               fullWidth
             />
           </Col>
-          <Col xs={2} />
+          <Col xs={1} />
         </Row>
         <br />
         <Row center="xs">
-          <Col xs={2} />
+          <Col xs={1} />
           <Col xs>
             <TextField
-              hintText="Module syllabus"
+              value={this.state.syllabus}
+              floatingLabelText="Module syllabus"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
               onChange={(e, v) => this.setState({ syllabus: v })}
               multiLine={true}
               rows={1}
@@ -179,33 +214,61 @@ class CreateModule extends Component {
               fullWidth
             />
           </Col>
-          <Col xs={2} />
+          <Col xs={1} />
         </Row>
         <br />
         <Row center="xs">
-          <Col xs={2} />
+          <Col xs={1} />
           <Col xs>
             <TextField
-              hintText="Semester"
-              onChange={(e, v) => this.setState({ semester: parseInt(v, 10) })}
+              value={String(this.state.semester)}
+              floatingLabelText="Semester"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
+              onChange={(e, v) => {
+                const s = parseInt(v, 10);
+                if(s !== 1 && s !== 2) {
+                  return;
+                }
+                this.setState({ semester: s });
+              }}
               type={"number"}
             />
           </Col>
           <Col xs>
             <TextField
-              hintText="Year"
-              onChange={(e, v) => this.setState({ year_of_study: parseInt(v, 10) })}
+              value={String(this.state.year_of_study)}
+              floatingLabelText="Year"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
+              onChange={(e, v) => {
+                const year = parseInt(v, 10);
+                console.log(year);
+                if(year < 0 || year > 6) {
+                  return;
+                }
+                this.setState({ year_of_study: year });
+              }}
               type={"number"}
             />
           </Col>
           <Col xs>
             <TextField
-              hintText="Credits"
+              value={String(this.state.credit)}
+              floatingLabelText="Credits"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
               onChange={(e, v) => this.setState({ credit: parseInt(v, 10) })}
               type={"number"}
             />
           </Col>
-          <Col xs={2} />
+          <Col xs={1} />
         </Row>
         <br />
         <Row left="xs">
@@ -216,10 +279,15 @@ class CreateModule extends Component {
         </Row>
         <br />
         <Row center="xs">
-          <Col xs={2} />
+          <Col xs={1} />
           <Col xs>
             <TextField
-              hintText="Exam code"
+              value={this.state.exam.code}
+              floatingLabelText="Exam code"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
               onChange={(e, v) => this.setState(p => {
                 p.exam.code = v;
                 return p;
@@ -229,7 +297,12 @@ class CreateModule extends Component {
           </Col>
           <Col xs>
             <TextField
-              hintText="%"
+              value={this.state.exam.percentage}
+              floatingLabelText="Exam %"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
               onChange={(e, v) => this.setState(p => {
                 p.exam.percentage = parseInt(v, 10);
                 return p;
@@ -239,7 +312,12 @@ class CreateModule extends Component {
           </Col>
           <Col xs>
             <TextField
-              hintText="Type"
+              value={this.state.exam.type}
+              floatingLabelText="Exam type"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
               onChange={(e, v) => this.setState(p => {
                 p.exam.type = v;
                 return p;
@@ -247,14 +325,19 @@ class CreateModule extends Component {
               type={"Text"}
             />
           </Col>
-          <Col xs={2} />
+          <Col xs={1} />
         </Row>
         <br />
         <Row center="xs">
-          <Col xs={2} />
+          <Col xs={1} />
           <Col xs>
             <TextField
-              hintText="Exam description"
+              value={this.state.exam.description}
+              floatingLabelText="Exam description"
+              floatingLabelFixed={true}
+              floatingLabelStyle={this.hintStyle}
+              floatingLabelFocusStyle={this.hintStyle}
+              underlineStyle={this.underlineStyle}
               onChange={(e, v) => this.setState(p => {
                 p.exam.description = v;
                 return p;
@@ -265,7 +348,7 @@ class CreateModule extends Component {
               fullWidth
             />
           </Col>
-          <Col xs={2} />
+          <Col xs={1} />
         </Row>
         <br />
         <Row left="xs">
@@ -278,7 +361,7 @@ class CreateModule extends Component {
               primary={true}
               style={{ margin: 12 }}
               onClick={() => this.setState(p => {
-                p.cwks.push(this.cwk);
+                p.cwks.push(Object.assign({}, this.cwk));
                 return p;
               })}
             />
@@ -292,7 +375,7 @@ class CreateModule extends Component {
               })}
             />
           </ Col>
-          <Divider></Divider>
+          <Divider />
         </Row>
         <br />
         {this.createCwkList(this.state.cwks.length)}

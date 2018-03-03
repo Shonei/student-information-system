@@ -61,6 +61,7 @@ class StudentRow extends PureComponent {
     if (this.state.edit) {
       return <TextField
         name={text + ''}
+        style={{ maxWidth: '100px' }}
         hintText={hint}
         onChange={func}
         defaultValue={text}

@@ -8,14 +8,6 @@ class StudentList extends PureComponent {
     super();
 
     this.state = {
-      deadline: '',
-      description: '',
-      id: '',
-      marks: '',
-      module_code: '',
-      name: '',
-      percentage: '',
-      posted_on: '',
       studentList: []
     };
 
@@ -24,13 +16,6 @@ class StudentList extends PureComponent {
 
   componentDidMount() {
     let courseworkId = window.sessionStorage.getItem('coursework');
-
-    fetch('/get/cwk/' + courseworkId, {
-      method: 'GET',
-      credentials: 'same-origin',
-    }).then(e => e.json())
-      .then(e => this.setState(() => e[0]))
-      .catch(console.error)
 
     fetch('/get/cwk/students/' + courseworkId, {
       method: 'GET',

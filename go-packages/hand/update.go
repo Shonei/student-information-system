@@ -21,7 +21,7 @@ func Update(d utils.DecoderExecuter, f func(utils.DecoderExecuter) error) http.H
 
 		if err := f(d); err != nil {
 			log.Println(err)
-			http.Error(w, "We were unable to update the exam percentage.", http.StatusInternalServerError)
+			http.Error(w, "We were unable to update the databse at this moment.", http.StatusInternalServerError)
 			return
 		}
 	})

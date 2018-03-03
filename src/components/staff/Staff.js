@@ -35,7 +35,11 @@ class Staff extends PureComponent {
       .then(m => {
         m = m.map(module => {
           const code = module.code;
-          module.code = <FlatButton style={{ cursor: "pointer" }} onClick={() => this.handleModuleClick(code)} label={code} />;
+          module.code = <FlatButton
+            style={{ cursor: "pointer" }}
+            onClick={() => this.handleModuleClick(code)}
+            label={code}
+            secondary={true} />;
           return module;
         });
         this.setState({ modules: m });
@@ -46,7 +50,11 @@ class Staff extends PureComponent {
       .then(val => {
         val = val.map(student => {
           const user = student.username;
-          student.username = <FlatButton style={{ cursor: "pointer" }} onClick={() => this.handleStudentClick(user)} label={user} />;
+          student.username = <FlatButton
+            style={{ cursor: "pointer" }}
+            onClick={() => this.handleStudentClick(user)}
+            label={user}
+            secondary={true} />;
           return student;
         });
         this.setState({ tutees: val });

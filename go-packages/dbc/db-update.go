@@ -20,7 +20,11 @@ func (e *ExamPercent) Decode(d *json.Decoder) error {
 
 // Execute updates the database and performs necessary security checks
 func (e *ExamPercent) Execute(db utils.Execute) error {
-	if e.Percentage > 100 {
+	if e.Percentage > 100 || e.Percentage < 0 {
+		return utils.ErrSuspiciousInput
+	}
+
+	if !basicParser.MatchString(e.Code) {
 		return utils.ErrSuspiciousInput
 	}
 
@@ -44,9 +48,14 @@ func (c *CwkMarks) Decode(d *json.Decoder) error {
 
 // Execute updates the database and performs necessary security checks
 func (c *CwkMarks) Execute(db utils.Execute) error {
-	if c.Percentage > 100 {
+	if c.Percentage > 100 || c.Percentage < 0 {
 		return utils.ErrSuspiciousInput
 	}
+
+	if c.Marks < 0 {
+		return utils.ErrSuspiciousInput
+	}
+
 	return db.Execute(
 		"SELECT * FROM change_cwk_marks_and_percent($1, $2, $3);",
 		c.Percentage,
@@ -69,6 +78,10 @@ func (c *CwkResult) Decode(d *json.Decoder) error {
 
 // Execute updates the database and performs necessary security checks
 func (c *CwkResult) Execute(db utils.Execute) error {
+	if c.Result < 0 {
+		return utils.ErrSuspiciousInput
+	}
+
 	return db.Execute(
 		"SELECT * FROM update_student_cwk($1, $2, $3, $4);",
 		c.Result,

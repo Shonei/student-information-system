@@ -165,12 +165,18 @@ forChannels:
 	for {
 		// selects and reads from channels
 		select {
+		// read from the channel
 		case msg, ok := <-staff:
+
+			// channel has been closed
 			if !ok {
+
 				// nil so we don't select the channel agian
 				staff = nil
+
 				// deacrease the count of waiting channels
 				waitingChannels--
+
 				// break so we don't overwrite the data withan empty map
 				break
 			}

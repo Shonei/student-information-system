@@ -24,8 +24,8 @@ class CwkList extends PureComponent {
   render() {
     return (
       <Row start="xs">
-        <Col xs={2} />
-        <Col xs={8} >
+        <Col xs={1} />
+        <Col xs={10} >
           <h3>Courseworks:</h3>
           <Divider />
           <Row>
@@ -44,7 +44,7 @@ class CwkList extends PureComponent {
           </Row>
           {this.getCourseworks(this.props.cwk)}
         </ Col>
-        <Col xs={2} />
+        <Col xs={1} />
       </Row>
     );
   }

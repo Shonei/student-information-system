@@ -38,8 +38,8 @@ class SearchBar extends Component {
   render() {
     return (
       <Grid fluid>
-        <Row end="xs">
-          <Col xs={2} >
+        <Row end="xs" around="xs">
+          <Col xs={6} >
             <RaisedButton
               label="Create Module"
               primary={true}
@@ -49,12 +49,10 @@ class SearchBar extends Component {
               }}
             />
           </Col>
-          <Col xs={5} >
-            <p style={{ color: 'red' }}>{this.state.errorMessage}</p>
-          </Col>
-          <Col xs={5} >
+          <Col xs={6} >
             <TextField
               hintText="Search"
+              style={{ maxWidth: '100%' }}
               onChange={(event, text) => this.search = text}
             />
             <RaisedButton
@@ -64,7 +62,11 @@ class SearchBar extends Component {
               onClick={this.handleSearch}
             />
           </Col>
-          <Col xs={1} />
+        </Row>
+        <Row end="xs">
+          <Col>
+            <p style={{ color: 'red' }}>{this.state.errorMessage}</p>
+          </Col>
         </Row>
       </Grid>
     );
