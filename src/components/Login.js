@@ -7,6 +7,10 @@ class Login extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      error: ''
+    };
+
     this.username = '';
     this.password = '';
 
@@ -18,7 +22,7 @@ class Login extends Component {
   // A generic http responce parcer for the fetch api.
   fetchHTTPErrorCheck(res) {
     if (!res.ok) {
-      throw res;
+      return Promise.reject(res);
     } else {
       return res.json();
     }
@@ -65,13 +69,20 @@ class Login extends Component {
           loc = '/staff';
           window.sessionStorage.setItem('staff', this.username);
         }
+
         window.sessionStorage.setItem('loggedin', this.username);
         document.location.href = loc;
       })
       .catch(err => {
-        console.log(err)
-        // err.text()
-        //   .then(e => console.log(e))
+        if (err.status == 500) {
+          this.setState({ error: 'We are currently expiriencing technical difficulties.' });
+          return;
+        } else if (err.status == 401) {
+          this.setState({error: 'Wrong username or password.'});
+          return;
+        }
+
+        this.setState({error: 'We encountered an error whily trying to connect ot the server. Please reload and try again.'});
       });
   }
 
@@ -109,6 +120,9 @@ class Login extends Component {
               </Col>
             </Row>
           </Col>
+        </Row>
+        <Row center="xs">
+          <p>{this.state.error}</p>
         </Row>
       </Grid>
     );

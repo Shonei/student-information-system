@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Row, Col } from 'react-flexbox-grid';
-import { FlatButton, TextField } from 'material-ui';
+import { RaisedButton, TextField } from 'material-ui';
 import PropTypes from 'prop-types';
 import { orange500 } from 'material-ui/styles/colors';
 
@@ -76,10 +76,10 @@ class CwkRow extends PureComponent {
     return (
       <Row>
         <Col xs>
-          <FlatButton
+          <RaisedButton
             style={{ cursor: "pointer" }}
             onClick={() => this.handleCwkClick(this.props.cwk.id)}
-            secondary={true}
+            primary={true}
             label={this.props.cwk.id} />
         </ Col>
         <Col xs >

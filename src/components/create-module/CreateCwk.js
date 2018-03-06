@@ -77,10 +77,8 @@ class CreateCwk extends Component {
               floatingLabelFocusStyle={this.hintStyle}
               underlineStyle={this.underlineStyle}
               onChange={(e, v) => {
-                this.setState({ name: v });
                 this.props.onNameChange(this.state.index, v);
               }}
-              value={this.state.name}
               type={"text"}
               style={{ width: '100%' }}
             />
@@ -93,11 +91,12 @@ class CreateCwk extends Component {
               floatingLabelFocusStyle={this.hintStyle}
               underlineStyle={this.underlineStyle}
               onChange={(e, v) => {
-                this.setState({ posted_on: v });
+                // may need to make this controlled later
+                // this.setState({ posted_on: v });
                 this.props.onPostedOnChange(this.state.index, v);
               }}
               type={"date"}
-              value={this.state.posted_on}
+              // value={this.state.posted_on}
               style={{ width: '100%' }}
             />
           </Col>
@@ -109,11 +108,11 @@ class CreateCwk extends Component {
               floatingLabelFocusStyle={this.hintStyle}
               underlineStyle={this.underlineStyle}
               onChange={(e, v) => {
-                this.setState({ deadline: v });
+                // this.setState({ deadline: v });
                 this.props.onDeadlineChange(this.state.index, v);
               }}
               type={"date"}
-              value={this.state.deadline}
+              // value={this.state.deadline}
               style={{ width: '100%' }}
             />
           </Col>
@@ -175,11 +174,11 @@ class CreateCwk extends Component {
               floatingLabelStyle={this.hintStyle}
               floatingLabelFocusStyle={this.hintStyle}
               onChange={(e, v) => {
-                this.setState({ description: v });
+                // this.setState({ description: v });
                 this.props.onDescriptionChange(this.state.index, v);
               }}
               multiLine={true}
-              value={this.state.description}
+              // value={this.state.description}
               rows={1}
               type={"text"}
               fullWidth

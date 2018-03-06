@@ -2,7 +2,6 @@ package utils
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 // DB is custom struct to abstract the database
@@ -69,7 +68,6 @@ func (db *DB) Execute(s string, args ...interface{}) error {
 	}
 
 	rows, err := result.RowsAffected()
-	fmt.Println(rows)
 	if rows < 1 {
 		return ErrEmptySQLSet
 	}

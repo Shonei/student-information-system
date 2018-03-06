@@ -43,8 +43,7 @@ class Staff extends PureComponent {
   getList(k, arr, getListItem) {
     return (
       <List
-        key={k}
-      >
+        key={k}>
         {arr.map(e => getListItem(e))}
       </List>
     );

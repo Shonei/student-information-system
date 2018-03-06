@@ -1,16 +1,15 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Row, Col } from 'react-flexbox-grid';
 import { RaisedButton, TextField } from 'material-ui';
 import PropTypes from 'prop-types';
 
-class StudentRow extends PureComponent {
-  constructor() {
-    super();
+class StudentRow extends Component {
+  constructor(props) {
+    super(props);
 
     this.state = {
       result: ' ',
-      handed_in: '',
-      edit: false
+      handed_in: ''
     };
 
     this.handleUpdateCwkResult = this.handleUpdateCwkResult.bind(this);
@@ -18,12 +17,7 @@ class StudentRow extends PureComponent {
   }
 
   componentDidMount() {
-    // if the results are vailable we make the option to edit them available
-    // if the results are missing we just give the option to update them by default
-    if (!this.props.student.result) {
-      this.setState({ edit: true });
-    }
-    
+    console.log(this.props);
     // we copy the props onto the state so we can edit it freely
     this.setState({ result: this.props.student.result });
     this.setState({ handed_in: this.props.student.handed_in });
@@ -57,7 +51,7 @@ class StudentRow extends PureComponent {
   // this function will return either a paragraph showing the results or a
   // TextField that is used to input the new results.
   // If the user is changing existing results the fiels will display them as default values. 
-  shouldEdit(text, hint, func, type = 'text') {
+  shouldEdit(text, hint, func, type = 'number') {
     if (this.state.edit) {
       return <TextField
         name={text + ''}
@@ -82,18 +76,36 @@ class StudentRow extends PureComponent {
           <p>{this.props.student.username}</p>
         </Col>
         <Col xs>
-          {this.shouldEdit(this.state.result, "result", (o, e) => this.setState({ result: e }))}
+          {
+            this.props.edit ? <TextField
+              name={'number'}
+              style={{ maxWidth: '100px' }}
+              hintText={'result'}
+              onChange={(e, v) => {
+                if (v < 0) {
+                  return;
+                }
+                this.setState({ result: v })
+                this.props.onResultChange(this.props.student.student_id, v);
+              }}
+              value={this.state.result}
+              type={'number'} /> :
+              <p>{this.state.result}</p>
+          }
         </ Col>
         <Col xs>
-          {this.shouldEdit(date, "", (o, e) => this.setState({ handed_in: e }), "date")}
-        </ Col>
-        <Col xs>
-          <RaisedButton
-            label={this.state.edit ? "Update" : "Edit"}
-            primary={true}
-            style={{ margin: 12 }}
-            onClick={this.state.edit ? this.handleUpdateCwkResult : () => this.setState({ edit: true })}
-          />
+          {
+            this.props.edit ? <TextField
+              name={'date'}
+              style={{ maxWidth: '100px' }}
+              onChange={(e, v) => {
+                this.setState({v});
+                this.props.onDateChange(this.props.student.student_id, v);
+              }}
+              defaultValue={this.state.handed_in}
+              type={'date'} /> :
+              <p>{new Date(this.state.handed_in).toDateString()}</p>
+          }
         </ Col>
       </Row>
     );

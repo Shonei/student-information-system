@@ -152,7 +152,6 @@ class CreateModule extends Component {
           <Col xs={1} />
           <Col xs>
             <TextField
-              value={this.state.code}
               floatingLabelText="Module code"
               floatingLabelFixed={true}
               floatingLabelStyle={this.hintStyle}
@@ -164,7 +163,6 @@ class CreateModule extends Component {
           </Col>
           <Col xs>
             <TextField
-              value={this.state.name}
               floatingLabelText="Module name"
               floatingLabelFixed={true}
               floatingLabelStyle={this.hintStyle}
@@ -181,7 +179,6 @@ class CreateModule extends Component {
           <Col xs={1} />
           <Col xs>
             <TextField
-              value={this.state.description}
               floatingLabelText="Module description"
               floatingLabelFixed={true}
               floatingLabelStyle={this.hintStyle}
@@ -201,7 +198,6 @@ class CreateModule extends Component {
           <Col xs={1} />
           <Col xs>
             <TextField
-              value={this.state.syllabus}
               floatingLabelText="Module syllabus"
               floatingLabelFixed={true}
               floatingLabelStyle={this.hintStyle}
@@ -264,7 +260,13 @@ class CreateModule extends Component {
               floatingLabelStyle={this.hintStyle}
               floatingLabelFocusStyle={this.hintStyle}
               underlineStyle={this.underlineStyle}
-              onChange={(e, v) => this.setState({ credit: parseInt(v, 10) })}
+              onChange={(e, v) => {
+                if(v < 0) {
+                  // module can't have negative cradits
+                  return;
+                }
+                this.setState({ credit: parseInt(v, 10) });
+              }}
               type={"number"}
             />
           </Col>
@@ -282,7 +284,6 @@ class CreateModule extends Component {
           <Col xs={1} />
           <Col xs>
             <TextField
-              value={this.state.exam.code}
               floatingLabelText="Exam code"
               floatingLabelFixed={true}
               floatingLabelStyle={this.hintStyle}
@@ -312,7 +313,6 @@ class CreateModule extends Component {
           </Col>
           <Col xs>
             <TextField
-              value={this.state.exam.type}
               floatingLabelText="Exam type"
               floatingLabelFixed={true}
               floatingLabelStyle={this.hintStyle}
@@ -332,7 +332,6 @@ class CreateModule extends Component {
           <Col xs={1} />
           <Col xs>
             <TextField
-              value={this.state.exam.description}
               floatingLabelText="Exam description"
               floatingLabelFixed={true}
               floatingLabelStyle={this.hintStyle}

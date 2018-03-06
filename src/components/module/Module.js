@@ -24,7 +24,7 @@ class Module extends Component {
     this.updateCwkList = this.updateCwkList.bind(this);
     this.getExam = this.getExam.bind(this);
     this.handleClick = this.handleClick.bind(this);
-    this.postdata = this.postDate.bind(this);
+    this.postData = this.postData.bind(this);
   }
 
   componentDidMount() {
@@ -41,7 +41,7 @@ class Module extends Component {
       .catch(console.error);
   }
 
-  postDate(url, data, type) {
+  postData(url, data, type) {
     return fetch(url, {
       credentials: 'same-origin',
       method: "POST",
@@ -60,10 +60,13 @@ class Module extends Component {
 
   handleClick() {
     if (this.state.editing) {
+      // array to hold all the post promises
       let request = [];
 
-      request.push(this.postDate('/update/exam/percentage', this.state.exam, 'exam'));
+      // send a post for the exam update
+      request.push(this.postData('/update/exam/percentage', this.state.exam, 'exam'));
 
+      // post all cwk updates
       Object.keys(this.updateCwks).forEach(key => {
         let obj = {
           id: parseInt(key, 10),
@@ -71,14 +74,18 @@ class Module extends Component {
           percentage: parseInt(this.updateCwks[key].percentage, 10)
         };
 
-        request.push(this.postDate('/update/cwk/percentage', obj, 'cwk'));
+        request.push(this.postData('/update/cwk/percentage', obj, 'cwk'));
       });
 
       // wait for all request to resolve to update the state
       Promise.all(request)
         .then(arr => {
           arr.forEach(val => {
+
+            // we update all the cwk % with the new values on success
             if (val.type === 'cwk') {
+
+              // find the cwk
               let index = this.state.cwks.findIndex(v => v.id === val.id);
               if (index > -1) {
                 this.setState(prev => {
@@ -87,11 +94,6 @@ class Module extends Component {
                   return prev;
                 });
               }
-            } else if (val.type === 'exam') {
-              this.setState(prev => {
-                prev.exam.percentage = val.percentage;
-                return prev;
-              });
             }
           });
         })
@@ -107,23 +109,27 @@ class Module extends Component {
     };
   }
 
-  getExam() {
+  getExam(value) {
     // empty object check
-    if (!this.state.exam) {
+    if (!value) {
       return;
     }
-    const value = this.state.exam;
+
+    value.percentage = value.percentage ? value.percentage : 0;
+
     return (
       <Row >
         <Col xs>
           <p>{value.code}</p>
         </ Col>
         <Col xs >
+        {/* depending on state.editing we return a text field or a p tag to show the value */}
           {this.state.editing ? <TextField
             id={parseInt(Math.random() * 10, 10) + ''}
-            style={{ maxWidth: '60px' }}
+            style={{ maxWidth: '100px' }}
             onChange={(e, v) => {
               this.setState(prev => {
+                // control the upper and lower bounds of the % 
                 if (v < 0 || v > 100) {
                   return prev;
                 }
@@ -206,7 +212,7 @@ class Module extends Component {
                   style={{ cursor: "pointer" }}
                   onClick={this.handleClick}
                   primary={true}
-                  label={this.state.editing ? "Update" : "Edit"} />
+                  label={this.state.editing ? "Update" : "Edit %"} />
               </ Col>
             </Row>
             <Divider />
@@ -232,7 +238,7 @@ class Module extends Component {
                 <p><b>Type</b></p>
               </ Col>
             </Row>
-            {this.getExam()}
+            {this.getExam(this.state.exam)}
           </ Col>
           <Col xs={1} />
         </Row>

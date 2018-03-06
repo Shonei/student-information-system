@@ -3,8 +3,8 @@ import { RaisedButton, TextField } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 
 class SearchBar extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       errorMessage: ''

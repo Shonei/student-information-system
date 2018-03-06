@@ -80,6 +80,8 @@ func main() {
 		return v.Execute(db)
 	}
 
+	// This function is used for the creation of the module.
+	// it makes sure the transaction is commited or rolled back as needed.
 	create := func(v utils.DecoderCreator) error {
 		tx, err := db.Begin()
 		if err != nil {
