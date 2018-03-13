@@ -49,13 +49,13 @@ func BasicAuth(next http.Handler) http.Handler {
 			if claims.User == vars["user"] {
 				next.ServeHTTP(w, r)
 			} else {
-				http.Error(w, "You don't have the authority to access that resource", http.StatusUnauthorized)
+				http.Error(w, "You don't have the authority to access that resource.", http.StatusUnauthorized)
 			}
 		// staff can view all data
 		case 2, 3:
 			next.ServeHTTP(w, r)
 		default:
-			http.Error(w, "You don't have the authority to access that resource", http.StatusUnauthorized)
+			http.Error(w, "You don't have the authority to access that resource.", http.StatusUnauthorized)
 		}
 		return
 	})
@@ -84,7 +84,7 @@ func StaffOnly(next http.Handler) http.Handler {
 		case 2, 3:
 			next.ServeHTTP(w, r)
 		default:
-			http.Error(w, "You don't have the authority to access that resource", http.StatusUnauthorized)
+			http.Error(w, "You don't have the authority to access that resource.", http.StatusUnauthorized)
 		}
 		return
 	})
@@ -126,7 +126,7 @@ func validateJWT(token string) (customToken, error) {
 func writeError(w http.ResponseWriter, err error) {
 	switch err {
 	case errTokenExpired:
-		http.Error(w, "The token has expired", http.StatusUnauthorized)
+		http.Error(w, "The token has expired.", http.StatusUnauthorized)
 	case errInvalidToken:
 		http.Error(w, "Invalid JWT", http.StatusUnauthorized)
 	default:

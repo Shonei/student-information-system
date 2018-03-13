@@ -64,8 +64,37 @@ func main() {
 	getStaffTutees := func(str string) ([]map[string]string, error) {
 		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_staff_tutees($1);", str)
 	}
+	getModuleDetails := func(str string) (utils.Module, error) {
+		return dbc.GetModuleDetails(db, str)
+	}
+	getCourseworkDetails := func(str string) ([]map[string]string, error) {
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_cwk_details($1);", str)
+	}
+	getStudentsOnCwk := func(str string) ([]map[string]string, error) {
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_cwk_students($1);", str)
+	}
 	search := func(str string) (map[string][]map[string]string, error) {
 		return dbc.Search(db, str)
+	}
+	update := func(v utils.DecoderExecuter) error {
+		return v.Execute(db)
+	}
+
+	// This function is used for the creation of the module.
+	// it makes sure the transaction is commited or rolled back as needed.
+	create := func(v utils.DecoderCreator) error {
+		tx, err := db.Begin()
+		if err != nil {
+			return utils.ErrSQLFailed
+		}
+
+		if err := v.Create(tx); err != nil {
+			tx.Rollback()
+			return utils.ErrSQLFailed
+		}
+
+		tx.Commit()
+		return nil
 	}
 
 	r := mux.NewRouter()
@@ -74,7 +103,8 @@ func main() {
 	r.Handle("/get/token/{user}", hand.GetToken(genAuthtoken)).Methods("GET")
 
 	// Student part of the API
-	r.Handle("/get/student/profile/{user}", mw.BasicAuth(hand.GetProfile(getStudentPro))).Methods("GET")
+	r.Handle(
+		"/get/student/profile/{user}", mw.BasicAuth(hand.GetProfile(getStudentPro))).Methods("GET")
 	r.Handle("/get/student/cwk/timetable/{user}", mw.BasicAuth(hand.BasicGet(getCwkTimetable))).Methods("GET")
 	r.Handle("/get/student/cwk/results/{user}", mw.BasicAuth(hand.BasicGet(getCwkResults))).Methods("GET")
 	r.Handle("/get/student/modules/now/{user}", mw.BasicAuth(hand.BasicGet(getNowModules))).Methods("GET")
@@ -84,7 +114,16 @@ func main() {
 	r.Handle("/get/staff/profile/{user}", mw.StaffOnly(hand.GetProfile(getStaffPro))).Methods("GET")
 	r.Handle("/get/staff/modules/{user}", mw.StaffOnly(hand.BasicGet(getStaffModules))).Methods("GET")
 	r.Handle("/get/staff/tutees/{user}", mw.StaffOnly(hand.BasicGet(getStaffTutees))).Methods("GET")
+
+	// ADD AUTH MIDLLEWARE
+	r.Handle("/get/module/{code}", hand.GetForModule(getModuleDetails)).Methods("GET")
+	r.Handle("/get/cwk/{code}", hand.GetForCode(getCourseworkDetails)).Methods("GET")
+	r.Handle("/get/cwk/students/{code}", hand.GetForCode(getStudentsOnCwk)).Methods("GET")
 	r.Handle("/search/{query}", hand.GetSearch(search)).Methods("GET")
+	r.Handle("/update/cwk/results", hand.Update(&dbc.CwkResult{}, update)).Methods("POST")
+	r.Handle("/update/exam/percentage", hand.Update(&dbc.ExamPercent{}, update)).Methods("POST")
+	r.Handle("/update/cwk/percentage", hand.Update(&dbc.CwkMarks{}, update)).Methods("POST")
+	r.Handle("/add/module", hand.Create(&dbc.NewModule{}, create)).Methods("POST")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))
@@ -94,12 +133,13 @@ func main() {
 	r.PathPrefix("/student").Handler(http.StripPrefix("/student", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/staff").Handler(http.StripPrefix("/staff", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/search").Handler(http.StripPrefix("/search", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/module").Handler(http.StripPrefix("/module", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/coursework").Handler(http.StripPrefix("/coursework", http.FileServer(http.Dir("build/")))).Methods("GET")
+	r.PathPrefix("/create/module").Handler(http.StripPrefix("/create/module", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/"))).Methods("GET")
 
 	// listen on the router
 	http.Handle("/", r)
-
-	// fmt.Println(dbc.Search(db, "s"))
 
 	log.Println(http.ListenAndServe(":"+port, nil))
 }

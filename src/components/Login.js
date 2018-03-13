@@ -2,11 +2,14 @@ import React, { Component } from 'react';
 import { TextField, RaisedButton } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { createHmac } from 'crypto';
-// import fetch from 'node-fetch';
 
 class Login extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      error: ''
+    };
 
     this.username = '';
     this.password = '';
@@ -19,7 +22,7 @@ class Login extends Component {
   // A generic http responce parcer for the fetch api.
   fetchHTTPErrorCheck(res) {
     if (!res.ok) {
-      throw res;
+      return Promise.reject(res);
     } else {
       return res.json();
     }
@@ -55,24 +58,31 @@ class Login extends Component {
         // Set user and access_level in the local storage so we can use it 
         // as a global shared state to manage the view.
         // This makes it so users have to always login once they leave the app.
-        window.localStorage.setItem('access_level', data.level);
+        window.sessionStorage.setItem('access_level', data.level);
 
         // a somewhat ugly change of path but it works.
         let loc = '/';
         if (data.level === '1') {
           loc = '/student';
-          window.localStorage.setItem('student', this.username);
+          window.sessionStorage.setItem('student', this.username);
         } else if (parseInt(data.level, 10) > 1) {
           loc = '/staff';
-          window.localStorage.setItem('staff', this.username);
+          window.sessionStorage.setItem('staff', this.username);
         }
-        window.localStorage.setItem('loggedin', this.username);
+
+        window.sessionStorage.setItem('loggedin', this.username);
         document.location.href = loc;
       })
       .catch(err => {
-        console.log(err)
-        // err.text()
-        //   .then(e => console.log(e))
+        if (err.status == 500) {
+          this.setState({ error: 'We are currently expiriencing technical difficulties.' });
+          return;
+        } else if (err.status == 401) {
+          this.setState({error: 'Wrong username or password.'});
+          return;
+        }
+
+        this.setState({error: 'We encountered an error whily trying to connect ot the server. Please reload and try again.'});
       });
   }
 
@@ -120,6 +130,9 @@ class Login extends Component {
               </Col>
             </Row>
           </Col>
+        </Row>
+        <Row center="xs">
+          <p>{this.state.error}</p>
         </Row>
       </Grid>
     );

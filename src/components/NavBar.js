@@ -5,6 +5,10 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Login from './Login';
 import Staff from './staff/Staff';
 import Search from './staff/Search';
+import SearchBar from './staff/SearchBar';
+import Module from './module/Module';
+import Coursework from './coursework/Coursework';
+import CreateModule from './create-module/CreateModule';
 
 const styles = {
   cursor: 'pointer',
@@ -14,28 +18,36 @@ class NavBar extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      accessLevel: 0
+    };
+
     this.handleHomeClick = this.handleHomeClick.bind(this);
+  }
+
+  componentDidMount() {
+    const lvl = sessionStorage.getItem('access_level');
+    this.setState({ accessLevel: parseInt(lvl, 10) });
   }
 
   // Clears all global state and cookies
   handleLogoff(user) {
     document.cookie = '';
-    localStorage.clear();
+    sessionStorage.clear();
     document.location.href = '/';
   }
 
   // Based on the access level take the user to their home page
   handleHomeClick() {
-    let lvl = localStorage.getItem('access_level');
     let loc = '/';
-    let user = window.localStorage.getItem('loggedin');
-    if (lvl === '1') {
+    let user = window.sessionStorage.getItem('loggedin');
+    if (this.state.accessLevel === 1) {
       loc = '/student';
-      window.localStorage.setItem('student', user);
-    } else {
+      window.sessionStorage.setItem('student', user);
+    } else if (this.state.accessLevel > 1) {
       loc = '/staff';
-      window.localStorage.setItem('staff', user);
-    } 
+      window.sessionStorage.setItem('staff', user);
+    }
     document.location.href = loc;
   }
 
@@ -49,12 +61,16 @@ class NavBar extends Component {
           iconElementRight={<FlatButton label="Logoff"
             onClick={this.handleLogoff} />}>
         </AppBar>
+        {this.state.accessLevel > 1 ? <SearchBar></SearchBar> : <div />}
         <Router>
           <div>
             <Route exact path="/" render={() => <Login></Login>} />
             <Route exact path="/student" render={() => <Student></Student>} />
             <Route exact path="/staff" render={() => <Staff></Staff>} />
             <Route exact path="/search" render={() => <Search></Search>} />
+            <Route exact path="/module" render={() => <Module></Module>} />
+            <Route exact path="/coursework" render={() => <Coursework></Coursework>} />
+            <Route exact path="/create/module" render={() => <CreateModule></CreateModule>} />
           </div>
         </Router>
       </div>

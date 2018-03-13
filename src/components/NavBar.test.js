@@ -7,11 +7,14 @@ import { MuiThemeProvider as mui } from 'material-ui/styles/MuiThemeProvider';
 
 configure({ adapter: new Adapter() });
 
+window.sessionStorage = {
+  getItem: jest.fn(cb => 'shgsg')
+};
 
 describe('testing the NavBar', () => {
   it('It renders', () => {
     const wrapper = shallow(<NavBar />, { context: { mui } });
-    expect(wrapper.find('Route').length).toEqual(4);
+    expect(wrapper.find('Route').length).toEqual(7);
     expect(wrapper.find('AppBar').length).toEqual(1);
   });
 });

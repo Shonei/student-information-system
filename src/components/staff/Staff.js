@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { wrapFetch } from './../helpers';
-import { Avatar, FlatButton, TextField, RaisedButton } from 'material-ui';
+import { Avatar, FlatButton, RaisedButton } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import CustomTable from './../CustomTable';
 
@@ -19,59 +19,65 @@ class Staff extends PureComponent {
       last_name: '',
       middle_name: '',
       phone: '',
-      errorMessage: ''
+      error: ''
     };
 
-    this.search = '';
     this.handleStudentClick = this.handleStudentClick.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
+    this.handleModuleClick = this.handleModuleClick.bind(this);
   }
 
   componentDidMount() {
     wrapFetch('staff', '/get/staff/profile/')
       .then(j => this.setState(() => j))
-      .catch(console.log);
+      .catch(err => this.setState({ error: 'We failed to retrieve your profile.' }));
 
     wrapFetch('staff', '/get/staff/modules/')
-      .then(m => this.setState({ modules: m }))
-      .catch(console.log);
+      .then(m => {
+        m = m.map(module => {
+          const code = module.code;
+          module.code = <RaisedButton
+            style={{ cursor: "pointer" }}
+            onClick={() => this.handleModuleClick(code)}
+            primary={true}
+            label={code} />;
+
+          return module;
+        });
+        this.setState({ modules: m });
+      })
+      .catch(err => this.setState({ error: 'We failed to retrieve your list of modules.' }));
 
     wrapFetch('staff', '/get/staff/tutees/')
       .then(val => {
         val = val.map(student => {
           const user = student.username;
-          student.username = <FlatButton style={{ cursor: "pointer" }} onClick={() => this.handleStudentClick(user)} label={user} />;
+          // student.username = <a
+          //   style={{ textDecoration: 'none' }}
+          //   onClick={() => this.handleStudentClick(user)}
+          //   href="#">{user}</a>;
+
+          student.username = <RaisedButton
+            style={{ cursor: "pointer" }}
+            onClick={() => this.handleStudentClick(user)}
+            primary={true}
+            label={user} />;
+
           return student;
         });
         this.setState({ tutees: val });
       })
-      .catch(console.log);
+      .catch(err => this.setState({ error: 'We failed to retrieve your list of tutees.' }));
   }
 
   handleStudentClick(username) {
-    window.localStorage.setItem('student', username);
+    window.sessionStorage.setItem('student', username);
     window.location.href = '/student';
   }
 
-  handleSearch(e) {
-    e.preventDefault();
-    if (this.search.length === 0) {
-      this.setState({ errorMessage: 'Can\'t search for empty values.' });
-      return;
-    }
 
-    return fetch('/search/' + this.search, {
-      credentials: 'same-origin',
-    }).then(res => {
-      if (!res.ok) {
-        return Promise.reject(res);
-      } else {
-        return res.json();
-      }
-    }).then(data => {
-      localStorage.setItem('search', JSON.stringify(data));
-      window.location.href = '/search';
-    }).catch(err => this.setState({ errorMessage : 'No results were found.'}));
+  handleModuleClick(id) {
+    window.sessionStorage.setItem('module', id);
+    window.location.href = '/module';
   }
 
   render() {
@@ -80,26 +86,6 @@ class Staff extends PureComponent {
 
     return (
       <Grid fluid>
-        <Row end="xs">
-          <Col xs={6} >
-            <p style={{ color: 'red' }}>{this.state.errorMessage}</p>
-          </Col>
-          <Col xs={5} >
-            <TextField
-              hintText="Search"
-              onChange={(event, text) => this.search = text}
-            />
-            <RaisedButton
-              label="Search"
-              primary={true}
-              style={{ margin: 12 }}
-              onClick={this.handleSearch}
-            />
-          </Col>
-          <Col xs={1} />
-        </Row>
-        <br />
-        <br />
         <Row center="xs">
           <Col xs={12} md={3}>
             <Avatar src={URL}
@@ -114,8 +100,13 @@ class Staff extends PureComponent {
           </Col>
         </Row>
         <br />
+        <Row center="xs">
+          <Col xs>
+            <p>{this.state.error}</p>
+          </Col>
+        </Row>
         <br />
-        <h3><b>Modules:</b></h3>
+        <h3><b>My modules:</b></h3>
         <CustomTable
           headers={['Code', 'Name', 'Role']}
           order={['code', 'name', 'staff_role']}
@@ -123,7 +114,7 @@ class Staff extends PureComponent {
         ></CustomTable>
         <br />
         <br />
-        <h3><b>Tutoring:</b></h3>
+        <h3><b>My tutees:</b></h3>
         <CustomTable
           headers={['Username', 'ID', 'Programme', 'Year']}
           order={['username', 'id', 'programme_code', 'year']}

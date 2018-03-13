@@ -22,10 +22,11 @@ class Staff extends PureComponent {
     this.getModule = this.getModule.bind(this);
     this.getProgramme = this.getProgramme.bind(this);
     this.handlePersonClick = this.handlePersonClick.bind(this);
+    this.handleModuleClick = this.handleModuleClick.bind(this);
   }
 
   componentDidMount() {
-    let results = localStorage.getItem('search');
+    let results = sessionStorage.getItem('search');
     results = JSON.parse(results);
 
     this.tables['students'] = results.students ? results.students : [];
@@ -42,27 +43,28 @@ class Staff extends PureComponent {
   getList(k, arr, getListItem) {
     return (
       <List
-        key={k}
-      >
+        key={k}>
         {arr.map(e => getListItem(e))}
       </List>
     );
   }
 
   handlePersonClick(user) {
-    let href = '';
     let itemName = '';
     if (this.state.value === 'students') {
-      href = '/student';
       itemName = 'student';
     } else if (this.state.value === 'staff') {
-      href = '/staff';
       itemName = 'staff';
     } else {
       return;
     }
-    localStorage.setItem(itemName, user);
-    window.location.href = itemName;
+    sessionStorage.setItem(itemName, user);
+    window.location.href = '/' + itemName;
+  }
+
+  handleModuleClick(id) {
+    window.sessionStorage.setItem('module', id);
+    window.location.href = '/module';
   }
 
   getPerson(person) {
@@ -100,6 +102,10 @@ class Staff extends PureComponent {
   getModule(m) {
     return (
       <ListItem
+        onClick={event => {
+          event.preventDefault();
+          this.handleModuleClick(m.code);
+        }}
         key={m.code}
         leftAvatar={<Avatar>{m.name.charAt(0)}</Avatar>}
         primaryText={m.name}
@@ -112,24 +118,22 @@ class Staff extends PureComponent {
 
   render() {
     return (
-      <div>
-        <Tabs
-          value={this.state.value}
-          onChange={this.handleChange}>
-          <Tab label="Students" value="students">
-            {this.getList("students", this.tables[this.state.value], this.getPerson)}
-          </Tab>
-          <Tab label="Staff" value="staff">
-            {this.getList("staff", this.tables[this.state.value], this.getPerson)}
-          </Tab>
-          <Tab label="Modules" value="modules">
-            {this.getList("modules", this.tables[this.state.value], this.getModule)}
-          </Tab>
-          <Tab label="Programmes" value="programmes">
-            {this.getList("programmes", this.tables[this.state.value], this.getProgramme)}
-          </Tab>
-        </Tabs>
-      </div>
+      <Tabs
+        value={this.state.value}
+        onChange={this.handleChange}>
+        <Tab label="Students" value="students">
+          {this.getList("students", this.tables[this.state.value], this.getPerson)}
+        </Tab>
+        <Tab label="Staff" value="staff">
+          {this.getList("staff", this.tables[this.state.value], this.getPerson)}
+        </Tab>
+        <Tab label="Modules" value="modules">
+          {this.getList("modules", this.tables[this.state.value], this.getModule)}
+        </Tab>
+        <Tab label="Programmes" value="programmes">
+          {this.getList("programmes", this.tables[this.state.value], this.getProgramme)}
+        </Tab>
+      </Tabs>
     );
   }
 }

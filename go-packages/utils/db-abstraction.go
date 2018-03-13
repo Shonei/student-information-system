@@ -9,13 +9,30 @@ type DB struct {
 	*sql.DB
 }
 
+// Select is a databse interface that returns a single value
+// used to get the salt or uesrname of a user.
+type Select interface {
+	Select(string, ...interface{}) (string, error)
+}
+
+// SelectMulti is used to read multiple lines.
+// The read data will be prased and read into a map
+// for ease of use and parsing.
+type SelectMulti interface {
+	SelectMulti(string, ...interface{}) ([]map[string]string, error)
+}
+
+type Execute interface {
+	Execute(string, ...interface{}) error
+}
+
 // DBAbstraction hides the database access.
 // It should make testing the server easier
 // as we can mock the responce from this layer.
 type DBAbstraction interface {
-	Select(string, ...interface{}) (string, error)
-	SelectMulti(string, ...interface{}) ([]map[string]string, error)
-	PreparedStmt(string, ...interface{}) error
+	Select
+	SelectMulti
+	Execute
 }
 
 // Select is a basic query function that expect to recieve a single string
@@ -41,22 +58,21 @@ func (db *DB) SelectMulti(s string, args ...interface{}) ([]map[string]string, e
 	return m, nil
 }
 
-// PreparedStmt will be the abstacction for update and insert queries.
+// Execute will be the abstacction for update and insert queries.
 // It won't return data after the statement has been return but only
 // return an error if one has occured.
-func (db *DB) PreparedStmt(s string, args ...interface{}) error {
-	stmt, err := db.Prepare(s)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(args...)
+func (db *DB) Execute(s string, args ...interface{}) error {
+	result, err := db.Exec(s, args...)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	rows, err := result.RowsAffected()
+	if rows < 1 {
+		return ErrEmptySQLSet
+	}
+
+	return err
 }
 
 // Reads the data from sqlRows into a []map[string]string
