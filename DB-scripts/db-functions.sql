@@ -14,7 +14,7 @@
 -- SQL VERSION OF A FUNCTION
 
 -- GET STUDENT PROFILE
-DROP FUNCTION get_student_profile(TEXT);
+-- DROP FUNCTION get_student_profile(TEXT);
 CREATE OR REPLACE FUNCTION get_student_profile(TEXT) 
 RETURNS TABLE(id INT, first_name TEXT, middle_name TEXT, last_name TEXT, email TEXT, current_level INT, picture_url TEXT, entry_year DATE) 
 AS $$
@@ -25,7 +25,7 @@ AS $$
 LANGUAGE SQL;
 
 -- GET STAFF PROFILE
-DROP FUNCTION get_staff_profile(TEXT);
+-- DROP FUNCTION get_staff_profile(TEXT);
 CREATE OR REPLACE FUNCTION get_staff_profile(TEXT) 
 RETURNS TABLE(id INT, first_name TEXT, middle_name TEXT, last_name TEXT, email TEXT, address1 TEXT, address2 TEXT, phone TEXT) 
 AS $$
@@ -36,7 +36,7 @@ AS $$
 LANGUAGE SQL;
 
 -- GET STUDENT CURRENT MODULES
-DROP FUNCTION get_student_current_modules(TEXT);
+-- DROP FUNCTION get_student_current_modules(TEXT);
 CREATE OR REPLACE FUNCTION get_student_current_modules(TEXT) 
 RETURNS TABLE(code TEXT, name TEXT, stude_year DATE, result INT) 
 AS $$
@@ -50,7 +50,7 @@ AS $$
 LANGUAGE SQL;
 
 -- GET STUDENT PAST MODULES
-DROP FUNCTION get_student_past_modules(TEXT);
+-- DROP FUNCTION get_student_past_modules(TEXT);
 CREATE OR REPLACE FUNCTION get_student_past_modules(TEXT) 
 RETURNS TABLE(code TEXT, name TEXT, stude_year DATE, result INT) 
 AS $$
@@ -64,7 +64,7 @@ AS $$
 LANGUAGE SQL;
 
 -- GET STRUDENT CWK RESULTS
-DROP FUNCTION get_student_cwk_results(TEXT);
+-- DROP FUNCTION get_student_cwk_results(TEXT);
 CREATE OR REPLACE FUNCTION get_student_cwk_results(TEXT) 
 RETURNS TABLE(module_code TEXT, cwk_name TEXT, percentage INT, marks INT, result INT) 
   AS $$
@@ -78,7 +78,7 @@ RETURNS TABLE(module_code TEXT, cwk_name TEXT, percentage INT, marks INT, result
 LANGUAGE SQL;
 
 -- GET STUDENT CWK TIMETABLE
-DROP FUNCTION get_student_cwk_timetable(TEXT); 
+-- DROP FUNCTION get_student_cwk_timetable(TEXT); 
 CREATE OR REPLACE FUNCTION get_student_cwk_timetable(TEXT) 
 RETURNS TABLE(cwk_name TEXT, posted_on DATE, deadline DATE) 
   AS $$
@@ -92,7 +92,7 @@ RETURNS TABLE(cwk_name TEXT, posted_on DATE, deadline DATE)
 LANGUAGE SQL;
 
 -- GET STAFF MODULES
-DROP FUNCTION get_staff_modules(TEXT);
+-- DROP FUNCTION get_staff_modules(TEXT);
 CREATE OR REPLACE FUNCTION get_staff_modules(TEXT) 
 RETURNS TABLE(code TEXT, name TEXT, staff_role TEXT) 
 AS $$
@@ -105,7 +105,7 @@ AS $$
 LANGUAGE SQL;
 
 -- GET STAFF TUTEES
-DROP FUNCTION get_staff_tutees(TEXT);
+-- DROP FUNCTION get_staff_tutees(TEXT);
 CREATE OR REPLACE FUNCTION get_staff_tutees(TEXT) 
 RETURNS TABLE(username TEXT, id INT, programme_code TEXT, year TEXT) 
 AS $$
@@ -117,7 +117,7 @@ AS $$
   WHERE tutor.staff_id = (SELECT id FROM login_info WHERE username = $1) $$
 LANGUAGE SQL;
 
-DROP FUNCTION make_name(TEXT, TEXT, TEXT);
+-- DROP FUNCTION make_name(TEXT, TEXT, TEXT);
 CREATE OR REPLACE FUNCTION make_name(TEXT, TEXT, TEXT) RETURNS TEXT AS $$
 SELECT ($1::TEXT || ' '::TEXT || $2::TEXT || ' '::TEXT || $3::TEXT) $$
 LANGUAGE SQL;
@@ -230,6 +230,12 @@ END;
 $$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION lorem() RETURNS TEXT AS $$
+-- CREATE OR REPLACE FUNCTION lorem() RETURNS TEXT AS $$
+-- LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION lorem() RETURNS TEXT AS $$ 
+BEGIN 
   RETURN 'Lorem ipsum dolor sit amet, tincidunt vel massa in eu fermentum, leo tortor nec, nec tellus ut dictum in et urna. Sollicitudin rhoncus mi eros mauris magna nisl, dis lorem tincidunt, maecenas nec vestibulum non at, posuere justo placerat velit sed. Et sapien a, mus feugiat nunc. In id vel, vitae ipsum vitae maecenas ante vel. Mi eu, non vulputate, urna facilisis volutpat, sed malesuada id adipiscing placerat posuere donec, iaculis natus rhoncus sed. Leo est ac proin nulla aliquam fermentum, amet donec ornare, a conubia semper, id montes tellus. Et sagittis risus, sollicitudin at sem risus, quis ultricies dictum et tempus, vestibulum augue velit vehicula nec, massa felis vel. Fames porta, ultrices urna etiam quis, in justo sit, proin ac nam, ipsum vitae. Sem augue wisi nec quam, nulla augue eros et egestas integer lectus.';
-LANGUAGE SQL;
+END;
+$$
+LANGUAGE plpgsql;

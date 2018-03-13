@@ -20,7 +20,7 @@ describe('testing the Staff', () => {
 
   it('It renders', () => {
     expect(wrapper.find('Grid').length).toEqual(1);
-    expect(wrapper.find('Row').length).toEqual(1);
+    expect(wrapper.find('Row').length).toEqual(2);
     expect(wrapper.find('CustomTable').length).toEqual(2);
 
     expect(fetch.mock.calls.length).toBe(3);

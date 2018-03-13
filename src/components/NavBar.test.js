@@ -14,7 +14,7 @@ window.sessionStorage = {
 describe('testing the NavBar', () => {
   it('It renders', () => {
     const wrapper = shallow(<NavBar />, { context: { mui } });
-    expect(wrapper.find('Route').length).toEqual(6);
+    expect(wrapper.find('Route').length).toEqual(7);
     expect(wrapper.find('AppBar').length).toEqual(1);
   });
 });

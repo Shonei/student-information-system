@@ -44,7 +44,7 @@ describe('Creates new module', () => {
 
   afterEach(() => {
     return client.query('DELETE FROM module WHERE code = $1', [2552])
-    .then(console.log)
+    .then("Remove create module OK")
     .catch(console.log);
   });
 
@@ -70,7 +70,7 @@ describe('Creates new module', () => {
       credit: 20
     };
 
-    return fetch('http://localhost:54656/create/module', {
+    return fetch('http://localhost:54656/add/module', {
       credentials: 'same-origin',
       method: "POST",
       body: JSON.stringify(obj),
