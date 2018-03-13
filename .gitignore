@@ -22,7 +22,8 @@
 /coverage
 
 # production
-
+/build
+/Godep
 
 # misc
 .DS_Store
