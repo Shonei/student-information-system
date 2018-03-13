@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Col } from 'react-flexbox-grid';
-import { RaisedButton, TextField } from 'material-ui';
+import { TextField } from 'material-ui';
 import PropTypes from 'prop-types';
 
 class StudentRow extends Component {
@@ -66,7 +66,6 @@ class StudentRow extends Component {
   }
 
   render() {
-    const date = new Date(this.state.handed_in).toDateString();
     return (
       <Row>
         <Col xs>

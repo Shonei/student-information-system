@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { wrapFetch } from './../helpers';
-import { Avatar, FlatButton, RaisedButton } from 'material-ui';
+import { Avatar, RaisedButton } from 'material-ui';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import CustomTable from './../CustomTable';
 

@@ -34,9 +34,12 @@ class Module extends Component {
       method: 'GET',
       credentials: 'same-origin',
     }).then(e => e.json())
-      .then(module => this.setState(() => {
-        module.exam = module.exam[0];
-        return module;
+      .then(m => this.setState(() => {
+        // the module might not have an exam assotiated with it
+        if(m.exam) {
+          m.exam = m.exam[0];
+        }
+        return m;
       }))
       .catch(console.error);
   }

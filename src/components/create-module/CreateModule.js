@@ -21,12 +21,12 @@ class CreateModule extends Component {
     };
 
     this.cwk = {
-      id: parseInt(Math.random() * 1000),
+      id: 0,
       name: '',
       posted_on: '',
       deadline: '',
-      percentage: 10,
-      marks: 20,
+      percentage: 0,
+      marks: 0,
       description: ''
     };
 
@@ -37,13 +37,14 @@ class CreateModule extends Component {
       syllabus: '',
       semester: 1,
       year_of_study: 1,
-      credit: 10,
+      credit: 0,
       exam: {
         code: '',
-        percentage: 80,
+        percentage: 0,
         type: '',
         description: ''
       },
+      // make copy of the object so we pass a new reference
       cwks: [Object.assign({}, this.cwk)]
     };
 
@@ -60,13 +61,20 @@ class CreateModule extends Component {
 
   handleCreateModule() {
     console.log(this.state);
-    // fetch('/add/module', {
-    //   credentials: 'same-origin',
-    //   method: "POST",
-    //   body: JSON.stringify(this.state),
-    // })
-    // .then(console.log)
-    // .catch(console.log)
+    fetch('/add/module', {
+      credentials: 'same-origin',
+      method: "POST",
+      body: JSON.stringify(this.state),
+    })
+    .then(res => {
+      if(res.ok) {
+        window.sessionStorage.setItem('module', this.state.code);
+        window.location.href = '/module';
+      } else {
+        Promise.reject('creation failed');
+      }
+    })
+    .catch(console.log)
   }
 
   createCwkList(number) {
@@ -93,7 +101,7 @@ class CreateModule extends Component {
   onCwkIdChange(i, v) {
     this.setState(p => {
       console.log(i);
-      p.cwks[i].id = parseInt(v);
+      p.cwks[i].id = parseInt(v, 10);
       return p;
     });
   }
@@ -121,7 +129,7 @@ class CreateModule extends Component {
 
   onCwkPercentageChange(i, v) {
     this.setState(p => {
-      p.cwks[i].percentage = parseInt(v);
+      p.cwks[i].percentage = parseInt(v, 10);
       return p;
     });
   }
@@ -135,7 +143,7 @@ class CreateModule extends Component {
 
   onCwkMarksChange(i, v) {
     this.setState(p => {
-      p.cwks[i].marks = parseInt(v);
+      p.cwks[i].marks = parseInt(v, 10);
       return p;
     });
   }
