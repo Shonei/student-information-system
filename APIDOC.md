@@ -178,14 +178,14 @@ The endpoint for the search option of the API. The query takes a string that is 
   "programmes":[
     {
       "name": "SQL matrix!", 
-      code:10684
+      "code":10684
     }
  	],
   
   "staff":[
  	  {
-      "name": "Otha Clinton Dooley" 
-      "username": "shyl4" 
+      "name": "Otha Clinton Dooley", 
+      "username": "shyl4",
       "id": 62540
     }
   ],
