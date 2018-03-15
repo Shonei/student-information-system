@@ -91,7 +91,7 @@ class StudentList extends PureComponent {
         handed_in: this.edited[key].handed_in
       };
       console.log(data);
-      // this.doPost(data);
+      this.doPost(data);
     });
 
     this.setState({ editing: false });
