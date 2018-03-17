@@ -29,7 +29,7 @@ func (e *ExamPercent) Execute(db utils.Execute) error {
 	}
 
 	return db.Execute(
-		"SELECT * FROM change_exam_percentage($1, $2);",
+		"UPDATE exam SET percentage = $1 WHERE code = $2;",
 		e.Percentage,
 		e.Code)
 }
@@ -57,7 +57,7 @@ func (c *CwkMarks) Execute(db utils.Execute) error {
 	}
 
 	return db.Execute(
-		"SELECT * FROM change_cwk_marks_and_percent($1, $2, $3);",
+		"UPDATE coursework SET percentage = $1, marks = $2 WHERE id = $3;",
 		c.Percentage,
 		c.Marks,
 		c.Id)
@@ -83,9 +83,57 @@ func (c *CwkResult) Execute(db utils.Execute) error {
 	}
 
 	return db.Execute(
-		"SELECT * FROM update_student_cwk($1, $2, $3, $4);",
+		"UPDATE coursework_result SET result = $1, handed_in = $2 WHERE coursework_id = $3 AND student_id = $4;",
 		c.Result,
 		c.HandedIn,
 		c.CwkID,
 		c.StudentID)
+}
+
+// AddPrerequsite is the data needed to add a prerequisite to a module
+type AddPrerequsite struct {
+	Code         string `json:"code"`
+	Prerequisite string `json:"prerequisites"`
+}
+
+// Decode reads the data into the struct
+func (p *AddPrerequsite) Decode(d *json.Decoder) error {
+	return d.Decode(p)
+}
+
+// Execute updates the database and performs necessary security checks
+func (p *AddPrerequsite) Execute(db utils.Execute) error {
+	if !punctuationParser.MatchString(p.Code) ||
+		!punctuationParser.MatchString(p.Prerequisite) {
+		return utils.ErrSuspiciousInput
+	}
+
+	return db.Execute(
+		"INSERT INTO prerequisites(module_code, prerequisite_code) VALUES($1, $2);",
+		p.Code,
+		p.Prerequisite)
+}
+
+// RemovePrerequisite is the data needed to remove a exisitng prerequisite of a module
+type RemovePrerequisite struct {
+	Code        string `json:"code"`
+	ToBeRemoved string `json:"to_be_removed"`
+}
+
+// Decode reads the data into the struct
+func (p *RemovePrerequisite) Decode(d *json.Decoder) error {
+	return d.Decode(p)
+}
+
+// Execute updates the database and performs necessary security checks
+func (p *RemovePrerequisite) Execute(db utils.Execute) error {
+	if !punctuationParser.MatchString(p.Code) ||
+		!punctuationParser.MatchString(p.ToBeRemoved) {
+		return utils.ErrSuspiciousInput
+	}
+
+	return db.Execute(
+		"DELETE FROM prerequisites WHERE module_code = $1 AND prerequisite_code = $2",
+		p.Code,
+		p.ToBeRemoved)
 }

@@ -19,8 +19,9 @@ func Update(d utils.DecoderExecuter, f func(utils.DecoderExecuter) error) http.H
 			return
 		}
 
+		// We needs a closure that exposes the database to the Executor
 		if err := f(d); err != nil {
-			log.Println("Execute er - ", err)
+			log.Println("Execute err - ", err)
 			http.Error(w, "We were unable to update the databse at this moment.", http.StatusInternalServerError)
 			return
 		}

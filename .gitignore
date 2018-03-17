@@ -40,3 +40,5 @@ yarn-error.log*
 test.js
 test.java
 static/test.go
+
+*.c

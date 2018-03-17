@@ -272,6 +272,10 @@ func formatModule(m map[string]string) (utils.Module, error) {
 		return utils.Module{}, err
 	}
 
+	if err := json.Unmarshal([]byte(m["prerequisites"]), &module.Prerequisites); err != nil {
+		return utils.Module{}, err
+	}
+
 	// copy the non json strings as normal data
 	module.Code = m["code"]
 	module.Description = m["description"]

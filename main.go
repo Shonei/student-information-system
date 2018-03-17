@@ -103,8 +103,7 @@ func main() {
 	r.Handle("/get/token/{user}", hand.GetToken(genAuthtoken)).Methods("GET")
 
 	// Student part of the API
-	r.Handle(
-		"/get/student/profile/{user}", mw.BasicAuth(hand.GetProfile(getStudentPro))).Methods("GET")
+	r.Handle("/get/student/profile/{user}", mw.BasicAuth(hand.GetProfile(getStudentPro))).Methods("GET")
 	r.Handle("/get/student/cwk/timetable/{user}", mw.BasicAuth(hand.BasicGet(getCwkTimetable))).Methods("GET")
 	r.Handle("/get/student/cwk/results/{user}", mw.BasicAuth(hand.BasicGet(getCwkResults))).Methods("GET")
 	r.Handle("/get/student/modules/now/{user}", mw.BasicAuth(hand.BasicGet(getNowModules))).Methods("GET")
@@ -123,6 +122,8 @@ func main() {
 	r.Handle("/update/cwk/results", hand.Update(&dbc.CwkResult{}, update)).Methods("POST")
 	r.Handle("/update/exam/percentage", hand.Update(&dbc.ExamPercent{}, update)).Methods("POST")
 	r.Handle("/update/cwk/percentage", hand.Update(&dbc.CwkMarks{}, update)).Methods("POST")
+	r.Handle("/add/prerequisite", hand.Update(&dbc.AddPrerequsite{}, update)).Methods("POST")
+	r.Handle("/remove/prerequisite", hand.Update(&dbc.RemovePrerequisite{}, update)).Methods("POST")
 	r.Handle("/add/module", hand.Create(&dbc.NewModule{}, create)).Methods("POST")
 
 	// Routes in place for testing purposes
