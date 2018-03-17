@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { Paper, Divider, RaisedButton, TextField } from 'material-ui';
 import CwkList from './CwkList';
+import Prerequisites from './Prerequisites';
 import { orange500 } from 'material-ui/styles/colors';
 
 class Module extends Component {
@@ -16,6 +17,7 @@ class Module extends Component {
     this.state = {
       exam: {},
       cwks: [],
+      prerequisites: [],
       editing: false,
     };
 
@@ -36,7 +38,7 @@ class Module extends Component {
     }).then(e => e.json())
       .then(m => this.setState(() => {
         // the module might not have an exam assotiated with it
-        if(m.exam) {
+        if (m.exam) {
           m.exam = m.exam[0];
         }
         return m;
@@ -126,7 +128,7 @@ class Module extends Component {
           <p>{value.code}</p>
         </ Col>
         <Col xs >
-        {/* depending on state.editing we return a text field or a p tag to show the value */}
+          {/* depending on state.editing we return a text field or a p tag to show the value */}
           {this.state.editing ? <TextField
             id={parseInt(Math.random() * 10, 10) + ''}
             style={{ maxWidth: '100px' }}
@@ -185,6 +187,10 @@ class Module extends Component {
           </Col>
           <Col xs={1} />
         </Row>
+        <br />
+        <Prerequisites
+          moduleCode={this.state.code}
+          prerequisites={this.state.prerequisites} />
         <br />
         <Row start="xs">
           <Col xs={1} />

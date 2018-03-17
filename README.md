@@ -45,3 +45,4 @@ All scripts that are needed to create the database are lacated in DB-scrippts.
 
 ## TODO
 - STOP JUST CONSOL LOGGING ERRORS
+- Module prerequisite not displayed after successful add

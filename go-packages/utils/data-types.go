@@ -43,15 +43,16 @@ type DecoderCreator interface {
 
 // Module respresents all the information about a given module.
 type Module struct {
-	Code        string `json:"code,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
-	Syllabus    string `json:"syllabus,omitempty"`
-	Semester    string `json:"semester,omitempty"`
-	Year        string `json:"year,omitempty"`
-	Credits     string `json:"credits,omitempty"`
-	Cwks        []Cwk  `json:"cwks,omitempty"`
-	Exam        []Exam `json:"exam,omitempty"`
+	Code          string          `json:"code,omitempty"`
+	Name          string          `json:"name,omitempty"`
+	Description   string          `json:"description,omitempty"`
+	Syllabus      string          `json:"syllabus,omitempty"`
+	Semester      string          `json:"semester,omitempty"`
+	Year          string          `json:"year,omitempty"`
+	Credits       string          `json:"credits,omitempty"`
+	Cwks          []Cwk           `json:"cwks,omitempty"`
+	Exam          []Exam          `json:"exam,omitempty"`
+	Prerequisites []Prerequisites `json:"prerequisites"`
 }
 
 // Exam is the needed information to connect it to a module
@@ -67,4 +68,9 @@ type Cwk struct {
 	Name       string `json:"cwk_name,omitempty"`
 	Marks      int    `json:"marks,omitempty"`
 	Percentage int    `json:"percentage,omitempty"`
+}
+
+type Prerequisites struct {
+	Name string `josn:"name"`
+	Code string `json:"code"`
 }

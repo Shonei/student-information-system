@@ -122,6 +122,8 @@ func main() {
 	r.Handle("/update/cwk/results", hand.Update(&dbc.CwkResult{}, update)).Methods("POST")
 	r.Handle("/update/exam/percentage", hand.Update(&dbc.ExamPercent{}, update)).Methods("POST")
 	r.Handle("/update/cwk/percentage", hand.Update(&dbc.CwkMarks{}, update)).Methods("POST")
+	r.Handle("/add/prerequisite", hand.Update(&dbc.AddPrerequsite{}, update)).Methods("POST")
+	r.Handle("/remove/prerequisite", hand.Update(&dbc.RemovePrerequisite{}, update)).Methods("POST")
 	r.Handle("/add/module", hand.Create(&dbc.NewModule{}, create)).Methods("POST")
 
 	// Routes in place for testing purposes

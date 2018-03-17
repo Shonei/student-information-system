@@ -166,11 +166,12 @@ LANGUAGE SQL;
 
 -- get module details
 CREATE OR REPLACE FUNCTION get_module_details(TEXT) 
-RETURNS TABLE(code TEXT, name TEXT, description TEXT, syllabus TEXT, semester INT, year INT, credits INT, cwks JSON, exam JSON)
+RETURNS TABLE(code TEXT, name TEXT, description TEXT, syllabus TEXT, semester INT, year INT, credits INT, cwks JSON, exam JSON, prerequisites JSON)
 AS $$
   SELECT module.code , module.name , module.description , module.syllabus , module.semester , module.year_of_study AS year , module.credits,
   to_json(ARRAY(SELECT row_to_json(r) FROM (SELECT id, cwk_name, marks, percentage FROM coursework WHERE module_code = $1) r)) as cwks,
-  to_json(ARRAY(SELECT row_to_json(r) FROM (SELECT code, percentage, type FROM exam WHERE module_code = $1) r)) as exam
+  to_json(ARRAY(SELECT row_to_json(r) FROM (SELECT code, percentage, type FROM exam WHERE module_code = $1) r)) as exam,
+  to_json(ARRAY(SELECT row_to_json(r) FROM (SELECT code, name FROM module WHERE code in (SELECT prerequisite_code FROM prerequisites WHERE module_code = $1)) r)) as prerequisites
   FROM module
   WHERE module.code = $1 $$
 LANGUAGE SQL;
@@ -198,37 +199,37 @@ AS $$
 LANGUAGE SQL;
 
 -- update students cwk result
-CREATE OR REPLACE FUNCTION update_student_cwk(INT, DATE, INT, INT)
-RETURNS BOOLEAN AS $$
-BEGIN 
-  UPDATE coursework_result
-  SET result = $1, handed_in = $2
-  WHERE coursework_id = $3
-  AND student_id = $4;
-  RETURN TRUE;
-END;
-$$
-LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION update_student_cwk(INT, DATE, INT, INT)
+-- RETURNS BOOLEAN AS $$
+-- BEGIN 
+--   UPDATE coursework_result
+--   SET result = $1, handed_in = $2
+--   WHERE coursework_id = $3
+--   AND student_id = $4;
+--   RETURN TRUE;
+-- END;
+-- $$
+-- LANGUAGE plpgsql;
 
 -- Creates the update exam % query
-CREATE OR REPLACE FUNCTION change_exam_percentage(INT, TEXT) 
-RETURNS BOOLEAN AS $$
-BEGIN 
-  UPDATE exam SET percentage = $1 WHERE code = $2;
-  RETURN TRUE;
-END;
-$$
-LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION change_exam_percentage(INT, TEXT) 
+-- RETURNS BOOLEAN AS $$
+-- BEGIN 
+--   UPDATE exam SET percentage = $1 WHERE code = $2;
+--   RETURN TRUE;
+-- END;
+-- $$
+-- LANGUAGE plpgsql;
 
 -- creates function to update cwk marks and %
-CREATE OR REPLACE FUNCTION change_cwk_marks_and_percent(INT, INT, INT) 
-RETURNS BOOLEAN AS $$
-BEGIN 
-  UPDATE coursework SET percentage = $1, marks = $2 WHERE id = $3;
-  RETURN TRUE;
-END;
-$$
-LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION change_cwk_marks_and_percent(INT, INT, INT) 
+-- RETURNS BOOLEAN AS $$
+-- BEGIN 
+--   UPDATE coursework SET percentage = $1, marks = $2 WHERE id = $3;
+--   RETURN TRUE;
+-- END;
+-- $$
+-- LANGUAGE plpgsql;
 
 -- CREATE OR REPLACE FUNCTION lorem() RETURNS TEXT AS $$
 -- LANGUAGE SQL;
