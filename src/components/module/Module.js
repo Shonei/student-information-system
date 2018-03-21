@@ -3,6 +3,8 @@ import { Grid, Row, Col } from 'react-flexbox-grid';
 import { Paper, Divider, RaisedButton, TextField } from 'material-ui';
 import CwkList from './CwkList';
 import Prerequisites from './Prerequisites';
+import ModuleDetails from './ModuleDetails';
+import EditDetails from './EditDetails';
 import { orange500 } from 'material-ui/styles/colors';
 
 class Module extends Component {
@@ -19,6 +21,7 @@ class Module extends Component {
       cwks: [],
       prerequisites: [],
       editing: false,
+      editModuleDetails: false
     };
 
     this.updateCwks = {};
@@ -27,6 +30,7 @@ class Module extends Component {
     this.getExam = this.getExam.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.postData = this.postData.bind(this);
+    this.handleModuleUpdate = this.handleModuleUpdate.bind(this);
   }
 
   componentDidMount() {
@@ -37,6 +41,8 @@ class Module extends Component {
       credentials: 'same-origin',
     }).then(e => e.json())
       .then(m => this.setState(() => {
+        console.log(m)
+
         // the module might not have an exam assotiated with it
         if (m.exam) {
           m.exam = m.exam[0];
@@ -158,56 +164,46 @@ class Module extends Component {
     );
   }
 
+  handleModuleUpdate(m) {
+    this.setState(prev => {
+      prev.description = m.description;
+      prev.syllabus = m.syllabus;
+      prev.credits = m.credit;
+      prev.semester = m.semester;
+      prev.year = m.year_of_study;
+      return prev;
+    });
+    this.setState({ editModuleDetails: !this.state.editModuleDetails });
+  }
+
   render() {
+    const details = {
+      code: this.state.code,
+      description: this.state.description,
+      syllabus: this.state.syllabus,
+      semester: this.state.semester,
+      year_of_study: this.state.year,
+      credit: this.state.credits,
+      name: this.state.name
+    };
+
     return (
       <Grid fluid>
-        <Row center="xs">
-          <Col xs={12}>
-            <h2>{this.state.code} {this.state.name}</h2>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={1} />
-          <Col xs={10}>
-            <h3>Description</h3>
-            <Paper style={{ padding: 10, textAlign: 'justify' }}>
-              <p>{this.state.description}</p>
-            </Paper>
-          </Col>
-          <Col xs={1} />
-        </Row>
-        <br />
-        <Row>
-          <Col xs={1} />
-          <Col xs={10}>
-            <h3>Syllabus</h3>
-            <Paper style={{ padding: 10, textAlign: 'justify' }}>
-              <p>{this.state.syllabus}</p>
-            </Paper>
-          </Col>
-          <Col xs={1} />
-        </Row>
+        {
+          this.state.editModuleDetails
+            ? <EditDetails
+              cb={this.handleModuleUpdate}
+              editing={this.state.editModuleDetails}
+              details={details} />
+            : <ModuleDetails
+              cb={() => this.setState({ editModuleDetails: !this.state.editModuleDetails })}
+              editing={this.state.editModuleDetails}
+              details={details} />
+        }
         <br />
         <Prerequisites
           moduleCode={this.state.code}
           prerequisites={this.state.prerequisites} />
-        <br />
-        <Row start="xs">
-          <Col xs={1} />
-          <Col xs>
-            <h3>Semester</h3>
-            <p>{this.state.semester}</p>
-          </ Col>
-          <Col xs >
-            <h3>Year</h3>
-            <p>{this.state.year}</p>
-          </Col>
-          <Col xs>
-            <h3>Credits</h3>
-            <p>{this.state.credits}</p>
-          </ Col>
-          <Col xs={1} />
-        </Row>
         <br />
         <Row start="xs" around="xs">
           <Col xs={1} />
@@ -256,7 +252,7 @@ class Module extends Component {
           cwk={this.state.cwks}
           editing={this.state.editing}
           onChange={this.updateCwkList} />
-      </Grid>
+      </Grid >
     );
   }
 }

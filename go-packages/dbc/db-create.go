@@ -11,7 +11,7 @@ import (
 )
 
 // Validas input such as descriptions that allow for punctuation
-var punctuationParser = regexp.MustCompile(`^[a-zA-Z0-9?.,!@'"(){\}\-\_+=%&* ]+$`)
+var punctuationParser = regexp.MustCompile(`^[[:alnum:][:space:],.!?%(){}';:]+$`)
 
 // NewModule is the data that is needed to create a new module.
 // It includes the information about the module.

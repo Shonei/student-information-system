@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -20,7 +21,7 @@ import (
 func main() {
 	connStr := os.Getenv("DATABASE_URL")
 	port := os.Getenv("PORT")
-
+	fmt.Println(connStr)
 	temp, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
@@ -119,12 +120,19 @@ func main() {
 	r.Handle("/get/cwk/{code}", hand.GetForCode(getCourseworkDetails)).Methods("GET")
 	r.Handle("/get/cwk/students/{code}", hand.GetForCode(getStudentsOnCwk)).Methods("GET")
 	r.Handle("/search/{query}", hand.GetSearch(search)).Methods("GET")
+	r.Handle("/add/prerequisite", hand.Update(&dbc.AddPrerequsite{}, update)).Methods("POST")
+	r.Handle("/add/module", hand.Create(&dbc.NewModule{}, create)).Methods("POST")
+	r.Handle("/remove/prerequisite", hand.Update(&dbc.RemovePrerequisite{}, update)).Methods("POST")
+	r.Handle("/remove/module/staff", hand.Update(&dbc.RemoveTeachingStaff{}, update)).Methods("POST")
+	r.Handle("/remove/module/student", hand.Update(&dbc.RemoveStudentModule{}, update)).Methods("POST")
 	r.Handle("/update/cwk/results", hand.Update(&dbc.CwkResult{}, update)).Methods("POST")
 	r.Handle("/update/exam/percentage", hand.Update(&dbc.ExamPercent{}, update)).Methods("POST")
 	r.Handle("/update/cwk/percentage", hand.Update(&dbc.CwkMarks{}, update)).Methods("POST")
-	r.Handle("/add/prerequisite", hand.Update(&dbc.AddPrerequsite{}, update)).Methods("POST")
-	r.Handle("/remove/prerequisite", hand.Update(&dbc.RemovePrerequisite{}, update)).Methods("POST")
-	r.Handle("/add/module", hand.Create(&dbc.NewModule{}, create)).Methods("POST")
+	r.Handle("/update/module", hand.Update(&dbc.EditModule{}, update)).Methods("POST")
+	r.Handle("/update/coursework/timetable", hand.Update(&dbc.UpdateCwkTimetable{}, update)).Methods("POST")
+	r.Handle("/add/module/student", hand.Update(&dbc.AddStudentModule{}, update)).Methods("POST")
+	r.Handle("/add/staff/tutee", hand.Update(&dbc.AddTutee{}, update)).Methods("POST")
+	r.Handle("/add/module/staff", hand.Update(&dbc.AddTeachingStaff{}, update)).Methods("POST")
 
 	// Routes in place for testing purposes
 	r.Handle("/test/auth/{user}", mw.BasicAuth(test()))

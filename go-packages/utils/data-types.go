@@ -11,7 +11,7 @@ type Decoder interface {
 	Decode(*json.Decoder) error
 }
 
-// Executer is the interface for updating the databse.
+// Executer is the interface for updating the database.
 // Data types implamenting it need to define a sql query and give it all the
 // data it needs as well as make checks to the data before hand.
 type Executer interface {
@@ -70,7 +70,8 @@ type Cwk struct {
 	Percentage int    `json:"percentage,omitempty"`
 }
 
+// Prerequisites is the information needed to retrieve alll the informationa bout a module
 type Prerequisites struct {
-	Name string `josn:"name"`
+	Name string `json:"name"`
 	Code string `json:"code"`
 }
