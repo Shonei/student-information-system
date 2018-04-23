@@ -26,6 +26,7 @@ class CustomTable extends PureComponent {
   }
 
   // given an order and values it creates an table body
+  // we use reacs abilit to render arrays and will be using an array to store the teble rows
   getBody(order, values) {
     let arr = [];
 
@@ -35,7 +36,7 @@ class CustomTable extends PureComponent {
     }
 
     // makes sure they are arrays 
-    if (values.lenght > 1 || order.lenght > 1) {
+    if (values.lenght > 0 || order.lenght > 0) {
       return;
     }
 
@@ -43,6 +44,8 @@ class CustomTable extends PureComponent {
     values.forEach((value, i) => {
       // create the tables body with a good enough unique key and check for empty values
       let temp = order.map(e => <TableRowColumn key={Math.random()}>{value[e] ? value[e] : ''}</TableRowColumn>);
+
+      // add the row to the final table body
       arr.push(<TableRow hoverable={true} key={i}>{temp}</TableRow>);
     });
 
@@ -68,6 +71,7 @@ CustomTable.propTypes = {
   // headers are needed so people can still know what info is stored in the table
   headers: PropTypes.arrayOf(PropTypes.string).isRequired,
   order: PropTypes.arrayOf(PropTypes.string),
+  values: PropTypes.array
 };
 
 export default CustomTable;

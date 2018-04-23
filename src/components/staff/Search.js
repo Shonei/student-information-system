@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { List, ListItem, Avatar, Tab, Tabs } from 'material-ui';
 import { darkBlack } from 'material-ui/styles/colors';
+
 class Staff extends PureComponent {
   constructor(props) {
     super(props);
@@ -18,7 +19,6 @@ class Staff extends PureComponent {
 
     this.getList = this.getList.bind(this);
     this.getPerson = this.getPerson.bind(this);
-    this.handleChange = this.handleChange.bind(this);
     this.getModule = this.getModule.bind(this);
     this.getProgramme = this.getProgramme.bind(this);
     this.handlePersonClick = this.handlePersonClick.bind(this);
@@ -29,17 +29,17 @@ class Staff extends PureComponent {
     let results = sessionStorage.getItem('search');
     results = JSON.parse(results);
 
+    // make sure we don't assign an undefined value because it will mess Reacts rendering
     this.tables['students'] = results.students ? results.students : [];
     this.tables['staff'] = results.staff ? results.staff : [];
     this.tables['modules'] = results.modules ? results.modules : [];
     this.tables['programmes'] = results.programmes ? results.programmes : [];
+
+    // not very elegant but we need to rerender the component because we didn't change the state
     this.forceUpdate();
   }
 
-  handleChange(e) {
-    this.setState({ value: e });
-  }
-
+  // generates a list from an array by applying the getListItem function
   getList(k, arr, getListItem) {
     return (
       <List
@@ -56,6 +56,8 @@ class Staff extends PureComponent {
     } else if (this.state.value === 'staff') {
       itemName = 'staff';
     } else {
+      // something has went wrong 
+      // better not do anything then load a page that users can't see
       return;
     }
     sessionStorage.setItem(itemName, user);
@@ -67,6 +69,9 @@ class Staff extends PureComponent {
     window.location.href = '/module';
   }
 
+  // creates alist item for a person
+  // It will display their name, username and id
+  // On the left there will be an avatar with their first initial
   getPerson(person) {
     return (
       <ListItem
@@ -85,6 +90,8 @@ class Staff extends PureComponent {
     );
   }
 
+  // generates a list item for a programme
+  // it only includes the code and UCAS code
   getProgramme(p) {
     return (
       <ListItem
@@ -99,6 +106,8 @@ class Staff extends PureComponent {
     );
   }
 
+  // generates a list item for a module
+  // it includes the name and code
   getModule(m) {
     return (
       <ListItem
@@ -120,7 +129,7 @@ class Staff extends PureComponent {
     return (
       <Tabs
         value={this.state.value}
-        onChange={this.handleChange}>
+        onChange={e => this.setState({ value: e })}>
         <Tab label="Students" value="students">
           {this.getList("students", this.tables[this.state.value], this.getPerson)}
         </Tab>

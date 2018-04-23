@@ -41,7 +41,7 @@ class Module extends Component {
       credentials: 'same-origin',
     }).then(e => e.json())
       .then(m => this.setState(() => {
-        console.log(m)
+        console.log(m);
 
         // the module might not have an exam assotiated with it
         if (m.exam) {

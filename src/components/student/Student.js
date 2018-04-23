@@ -20,6 +20,7 @@ class Student extends Component {
   }
 
   componentDidMount() {
+    // get the student profile
     fetch('student', '/get/student/profile/')
       .then(j => this.setState(() => j))
       .catch(console.log)

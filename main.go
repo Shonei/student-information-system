@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -21,7 +20,7 @@ import (
 func main() {
 	connStr := os.Getenv("DATABASE_URL")
 	port := os.Getenv("PORT")
-	fmt.Println(connStr)
+
 	temp, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
@@ -155,6 +154,6 @@ func main() {
 
 func test() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok"))
+		w.Write([]byte("ok ok"))
 	})
 }

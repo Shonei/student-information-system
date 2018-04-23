@@ -26,8 +26,8 @@ class Tables extends Component {
     this.setState({ value: e });
   }
 
-  // 3 of hte tables have an year value that needs to be made human readable.
-  // this is used by hte map function to parse said year value.
+  // 3 of the tables have an year value that needs to be made human readable.
+  // this is used by the map function to parse said year value.
   parseYear(obj) {
     obj.study_year = new Date(obj.study_year).getFullYear();
     return obj;
@@ -48,7 +48,6 @@ class Tables extends Component {
     fetch('student', '/get/student/modules/past/')
       .then(e => {
         this.tables["past"] = e.map(this.parseYear);
-        console.log(this.tables);
       })
       .catch(err => err.text().then(console.log));
 

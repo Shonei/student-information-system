@@ -35,6 +35,8 @@ class Staff extends PureComponent {
       .then(m => {
         m = m.map(module => {
           const code = module.code;
+
+          // creates to button to allow navigation to the module page
           module.code = <RaisedButton
             style={{ cursor: "pointer" }}
             onClick={() => this.handleModuleClick(code)}
@@ -50,12 +52,10 @@ class Staff extends PureComponent {
     wrapFetch('staff', '/get/staff/tutees/')
       .then(val => {
         val = val.map(student => {
+          // move the uesrname to a new variable so we don't lose his username
           const user = student.username;
-          // student.username = <a
-          //   style={{ textDecoration: 'none' }}
-          //   onClick={() => this.handleStudentClick(user)}
-          //   href="#">{user}</a>;
 
+          // creates a button to allow navigation to students home pages
           student.username = <RaisedButton
             style={{ cursor: "pointer" }}
             onClick={() => this.handleStudentClick(user)}

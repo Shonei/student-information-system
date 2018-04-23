@@ -76,7 +76,7 @@ func (db *DB) Execute(s string, args ...interface{}) error {
 }
 
 // Reads the data from sqlRows into a []map[string]string
-// This will be the basic type returned by the sql abstraction layer
+// This will be the type returned by the sql abstraction layer
 func readRows(rows *sql.Rows) ([]map[string]string, error) {
 	cols, err := rows.Columns()
 	if err != nil {
@@ -93,7 +93,7 @@ func readRows(rows *sql.Rows) ([]map[string]string, error) {
 	}
 
 	for rows.Next() {
-		// read data into dest that hold the pointers
+		// read data into dest that holds the pointers
 		err := rows.Scan(dest...)
 		if err != nil {
 			return nil, err

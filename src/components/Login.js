@@ -24,12 +24,13 @@ class Login extends Component {
     if (!res.ok) {
       return Promise.reject(res);
     } else {
+      // returns a promise
       return res.json();
     }
   }
 
   // given the salt it hashes a users password and returns
-  // a request to generate the token.
+  // a request that fetches the authentication token from the server.
   hashPassword(data) {
     let hash = createHmac('sha512', data.salt);
     hash.update(this.password);
@@ -50,7 +51,7 @@ class Login extends Component {
       .then(this.hashPassword)
       .then(this.fetchHTTPErrorCheck)
       .then(data => {
-        // set the token in hte cookie with a 2 hours time to live
+        // set the token in the cookie with a 2 hours time to live
         var h = new Date();
         h.setTime(h.getTime() + (2 * 60 * 60 * 1000));
         document.cookie = 'token=' + data.token + ";" + "expires=" + h.toUTCString() + ";path=/";
@@ -74,15 +75,16 @@ class Login extends Component {
         document.location.href = loc;
       })
       .catch(err => {
+        let message = 'We encountered an error while trying to connect ot the server. Please reload and try again.';
+
         if (err.status == 500) {
-          this.setState({ error: 'We are currently expiriencing technical difficulties.' });
-          return;
+          let message = 'We are currently expiriencing technical difficulties.';
         } else if (err.status == 401) {
-          this.setState({error: 'Wrong username or password.'});
-          return;
+          let message = 'Wrong username or password.';
         }
 
-        this.setState({error: 'We encountered an error whily trying to connect ot the server. Please reload and try again.'});
+        // display error message to user
+        this.setState({ error: message });
       });
   }
 
