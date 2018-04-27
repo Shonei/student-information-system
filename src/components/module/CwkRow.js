@@ -40,7 +40,7 @@ class CwkRow extends PureComponent {
 
   handleMarksChange(event, value) {
     // check for negative marks
-    if(value < 0) {
+    if (value < 0) {
       return;
     }
     this.setState({ marks: value });
@@ -49,7 +49,7 @@ class CwkRow extends PureComponent {
 
   handlePercentChange(event, value) {
     // % goes from 0 to 100
-    if(value > 100 || value < 0) {
+    if (value > 100 || value < 0) {
       return;
     }
     this.setState({ percentage: value });
@@ -67,9 +67,9 @@ class CwkRow extends PureComponent {
         underlineStyle={this.borderStyle}
         underlineFocusStyle={this.borderStyle}
         type={'number'} />;
-    } else {
-      return <p>{value}</p>;
     }
+
+    return <p>{value}</p>;
   }
 
   render() {

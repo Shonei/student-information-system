@@ -9,6 +9,7 @@ import SearchBar from './staff/SearchBar';
 import Module from './module/Module';
 import Coursework from './coursework/Coursework';
 import CreateModule from './create-module/CreateModule';
+import StudentList from './module/students/StudentList';
 
 const styles = {
   cursor: 'pointer',
@@ -71,6 +72,7 @@ class NavBar extends Component {
             <Route exact path="/module" render={() => <Module></Module>} />
             <Route exact path="/coursework" render={() => <Coursework></Coursework>} />
             <Route exact path="/create/module" render={() => <CreateModule></CreateModule>} />
+            <Route exact path="/module/students" render={() => <StudentList></StudentList>} />
           </div>
         </Router>
       </div>

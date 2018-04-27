@@ -181,7 +181,7 @@ func (m *EditModule) Execute(db utils.Execute) error {
 // UpdateCwkTimetable is used to change the deadline and the posted on time for a coursework.
 type UpdateCwkTimetable struct {
 	Code     string `json:"code"`
-	PostedOn string `json:"psted_on"`
+	PostedOn string `json:"posted_on"`
 	Deadline string `json:"deadline"`
 }
 
@@ -197,7 +197,7 @@ func (c *UpdateCwkTimetable) Execute(db utils.Execute) error {
 	}
 
 	return db.Execute(
-		"UPDATE coursework SET posted_on = $1, deadline = $2 WHERE module_code = $3;",
+		"UPDATE coursework SET posted_on = $1, deadline = $2 WHERE id = $3;",
 		c.PostedOn,
 		c.Deadline,
 		c.Code)
@@ -259,8 +259,6 @@ func (t *AddTutee) Execute(db utils.Execute) error {
 type AddStudentModule struct {
 	ModuleCode string `json:"module_code"`
 	StudentId  int    `json:"student_id"`
-	// Year must be formated as a date for a postgres database
-	Year int `json:"year"`
 }
 
 // Decode takes a json decoder and reads in the data from it into the struct.
@@ -270,19 +268,14 @@ func (m *AddStudentModule) Decode(d *json.Decoder) error {
 
 // Execute performes checks on the data and adds a student to a module for the specifies year.
 func (m *AddStudentModule) Execute(db utils.Execute) error {
-	if m.Year < 0 {
-		return utils.ErrSuspiciousInput
-	}
-
 	if !punctuationParser.MatchString(m.ModuleCode) {
 		return utils.ErrSuspiciousInput
 	}
 
 	return db.Execute(
-		"INSERT INTO student_modules(module_code, student_id, study_year) VALUES($1, $2, $3);",
+		"INSERT INTO student_modules(module_code, student_id, study_year) VALUES($1, $2, NOW());",
 		m.ModuleCode,
-		m.StudentId,
-		m.Year)
+		m.StudentId)
 }
 
 // RemoveStudentModule is used to remove a student from a module.
@@ -303,7 +296,7 @@ func (m *RemoveStudentModule) Execute(db utils.Execute) error {
 	}
 
 	return db.Execute(
-		"DELETE FORM student_module WHERE student_id = $1 AND module_code = $2;",
+		"DELETE FROM student_modules WHERE student_id = $1 AND module_code = $2;",
 		m.StudentId,
 		m.ModuleCode)
 }

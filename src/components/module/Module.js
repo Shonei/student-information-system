@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-flexbox-grid';
-import { Paper, Divider, RaisedButton, TextField } from 'material-ui';
+import { Divider, RaisedButton, TextField } from 'material-ui';
 import CwkList from './CwkList';
 import Prerequisites from './Prerequisites';
 import ModuleDetails from './ModuleDetails';
@@ -60,12 +60,12 @@ class Module extends Component {
     }).then(res => {
       if (!res.ok) {
         return res.text();
-      } else {
-        // server doesn't send any data on a success
-        // We switch from editing mode and give them the option to edit the results again
-        data.type = type;
-        return Promise.resolve(data);
       }
+
+      // server doesn't send any data on a success
+      // We switch from editing mode and give them the option to edit the results again
+      data.type = type;
+      return Promise.resolve(data);
     });
   }
 
@@ -154,6 +154,8 @@ class Module extends Component {
             underlineStyle={this.borderStyle}
             underlineFocusStyle={this.borderStyle}
             type={'number'} /> :
+
+            // if editing is false just display the percentage
             <p>{value.percentage}</p>
           }
         </Col>
@@ -252,6 +254,20 @@ class Module extends Component {
           cwk={this.state.cwks}
           editing={this.state.editing}
           onChange={this.updateCwkList} />
+        <br />
+        <Row start="xs" around="xs">
+          <Col xs={1} />
+          <Col xs>
+          <Divider />
+          <br/>
+            <RaisedButton
+              style={{ cursor: "pointer" }}
+              onClick={() => window.location.href = 'module/students'}
+              primary={true}
+              label="View enrolled students" />
+          </ Col>
+          <Col xs={1} />
+        </Row>
       </Grid >
     );
   }

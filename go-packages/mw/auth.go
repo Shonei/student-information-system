@@ -66,21 +66,12 @@ func BasicAuth(next http.Handler) http.Handler {
 // all members of staff not only the ones that can modify a resource.
 func StaffOnly(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token, err := r.Cookie("token")
+		level, err := getAccessLevel(w, r)
 		if err != nil {
-			log.Println(err)
-			http.Error(w, "Cookie missing.", http.StatusBadRequest)
 			return
 		}
 
-		claims, err := validateJWT(token.Value)
-		if err != nil {
-			log.Println(err)
-			writeError(w, err)
-			return
-		}
-
-		switch claims.AccessLevel {
+		switch level {
 		case 2, 3:
 			next.ServeHTTP(w, r)
 		default:
@@ -133,4 +124,44 @@ func writeError(w http.ResponseWriter, err error) {
 		http.Error(w, "We were unable to validate your token.", http.StatusUnauthorized)
 	}
 	return
+}
+
+// AdminOnly gives access only to admins.
+// This gives full acces to users with level 3 access right.
+// endpoints authenticated by it should be used very cousesly and carefully.
+func AdminOnly(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		level, err := getAccessLevel(w, r)
+		if err != nil {
+			return
+		}
+
+		switch level {
+		case 3:
+			next.ServeHTTP(w, r)
+		default:
+			http.Error(w, "You don't have the authority to access that resource.", http.StatusUnauthorized)
+		}
+		return
+	})
+}
+
+// getAccessLevel gets and validates the claims passed to the request.
+// on success in returns the access level for the user.
+func getAccessLevel(w http.ResponseWriter, r *http.Request) (int, error) {
+	token, err := r.Cookie("token")
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Cookie missing.", http.StatusBadRequest)
+		return 0, err
+	}
+
+	claims, err := validateJWT(token.Value)
+	if err != nil {
+		log.Println(err)
+		writeError(w, err)
+		return 0, err
+	}
+
+	return claims.AccessLevel, nil
 }

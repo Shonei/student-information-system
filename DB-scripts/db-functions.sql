@@ -38,7 +38,7 @@ LANGUAGE SQL;
 -- GET STUDENT CURRENT MODULES
 -- DROP FUNCTION get_student_current_modules(TEXT);
 CREATE OR REPLACE FUNCTION get_student_current_modules(TEXT) 
-RETURNS TABLE(code TEXT, name TEXT, stude_year DATE, result INT) 
+RETURNS TABLE(code TEXT, name TEXT, study_year DATE, result INT) 
 AS $$
   SELECT module.code, module.name, student_modules.study_year, student_modules.result 
   FROM student_modules 
@@ -233,6 +233,18 @@ LANGUAGE SQL;
 
 -- CREATE OR REPLACE FUNCTION lorem() RETURNS TEXT AS $$
 -- LANGUAGE SQL;
+
+-- gets all the studetns enrolled on a module
+CREATE OR REPLACE FUNCTION get_module_students(TEXT) 
+RETURNS TABLE(id INT, username TEXT) 
+AS $$
+	SELECT student_modules.student_id, login_info.username FROM student_modules
+	INNER JOIN module ON module.code = student_modules.module_code
+	INNER JOIN student ON student.id = student_modules.student_id
+	INNER JOIN login_info ON login_info.id = student.id
+	WHERE module.code = $1
+	AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY') $$
+LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION lorem() RETURNS TEXT AS $$ 
 BEGIN 

@@ -41,6 +41,7 @@ class Tables extends Component {
   componentDidMount() {
     fetch('student', '/get/student/modules/now/')
       .then(e => {
+        console.log(e)
         this.tables["current"] = e.map(this.parseYear);
       })
       .catch(err => err.text().then(console.log));
@@ -60,8 +61,8 @@ class Tables extends Component {
     fetch('student', '/get/student/cwk/timetable/')
       .then(e => {
         e = e.map(elem => {
-          elem.deadline = new Date(elem.deadline).toLocaleString();
-          elem.posted_on = new Date(elem.posted_on).toLocaleString();
+          elem.deadline = new Date(elem.deadline).toDateString();
+          elem.posted_on = new Date(elem.posted_on).toDateString();
           return elem;
         });
         this.setState({ timetable: e });

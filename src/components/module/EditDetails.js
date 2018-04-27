@@ -31,22 +31,22 @@ class EditDetails extends PureComponent {
   }
 
   handleClick() {
-    const b = {
+    const data = {
       code: this.props.details.code,
       description: this.state.description,
       syllabus: this.state.syllabus,
       semester: parseInt(this.state.semester, 10),
       year_of_study: parseInt(this.state.year_of_study, 10),
-      credit: parseInt(this.state.credit)
+      credit: parseInt(this.state.credit, 10)
     };
 
     fetch('/update/module', {
       credentials: 'same-origin',
       method: "POST",
-      body: JSON.stringify(b)
+      body: JSON.stringify(data)
     }).then(res => {
       if (res.ok) {
-        this.props.cb(b);
+        this.props.cb(data);
         return;
       }
 

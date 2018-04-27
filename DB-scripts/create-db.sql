@@ -132,5 +132,18 @@ END;
 $$
 LANGUAGE plpgsql;
 
+-- Remove a students from a coursework once they are removed from the module 
+CREATE OR REPLACE FUNCTION coursework_remove_student() RETURNS TRIGGER AS $$ 
+BEGIN
+  DELETE FROM coursework_result
+  WHERE coursework_result.student_id = OLD.student_id;
+  RETURN NULL;
+END;
+$$
+LANGUAGE plpgsql;
+
 CREATE TRIGGER place_on_cwk AFTER INSERT ON student_modules
 FOR ROW EXECUTE PROCEDURE student_coursework();
+
+CREATE TRIGGER place_on_cwk AFTER DELETE ON student_modules
+FOR ROW EXECUTE PROCEDURE coursework_remove_student();

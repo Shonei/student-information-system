@@ -4,7 +4,8 @@ import (
 	"database/sql"
 )
 
-// DB is custom struct to abstract the database
+// DB is custom struct to abstract the database.
+// This way of declaration inherits all the methods defined on *sql.DB.
 type DB struct {
 	*sql.DB
 }
@@ -22,6 +23,8 @@ type SelectMulti interface {
 	SelectMulti(string, ...interface{}) ([]map[string]string, error)
 }
 
+// Execute is the database interface used for non select queries that
+// need to return any data.
 type Execute interface {
 	Execute(string, ...interface{}) error
 }

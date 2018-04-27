@@ -45,7 +45,6 @@ class Prerequisites extends PureComponent {
           prerequisites: this.state.prerequisite
         })
       }).then(res => {
-        console.log(res);
         if (!res.ok) {
           return res.text();
         } else {
@@ -58,6 +57,7 @@ class Prerequisites extends PureComponent {
     }
   }
 
+  // handles removing a prerequisite from a module
   handleRemove(code, pre) {
     fetch('/remove/prerequisite', {
       credentials: 'same-origin',
@@ -67,13 +67,14 @@ class Prerequisites extends PureComponent {
         to_be_removed: pre
       })
     }).then(res => {
-      console.log(res);
       if (!res.ok) {
         return res.text();
       } else { }
     });
   }
 
+  // creates a row for a prerequise
+  // it will have its code and name and a button to remove it if needed
   getRows(modules) {
     return modules.map(m => {
       return (

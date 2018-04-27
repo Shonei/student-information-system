@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { Grid, Row, Col } from 'react-flexbox-grid';
 import { Paper } from 'material-ui';
 import StudentList from './StudentList';
+import CourseworkTimetable from './CourseworkTimetable';
 
 class Coursewok extends PureComponent {
   constructor(props) {
@@ -50,26 +51,13 @@ class Coursewok extends PureComponent {
           <Col xs={1} />
         </Row>
         <br />
-        <Row start="xs">
-          <Col xs={1} />
-          <Col xs>
-            <h3>Deadline</h3>
-            <p>{new Date(this.state.deadline).toDateString()}</p>
-          </ Col>
-          <Col xs >
-            <h3>Posted on</h3>
-            <p>{new Date(this.state.posted_on).toDateString()}</p>
-          </Col>
-          <Col xs>
-            <h3>Marks</h3>
-            <p>{this.state.marks}</p>
-          </ Col>
-          <Col xs>
-            <h3>%</h3>
-            <p>{this.state.percentage}</p>
-          </ Col>
-          <Col xs={1} />
-        </Row>
+        <CourseworkTimetable 
+          deadline={this.state.deadline}
+          posted_on={this.state.posted_on}
+          marks={this.state.marks}
+          percentage={this.state.percentage}
+          code={this.state.id}
+        />
         <br />
         <Row start="xs">
           <Col xs>

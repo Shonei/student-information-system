@@ -16,6 +16,8 @@ class SearchBar extends Component {
 
   handleSearch(e) {
     e.preventDefault();
+    
+    // prevent empty search queries
     if (this.search.length === 0) {
       this.setState({ errorMessage: 'Can\'t search for empty values.' });
       return;
