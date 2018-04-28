@@ -67,6 +67,9 @@ func main() {
 	getModuleStudents := func(str string) ([]map[string]string, error) {
 		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_module_students($1);", str)
 	}
+	getModuleStaff := func(str string) ([]map[string]string, error) {
+		return dbc.RunMultyRowQuery(db, "SELECT * FROM get_module_staff($1);", str)
+	}
 	getModuleDetails := func(str string) (utils.Module, error) {
 		return dbc.GetModuleDetails(db, str)
 	}
@@ -120,6 +123,7 @@ func main() {
 	// ADD AUTH MIDLLEWARE
 	r.Handle("/get/module/{code}", hand.GetForModule(getModuleDetails)).Methods("GET")
 	r.Handle("/get/module/students/{code}", hand.GetForCode(getModuleStudents)).Methods("GET")
+	r.Handle("/get/module/staff/{code}", hand.GetForCode(getModuleStaff)).Methods("GET")
 	r.Handle("/get/cwk/{code}", hand.GetForCode(getCourseworkDetails)).Methods("GET")
 	r.Handle("/get/cwk/students/{code}", hand.GetForCode(getStudentsOnCwk)).Methods("GET")
 	r.Handle("/search/{query}", hand.GetSearch(search)).Methods("GET")

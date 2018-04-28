@@ -2,6 +2,7 @@ package dbc
 
 import (
 	"encoding/json"
+	"log"
 
 	"github.com/Shonei/student-information-system/go-packages/utils"
 )
@@ -218,8 +219,12 @@ func (t *AddTeachingStaff) Decode(d *json.Decoder) error {
 
 // Execute chacks the data and adds a member of staff to a module assigning it the given role.
 func (t *AddTeachingStaff) Execute(db utils.Execute) error {
+	log.Println("m - ", punctuationParser.MatchString(t.ModuleCode))
+	log.Println("s - ", punctuationParser.MatchString(t.StaffRole))
+
 	if !punctuationParser.MatchString(t.ModuleCode) ||
 		!punctuationParser.MatchString(t.StaffRole) {
+		log.Println("sldkjghsgdkflhjsdf")
 		return utils.ErrSuspiciousInput
 	}
 

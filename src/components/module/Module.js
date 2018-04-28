@@ -5,6 +5,7 @@ import CwkList from './CwkList';
 import Prerequisites from './Prerequisites';
 import ModuleDetails from './ModuleDetails';
 import EditDetails from './EditDetails';
+import Staff from './Staff';
 import { orange500 } from 'material-ui/styles/colors';
 
 class Module extends Component {
@@ -202,6 +203,10 @@ class Module extends Component {
               editing={this.state.editModuleDetails}
               details={details} />
         }
+        <br/>
+        <Staff
+          code={details.code}
+        ></Staff>
         <br />
         <Prerequisites
           moduleCode={this.state.code}

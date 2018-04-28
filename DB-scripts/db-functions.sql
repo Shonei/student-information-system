@@ -246,6 +246,16 @@ AS $$
 	AND to_char(student_modules.study_year, 'YYYY') = to_char(NOW(), 'YYYY') $$
 LANGUAGE SQL;
 
+-- returns all the staff members involved in a module
+CREATE OR REPLACE FUNCTION get_module_staff(TEXT) 
+RETURNS TABLE(id INT, role TEXT, name TEXT) 
+AS $$
+	SELECT teaching.staff_id, teaching.staff_role, make_name(staff.first_name, staff.middle_name, staff.last_name)
+	FROM teaching 
+	INNER JOIN staff ON staff.id = teaching.staff_id
+	WHERE teaching.module_code = $1 $$
+LANGUAGE SQL;
+
 CREATE OR REPLACE FUNCTION lorem() RETURNS TEXT AS $$ 
 BEGIN 
   RETURN 'Lorem ipsum dolor sit amet, tincidunt vel massa in eu fermentum, leo tortor nec, nec tellus ut dictum in et urna. Sollicitudin rhoncus mi eros mauris magna nisl, dis lorem tincidunt, maecenas nec vestibulum non at, posuere justo placerat velit sed. Et sapien a, mus feugiat nunc. In id vel, vitae ipsum vitae maecenas ante vel. Mi eu, non vulputate, urna facilisis volutpat, sed malesuada id adipiscing placerat posuere donec, iaculis natus rhoncus sed. Leo est ac proin nulla aliquam fermentum, amet donec ornare, a conubia semper, id montes tellus. Et sagittis risus, sollicitudin at sem risus, quis ultricies dictum et tempus, vestibulum augue velit vehicula nec, massa felis vel. Fames porta, ultrices urna etiam quis, in justo sit, proin ac nam, ipsum vitae. Sem augue wisi nec quam, nulla augue eros et egestas integer lectus.';

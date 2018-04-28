@@ -98,7 +98,7 @@ class StudentList extends Component {
                     hintText={'student ID'}
                     underlineStyle={this.underlineStyle}
                     onChange={(e, v) => {
-                      if (v.match(/^$|[0-9]/) != null) {
+                      if (v.match(/^$|^[0-9]*$/) != null) {
                         this.setState({ student: v });
                       }
                     }}
