@@ -15,7 +15,8 @@ class Student extends Component {
       email: '',
       entry_year: '',
       current_level: '',
-      id: ''
+      id: '',
+      error: ''
     };
   }
 
@@ -23,13 +24,14 @@ class Student extends Component {
     // get the student profile
     fetch('student', '/get/student/profile/')
       .then(j => this.setState(() => j))
-      .catch(console.log)
+      .catch(err => this.setState({error: 'Please reload the page and try again'}));
   }
 
   render() {
     return (
       <Grid fluid>
         <br />
+        <p>{this.state.error}</p>
         <Row center="xs">
           <Col xs={12} md={3}>
             <Avatar src="https://github.com/Shonei/student-information-system/blob/master/database.jpg?raw=true"

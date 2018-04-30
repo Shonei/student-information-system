@@ -3,7 +3,7 @@ import { Row, Col } from 'react-flexbox-grid';
 import { Divider, TextField, RaisedButton } from 'material-ui';
 import StudentRow from './StudentRow';
 import {
-  cyan900, cyan700
+  cyan900
 } from 'material-ui/styles/colors';
 
 class StudentList extends Component {

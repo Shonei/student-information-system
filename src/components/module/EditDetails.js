@@ -50,9 +50,8 @@ class EditDetails extends PureComponent {
         return;
       }
 
-      Promise.reject(res);
-    })
-      .catch(console.log);
+      return Promise.reject(res);
+    }).catch(err => this.setState({ error: 'We weren\'t able to update the module details.' }));
   }
 
   render() {
@@ -66,6 +65,7 @@ class EditDetails extends PureComponent {
               onClick={this.handleClick}
               primary={true}
               label={this.props.editing ? "Update" : "Edit module details"} />
+            <p>{this.state.error}</p>
           </ Col>
           <Col xs={1} />
         </Row>

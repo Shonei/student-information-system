@@ -149,12 +149,12 @@ func main() {
 	r.Handle("/ping", test())
 
 	// static file server
-	r.PathPrefix("/student").Handler(http.StripPrefix("/student", http.FileServer(http.Dir("build/")))).Methods("GET")
-	r.PathPrefix("/staff").Handler(http.StripPrefix("/staff", http.FileServer(http.Dir("build/")))).Methods("GET")
-	r.PathPrefix("/search").Handler(http.StripPrefix("/search", http.FileServer(http.Dir("build/")))).Methods("GET")
-	r.PathPrefix("/module").Handler(http.StripPrefix("/module", http.FileServer(http.Dir("build/")))).Methods("GET")
-	r.PathPrefix("/coursework").Handler(http.StripPrefix("/coursework", http.FileServer(http.Dir("build/")))).Methods("GET")
-	r.PathPrefix("/create/module").Handler(http.StripPrefix("/create/module", http.FileServer(http.Dir("build/")))).Methods("GET")
+	// r.PathPrefix("/student").Handler(http.StripPrefix("/student", http.FileServer(http.Dir("build/")))).Methods("GET")
+	// r.PathPrefix("/staff").Handler(http.StripPrefix("/staff", http.FileServer(http.Dir("build/")))).Methods("GET")
+	// r.PathPrefix("/search").Handler(http.StripPrefix("/search", http.FileServer(http.Dir("build/")))).Methods("GET")
+	// r.PathPrefix("/module").Handler(http.StripPrefix("/module", http.FileServer(http.Dir("build/")))).Methods("GET")
+	// r.PathPrefix("/coursework").Handler(http.StripPrefix("/coursework", http.FileServer(http.Dir("build/")))).Methods("GET")
+	// r.PathPrefix("/create/module").Handler(http.StripPrefix("/create/module", http.FileServer(http.Dir("build/")))).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("build/"))).Methods("GET")
 
 	// listen on the router
@@ -165,6 +165,6 @@ func main() {
 
 func test() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok ok"))
+		w.Write([]byte("Golang with hot reloadi"))
 	})
 }

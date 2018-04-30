@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { AppBar, FlatButton } from 'material-ui';
 import Student from './student/Student';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Login from './Login';
 import Staff from './staff/Staff';
 import Search from './staff/Search';
@@ -10,6 +10,8 @@ import Module from './module/Module';
 import Coursework from './coursework/Coursework';
 import CreateModule from './create-module/CreateModule';
 import StudentList from './module/students/StudentList';
+import ErrorBoundary from './ErrorBoundary';
+import Error404 from './404Error';
 
 const styles = {
   cursor: 'pointer',
@@ -63,18 +65,21 @@ class NavBar extends Component {
             onClick={this.handleLogoff} />}>
         </AppBar>
         {this.state.accessLevel > 1 ? <SearchBar></SearchBar> : <div />}
-        <Router>
-          <div>
-            <Route exact path="/" render={() => <Login></Login>} />
-            <Route exact path="/student" render={() => <Student></Student>} />
-            <Route exact path="/staff" render={() => <Staff></Staff>} />
-            <Route exact path="/search" render={() => <Search></Search>} />
-            <Route exact path="/module" render={() => <Module></Module>} />
-            <Route exact path="/coursework" render={() => <Coursework></Coursework>} />
-            <Route exact path="/create/module" render={() => <CreateModule></CreateModule>} />
-            <Route exact path="/module/students" render={() => <StudentList></StudentList>} />
-          </div>
-        </Router>
+        <ErrorBoundary>
+          <Router>
+            <Switch>
+              <Route exact path="/" render={() => <Login></Login>} />
+              <Route exact path="/student" render={() => <Student></Student>} />
+              <Route exact path="/staff" render={() => <Staff></Staff>} />
+              <Route exact path="/search" render={() => <Search></Search>} />
+              <Route exact path="/module" render={() => <Module></Module>} />
+              <Route exact path="/coursework" render={() => <Coursework></Coursework>} />
+              <Route exact path="/create/module" render={() => <CreateModule></CreateModule>} />
+              <Route exact path="/module/students" render={() => <StudentList></StudentList>} />
+              <Route component={Error404} />
+            </Switch>
+          </Router>
+        </ErrorBoundary>
       </div>
     );
   }

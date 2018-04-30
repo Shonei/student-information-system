@@ -10,7 +10,8 @@ class StudentList extends PureComponent {
     this.state = {
       studentList: [],
       editing: false,
-      cwkId: undefined
+      cwkId: undefined,
+      error: ''
     };
 
     this.edited = {};
@@ -31,11 +32,10 @@ class StudentList extends PureComponent {
       credentials: 'same-origin',
     }).then(e => e.json())
       .then(e => this.setState({ studentList: e }))
-      .catch(console.error)
+      .catch(err => this.setState({ error: 'Failed to load data. Reload page and try again.' }));
   }
 
   getStudentList(students, edit) {
-    console.log(edit)
     return students.map((student, index) => {
       return <StudentRow
         key={index}
@@ -79,7 +79,7 @@ class StudentList extends PureComponent {
         // We switch from editing mode and give them the option to edit the results again
         this.setState({ edit: false });
       }
-    }).catch(console.log)
+    }).catch(err => this.setState({ error: 'We failed to update the coursework results.' }));
   }
 
   updateStudentResults() {
@@ -90,7 +90,6 @@ class StudentList extends PureComponent {
         result: this.edited[key].result,
         handed_in: this.edited[key].handed_in
       };
-      console.log(data);
       this.doPost(data);
     });
 
@@ -104,6 +103,7 @@ class StudentList extends PureComponent {
           <Col xs={1} />
           <Col xs={10}>
             <h2>Students</h2>
+            <p>{this.state.error}</p>
             <Divider />
           </Col>
           <Col xs={1} />

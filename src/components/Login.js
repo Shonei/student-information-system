@@ -6,7 +6,7 @@ import { createHmac } from 'crypto';
 class Login extends Component {
   constructor(props) {
     super(props);
-
+// throw new Error('sdfsgf');
     this.state = {
       error: ''
     };
@@ -89,6 +89,8 @@ class Login extends Component {
   }
 
   render() {
+    // throw new Error('fail');
+    // return;
     return (
       <Grid fluid>
         <Row>

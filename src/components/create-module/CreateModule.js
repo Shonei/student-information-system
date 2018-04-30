@@ -45,7 +45,8 @@ class CreateModule extends Component {
         description: ''
       },
       // make copy of the object so we pass a new reference
-      cwks: [Object.assign({}, this.cwk)]
+      cwks: [Object.assign({}, this.cwk)],
+      error: ''
     };
 
     this.createCwkList = this.createCwkList.bind(this);
@@ -60,21 +61,19 @@ class CreateModule extends Component {
   }
 
   handleCreateModule() {
-    console.log(this.state);
     fetch('/add/module', {
       credentials: 'same-origin',
       method: "POST",
       body: JSON.stringify(this.state),
     })
-    .then(res => {
-      if(res.ok) {
-        window.sessionStorage.setItem('module', this.state.code);
-        window.location.href = '/module';
-      } else {
-        Promise.reject('creation failed');
-      }
-    })
-    .catch(console.log)
+      .then(res => {
+        if (res.ok) {
+          window.sessionStorage.setItem('module', this.state.code);
+          window.location.href = '/module';
+        } else {
+          Promise.reject('creation failed');
+        }
+      }).catch(err => this.setState({ error: 'Module creation failed. Check if all fields are correct.' }));
   }
 
   createCwkList(number) {
@@ -100,7 +99,6 @@ class CreateModule extends Component {
 
   onCwkIdChange(i, v) {
     this.setState(p => {
-      console.log(i);
       p.cwks[i].id = parseInt(v, 10);
       return p;
     });
@@ -154,6 +152,7 @@ class CreateModule extends Component {
         <Row center="xs">
           <Col xs={12}>
             <h2>Create new module</h2>
+            <p>{this.state.error}</p>
           </Col>
         </Row>
         <Row center="xs">
@@ -233,7 +232,7 @@ class CreateModule extends Component {
               underlineStyle={this.underlineStyle}
               onChange={(e, v) => {
                 const s = parseInt(v, 10);
-                if(s !== 1 && s !== 2) {
+                if (s !== 1 && s !== 2) {
                   return;
                 }
                 this.setState({ semester: s });
@@ -251,8 +250,7 @@ class CreateModule extends Component {
               underlineStyle={this.underlineStyle}
               onChange={(e, v) => {
                 const year = parseInt(v, 10);
-                console.log(year);
-                if(year < 0 || year > 6) {
+                if (year < 0 || year > 6) {
                   return;
                 }
                 this.setState({ year_of_study: year });
@@ -269,7 +267,7 @@ class CreateModule extends Component {
               floatingLabelFocusStyle={this.hintStyle}
               underlineStyle={this.underlineStyle}
               onChange={(e, v) => {
-                if(v < 0) {
+                if (v < 0) {
                   // module can't have negative cradits
                   return;
                 }

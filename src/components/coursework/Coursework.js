@@ -17,6 +17,7 @@ class Coursewok extends PureComponent {
       module_code: '',
       deadline: '',
       posted_on: '',
+      error: ''
     };
 
   }
@@ -29,7 +30,7 @@ class Coursewok extends PureComponent {
       credentials: 'same-origin',
     }).then(e => e.json())
       .then(e => this.setState(() => e[0]))
-      .catch(console.error)
+      .catch(err => this.setState({ error: 'Failed to load data. Reload page and try again.' }));
   }
 
   render() {
@@ -38,6 +39,7 @@ class Coursewok extends PureComponent {
         <Row center="xs">
           <Col xs={12}>
             <h2>{this.state.id} {this.state.name}</h2>
+            <p>{this.state.error}</p>
           </Col>
         </Row>
         <Row>
@@ -51,7 +53,7 @@ class Coursewok extends PureComponent {
           <Col xs={1} />
         </Row>
         <br />
-        <CourseworkTimetable 
+        <CourseworkTimetable
           deadline={this.state.deadline}
           posted_on={this.state.posted_on}
           marks={this.state.marks}

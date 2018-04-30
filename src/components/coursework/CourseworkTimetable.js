@@ -3,7 +3,7 @@ import { Row, Col } from 'react-flexbox-grid';
 import PropTypes from 'prop-types';
 import { RaisedButton, TextField } from 'material-ui';
 import {
-  cyan900, cyan700
+  cyan900
 } from 'material-ui/styles/colors';
 
 class CourseworkTimetable extends Component {

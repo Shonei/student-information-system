@@ -9,7 +9,8 @@ class Tables extends Component {
 
     this.state = {
       value: 'current',
-      timetable: []
+      timetable: [],
+      error: ''
     };
 
     this.tables = {
@@ -41,22 +42,21 @@ class Tables extends Component {
   componentDidMount() {
     fetch('student', '/get/student/modules/now/')
       .then(e => {
-        console.log(e)
         this.tables["current"] = e.map(this.parseYear);
       })
-      .catch(err => err.text().then(console.log));
+      .catch(err => this.setState({ error: 'Failed to load data. Reload pageand try again.' }));
 
     fetch('student', '/get/student/modules/past/')
       .then(e => {
         this.tables["past"] = e.map(this.parseYear);
       })
-      .catch(err => err.text().then(console.log));
+      .catch(err => this.setState({ error: 'Failed to load data. Reload pageand try again.' }));
 
     fetch('student', '/get/student/cwk/results/')
       .then(e => {
         this.tables["cwk"] = e.map(this.parseYear);
       })
-      .catch(err => err.text().then(console.log));
+      .catch(err => this.setState({ error: 'Failed to load data. Reload pageand try again.' }));
 
     fetch('student', '/get/student/cwk/timetable/')
       .then(e => {
@@ -67,12 +67,13 @@ class Tables extends Component {
         });
         this.setState({ timetable: e });
       })
-      .catch(err => err.text().then(console.log));
+      .catch(err => this.setState({ error: 'Failed to load data. Reload pageand try again.' }));
   }
 
   render() {
     return (
       <div>
+        <p>{this.state.error}</p>
         <br />
         <Tabs
           value={this.state.value}

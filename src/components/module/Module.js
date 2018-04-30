@@ -42,7 +42,6 @@ class Module extends Component {
       credentials: 'same-origin',
     }).then(e => e.json())
       .then(m => this.setState(() => {
-        console.log(m);
 
         // the module might not have an exam assotiated with it
         if (m.exam) {
@@ -67,7 +66,7 @@ class Module extends Component {
       // We switch from editing mode and give them the option to edit the results again
       data.type = type;
       return Promise.resolve(data);
-    });
+    }).catch(err => this.setState({ error: 'Couldn\'t load data. Try again later.' }));
   }
 
   handleClick() {
@@ -108,8 +107,7 @@ class Module extends Component {
               }
             }
           });
-        })
-        .catch(console.error);
+        }).catch(err => this.setState({ error: 'Updating data failed. Try again later.' }));
     }
     this.setState(prev => ({ editing: !prev.editing }));
   }
@@ -192,6 +190,7 @@ class Module extends Component {
 
     return (
       <Grid fluid>
+      <p>{this.state.error}</p>
         {
           this.state.editModuleDetails
             ? <EditDetails
@@ -203,7 +202,7 @@ class Module extends Component {
               editing={this.state.editModuleDetails}
               details={details} />
         }
-        <br/>
+        <br />
         <Staff
           code={details.code}
         ></Staff>
@@ -263,8 +262,8 @@ class Module extends Component {
         <Row start="xs" around="xs">
           <Col xs={1} />
           <Col xs>
-          <Divider />
-          <br/>
+            <Divider />
+            <br />
             <RaisedButton
               style={{ cursor: "pointer" }}
               onClick={() => window.location.href = 'module/students'}

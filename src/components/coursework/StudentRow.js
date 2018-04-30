@@ -17,12 +17,12 @@ class StudentRow extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props);
     // we copy the props onto the state so we can edit it freely
     this.setState({ result: this.props.student.result });
     this.setState({ handed_in: this.props.student.handed_in });
   }
 
+  // UNUSED FUNCTION
   handleUpdateCwkResult() {
     // The data the server needs to update the coursework results
     let data = {
@@ -84,7 +84,7 @@ class StudentRow extends Component {
                 if (v < 0) {
                   return;
                 }
-                this.setState({ result: v })
+                this.setState({ result: v });
                 this.props.onResultChange(this.props.student.student_id, v);
               }}
               value={this.state.result}

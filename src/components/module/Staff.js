@@ -23,7 +23,8 @@ class Staff extends Component {
       editing: false,
       staff: [],
       newStaff: '',
-      role: 'leading'
+      role: 'leading',
+      error: ''
     };
 
     this.handleClick = this.handleClick.bind(this);
@@ -40,7 +41,7 @@ class Staff extends Component {
         return res.json();
       })
       .then(data => this.setState({ staff: data }))
-      .catch(err => console.log(err));
+      .catch(err => this.setState({ error: 'Failed to load data. Reload pageand try again.' }));
   }
 
   handleClick() {
@@ -66,7 +67,7 @@ class Staff extends Component {
         }
 
         window.location.reload();
-      }).catch(err => console.log(err));
+      }).catch(err => this.setState({ error: 'Failed to add new staff member. Make sure the ID is correct.' }));
     }
   }
 
@@ -88,7 +89,7 @@ class Staff extends Component {
         prev.staff.splice(index, 1);
         return prev;
       });
-    }).catch(err => console.log(err));
+    }).catch(err => this.setState({ error: 'Failed to remove staff member. Try again in a few minutes.' }));
   }
 
   // creates a row for a prerequise
@@ -167,6 +168,7 @@ class Staff extends Component {
               </ Col>
             </Row>
             <br />
+            <p>{this.state.error}</p>
             <Divider />
             <Row>
               <Col xs>
