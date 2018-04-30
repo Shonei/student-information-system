@@ -41,8 +41,3 @@ All scripts that are needed to create the database are lacated in DB-scrippts.
 - To put data in the database run `node populate-db.js`. This will create fake data using fakerjs. All the users will have the username `shyl0-15` and password `password`.
 
 - Alternatively you can use the  insert-into-db.sql script that will put predefined data into your database.
-
-
-## TODO
-- STOP JUST CONSOL LOGGING ERRORS
-- Module prerequisite not displayed after successful add
