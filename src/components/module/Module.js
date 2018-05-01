@@ -22,7 +22,8 @@ class Module extends Component {
       cwks: [],
       prerequisites: [],
       editing: false,
-      editModuleDetails: false
+      editModuleDetails: false,
+      accessLevel: window.sessionStorage.getItem('access_level')
     };
 
     this.updateCwks = {};
@@ -190,7 +191,7 @@ class Module extends Component {
 
     return (
       <Grid fluid>
-      <p>{this.state.error}</p>
+        <p>{this.state.error}</p>
         {
           this.state.editModuleDetails
             ? <EditDetails
@@ -219,11 +220,14 @@ class Module extends Component {
                 <h2>Assesment:</h2>
               </Col>
               <Col xs>
-                <RaisedButton
-                  style={{ cursor: "pointer" }}
-                  onClick={this.handleClick}
-                  primary={true}
-                  label={this.state.editing ? "Update" : "Edit %"} />
+                {this.state.accessLevel === '3' ?
+                  <RaisedButton
+                    style={{ cursor: "pointer" }}
+                    onClick={this.handleClick}
+                    primary={true}
+                    label={this.state.editing ? "Update" : "Edit %"} /> :
+                  <div></div>
+                }
               </ Col>
             </Row>
             <Divider />

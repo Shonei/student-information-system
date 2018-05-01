@@ -20,7 +20,8 @@ class Prerequisites extends PureComponent {
 
     this.state = {
       editing: false,
-      prerequisite: ''
+      prerequisite: '',
+      accessLevel: window.sessionStorage.getItem('access_level')
     };
 
     this.handleClick = this.handleClick.bind(this);
@@ -66,7 +67,7 @@ class Prerequisites extends PureComponent {
     }).then(res => {
       if (!res.ok) {
         return res.text();
-      } 
+      }
 
       window.location.reload();
     });
@@ -82,14 +83,17 @@ class Prerequisites extends PureComponent {
             <p>{m.code}</p>
           </Col>
           <Col xs >
-            <p>{m.Name}</p>
+            <p>{m.name}</p>
           </Col>
           <Col xs>
-            <RaisedButton
-              style={{ cursor: "pointer" }}
-              onClick={() => this.handleRemove(this.props.moduleCode, m.code)}
-              primary={true}
-              label={"Remove prerequisite"} />
+            {this.state.accessLevel === '3' ?
+              <RaisedButton
+                style={{ cursor: "pointer" }}
+                onClick={() => this.handleRemove(this.props.moduleCode, m.code)}
+                primary={true}
+                label={"Remove prerequisite"} /> :
+              <div></div>
+            }
           </ Col>
         </Row>);
     });
@@ -107,11 +111,14 @@ class Prerequisites extends PureComponent {
                 <h2>Prerequisites:</h2>
               </Col>
               <Col xs>
-                <RaisedButton
-                  style={{ cursor: "pointer" }}
-                  onClick={this.handleClick}
-                  primary={true}
-                  label={this.state.editing ? "Add" : "Add prerequisite"} />
+                {this.state.accessLevel === '3' ?
+                  <RaisedButton
+                    style={{ cursor: "pointer" }}
+                    onClick={this.handleClick}
+                    primary={true}
+                    label={this.state.editing ? "Add" : "Add prerequisite"} /> :
+                  <div></div>
+                }
               </ Col>
               <Col xs>
                 {this.state.editing ?

@@ -17,7 +17,7 @@ afterAll(() => {
 });
 
 describe('Creates new module', () => {
-  const user = 'shyl3';
+  const user = 'shyl4';
   let testCookie;
 
   beforeAll(async () => {

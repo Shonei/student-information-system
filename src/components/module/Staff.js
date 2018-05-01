@@ -24,7 +24,8 @@ class Staff extends Component {
       staff: [],
       newStaff: '',
       role: 'leading',
-      error: ''
+      error: '',
+      accessLevel: window.sessionStorage.getItem('access_level')
     };
 
     this.handleClick = this.handleClick.bind(this);
@@ -33,7 +34,7 @@ class Staff extends Component {
   }
 
   componentDidMount() {
-    fetch('/get/module/staff/' + this.code)
+    fetch('/get/module/staff/' + this.code, { credentials: 'same-origin' })
       .then(res => {
         if (!res.ok) {
           return Promise.reject(res);
@@ -108,11 +109,14 @@ class Staff extends Component {
             <p>{val.role}</p>
           </Col>
           <Col xs>
+          {this.state.accessLevel === '3' ?
             <RaisedButton
-              style={{ cursor: "pointer" }}
-              onClick={() => this.handleRemove(val.id, i)}
-              primary={true}
-              label={"Remove staff"} />
+            style={{ cursor: "pointer" }}
+            onClick={() => this.handleRemove(val.id, i)}
+            primary={true}
+            label={"Remove staff"} /> : 
+            <div></div>
+          }
           </ Col>
         </Row>);
     });
@@ -130,11 +134,14 @@ class Staff extends Component {
                 <h2>Staff members:</h2>
               </Col>
               <Col xs>
-                <RaisedButton
-                  style={{ cursor: "pointer" }}
-                  onClick={this.handleClick}
-                  primary={true}
-                  label={this.state.editing ? "Add" : "Add staff member"} />
+                {this.state.accessLevel === '3' ?
+                  <RaisedButton
+                    style={{ cursor: "pointer" }}
+                    onClick={this.handleClick}
+                    primary={true}
+                    label={this.state.editing ? "Add" : "Add staff member"} /> :
+                  <div></div>
+                }
               </ Col>
               <Col xs>
                 {this.state.editing ?

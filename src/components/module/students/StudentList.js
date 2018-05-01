@@ -25,7 +25,7 @@ class StudentList extends Component {
   }
 
   componentDidMount() {
-    fetch('/get/module/students/' + this.state.code)
+    fetch('/get/module/students/' + this.state.code, { credentials: 'same-origin' })
       .then(res => {
         if (!res.ok) {
           this.setState({ error: 'We weren\'t able to retrieve the student listenerCount.' });

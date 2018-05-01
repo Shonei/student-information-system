@@ -145,5 +145,5 @@ LANGUAGE plpgsql;
 CREATE TRIGGER place_on_cwk AFTER INSERT ON student_modules
 FOR ROW EXECUTE PROCEDURE student_coursework();
 
-CREATE TRIGGER place_on_cwk AFTER DELETE ON student_modules
+CREATE TRIGGER cwk_remove_student AFTER DELETE ON student_modules
 FOR ROW EXECUTE PROCEDURE coursework_remove_student();

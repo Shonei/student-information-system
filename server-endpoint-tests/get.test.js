@@ -762,7 +762,7 @@ describe('Tests the /get/module/{code} endpoint', () => {
       return res.json();
     }).then(data => {
       expect(typeof data).toBe('object');
-      expect(data).toEqual({});
+      expect(data).toEqual({ "prerequisites": null });
     });
   });
 });

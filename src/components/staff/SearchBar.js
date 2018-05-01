@@ -7,7 +7,8 @@ class SearchBar extends Component {
     super(props);
 
     this.state = {
-      errorMessage: ''
+      errorMessage: '',
+      accessLevel: window.sessionStorage.getItem('access_level')
     };
 
     this.search = '';
@@ -16,7 +17,7 @@ class SearchBar extends Component {
 
   handleSearch(e) {
     e.preventDefault();
-    
+
     // prevent empty search queries
     if (this.search.length === 0) {
       this.setState({ errorMessage: 'Can\'t search for empty values.' });
@@ -42,14 +43,15 @@ class SearchBar extends Component {
       <Grid fluid>
         <Row end="xs" around="xs">
           <Col xs={6} >
-            <RaisedButton
-              label="Create Module"
-              primary={true}
-              style={{ margin: 12 }}
-              onClick={() => {
-                window.location.href = '\\create\\module';
-              }}
-            />
+            {this.state.accessLevel === '3' ?
+              <RaisedButton
+                label="Create Module"
+                primary={true}
+                style={{ margin: 12 }}
+                onClick={() => {
+                  window.location.href = '\\create\\module';
+                }}
+              /> : <div></div>}
           </Col>
           <Col xs={6} >
             <TextField

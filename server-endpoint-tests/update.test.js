@@ -19,7 +19,7 @@ afterAll(() => {
 describe('Updates a cwk results', () => {
   const id = 21939;
   const student_id = 44148;
-  const user = 'shyl3';
+  const user = 'shyl4';
   let testCookie;
 
   beforeAll(async () => {
@@ -78,7 +78,7 @@ describe('Updates a cwk results', () => {
     });
   });
 
-  it('Fails to update cwk result with wring id', () => {
+  it('Fails to update cwk result with wrong id', () => {
     expect.assertions(4);
     return fetch('http://localhost:54656/update/cwk/results', {
       credentials: 'same-origin',
@@ -93,7 +93,7 @@ describe('Updates a cwk results', () => {
         cookie: testCookie,
       }
     }).then(res => {
-      expect(res.ok).toBe(true);
+      expect(res.ok).toBe(false);
       return client.query('SELECT result, handed_in FROM coursework_result WHERE coursework_id = $1 AND student_id = $2', [id, student_id])
         .then(data => {
           expect(data.rows.length).toBe(1);
@@ -154,11 +154,11 @@ describe('Updates exam percentage', () => {
         cookie: testCookie,
       }
     }).then(res => {
-      expect(res.ok).toBe(true);
+      expect(res.ok).toBe(false);
       return client.query('SELECT percentage FROM exam WHERE code = $1', [code])
         .then(data => {
           expect(data.rows.length).toBe(1);
-          expect(data.rows[0].percentage).toEqual(66);
+          expect(data.rows[0].percentage).toEqual(75);
         });
     });
   });
@@ -180,7 +180,7 @@ describe('Updates exam percentage', () => {
       return client.query('SELECT percentage FROM exam WHERE code = $1', [code])
         .then(data => {
           expect(data.rows.length).toBe(1);
-          expect(data.rows[0].percentage).toEqual(66);
+          expect(data.rows[0].percentage).toEqual(75);
         });
     });
   });
@@ -198,11 +198,11 @@ describe('Updates exam percentage', () => {
         cookie: testCookie,
       }
     }).then(res => {
-      expect(res.ok).toBe(true);
+      expect(res.ok).toBe(false);
       return client.query('SELECT percentage FROM exam WHERE code = $1', [code])
         .then(data => {
           expect(data.rows.length).toBe(1);
-          expect(data.rows[0].percentage).toEqual(66);
+          expect(data.rows[0].percentage).toEqual(75);
         });
     });
   });
@@ -259,12 +259,12 @@ describe('Updates cwk percentage and marks', () => {
         cookie: testCookie,
       }
     }).then(res => {
-      expect(res.ok).toBe(true);
+      expect(res.ok).toBe(false);
       return client.query('SELECT percentage, marks FROM coursework WHERE id = $1', [cwk_id])
         .then(data => {
           expect(data.rows.length).toBe(1);
-          expect(data.rows[0].percentage).toEqual(66);
-          expect(data.rows[0].marks).toEqual(76);
+          expect(data.rows[0].percentage).toEqual(10);
+          expect(data.rows[0].marks).toEqual(100);
         });
     });
   });
@@ -287,8 +287,8 @@ describe('Updates cwk percentage and marks', () => {
       return client.query('SELECT percentage, marks FROM coursework WHERE id = $1', [cwk_id])
         .then(data => {
           expect(data.rows.length).toBe(1);
-          expect(data.rows[0].percentage).toEqual(66);
-          expect(data.rows[0].marks).toEqual(76);
+          expect(data.rows[0].percentage).toEqual(10);
+          expect(data.rows[0].marks).toEqual(100);
         });
     });
   });
