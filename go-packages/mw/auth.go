@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 
@@ -21,6 +22,15 @@ type customToken struct {
 
 var errTokenExpired = errors.New("jwt expired")
 var errInvalidToken = errors.New("the jwt is not valid")
+
+var mySecret = func() []byte {
+	secret := os.Getenv("SECRET")
+	if len(secret) == 0 {
+		panic("Missing secret key.")
+	}
+
+	return []byte(secret)
+}()
 
 // BasicAuth is the authorization middleware for get routes that provide information
 // about a specific student. It will make sure that the studetn can only view their own results
@@ -92,7 +102,7 @@ func validateJWT(token string) (customToken, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte("AllYourBase"), nil
+		return mySecret, nil
 	})
 
 	if err != nil {

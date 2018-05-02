@@ -39,7 +39,7 @@ describe('Tests the whole authentication process', () => {
         });
       }).then(res => res.json())
       .then(data => {
-        expect(data.token.length).toEqual(208);
+        expect(data.token.length).toEqual(207);
         expect(data.level).toEqual('1');
       });
   });

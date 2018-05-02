@@ -3,6 +3,7 @@ package dbc
 import (
 	"encoding/json"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 	"time"
@@ -14,6 +15,15 @@ import (
 
 // Used to validate all the username that will be used when accessing the DB
 var basicParser = regexp.MustCompile("^[a-zA-Z0-9]+$")
+
+var mySigningKey = func() []byte {
+	secret := os.Getenv("SECRET")
+	if len(secret) == 0 {
+		panic("Missing secret key.")
+	}
+
+	return []byte(secret)
+}()
 
 // the custom claims created in the JWT token
 // those are the clasim expected by the authentication middleware
@@ -49,8 +59,6 @@ func GenAuthToken(db utils.Select, user, hash string) (map[string]string, error)
 		return nil, utils.ErrUnothorized
 	}
 
-	mySigningKey := []byte("AllYourBase")
-
 	lvl, err := strconv.Atoi(level)
 	if err != nil {
 		return nil, err
@@ -61,12 +69,16 @@ func GenAuthToken(db utils.Select, user, hash string) (map[string]string, error)
 		user, lvl,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(2 * time.Hour).Unix(),
-			Issuer:    "test",
+			Issuer:    "SIS",
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	ss, err := token.SignedString(mySigningKey)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
 
 	j := map[string]string{"token": ss, "level": level}
 
