@@ -4,7 +4,7 @@
   "private": true,
   "proxy": "http://localhost:54656/",
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^5.0.0",
     "crypto": "^1.0.1",
     "draft-js": "^0.10.5",
     "faker": "^4.1.0",
